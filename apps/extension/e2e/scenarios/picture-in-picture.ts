@@ -4,6 +4,7 @@ import { fixtureLoggedInLiveChatUrl } from '../support/live-chat-fixture';
 import { openChatEnhancerMenu } from '../support/menu-openers';
 import { NORMAL_CHAT_MESSAGE_SELECTOR } from '../support/chat-surface';
 import { openLiveChat, startVideoPlaybackIfPaused } from '../support/youtube-page';
+import { getExtensionId } from '../support/extension';
 
 export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, context, chat }) => {
   await runPictureInPictureLiveScenario({ page, context, chat }, false);
@@ -204,6 +205,32 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
     (element as HTMLElement).style.minHeight = '0';
   });
   await chat.locator('#input[contenteditable]').fill('Unsent before PiP');
+  const originalInput = await chat.locator('#input[contenteditable]').evaluateHandle((element) => element);
+  const originalPlayer = await page.locator('#movie_player').evaluateHandle((element) => element);
+  const instance = await chat.locator('html').getAttribute('data-ytcq-content-instance');
+  const extensionId = await getExtensionId(context);
+  const extensions = await context.newPage();
+  try {
+    // Use Chrome's real Reload control. Command-line test installs otherwise
+    // become disabled on reload when Developer mode has never been enabled.
+    await extensions.goto('chrome://extensions');
+    const developerMode = extensions.locator('extensions-toolbar #devMode');
+    if (!(await developerMode.evaluate((toggle) => (toggle as HTMLElement & { checked: boolean }).checked))) {
+      await developerMode.click();
+    }
+    await extensions.locator(`extensions-item[id="${extensionId}"] #dev-reload-button`).click();
+  } finally {
+    await extensions.close();
+    await page.bringToFront();
+  }
+  await expect(chat.locator('html')).not.toHaveAttribute('data-ytcq-content-instance', instance!);
+  await expect(chat.locator('.ytcq-inbox-button')).toBeVisible();
+  await expect(chat.locator('#input[contenteditable]')).toHaveText('Unsent before PiP');
+  expect(await originalInput.evaluate((element) => element.isConnected)).toBe(true);
+  await originalInput.dispose();
+  expect(await originalPlayer.evaluate((element) => document.querySelector('#movie_player') === element)).toBe(true);
+  await originalPlayer.dispose();
+  await expect(page.locator('#movie_player video')).toHaveJSProperty('paused', false);
   const menu = await openChatEnhancerMenu(chat);
   const pipOpened = context.waitForEvent('page');
   await menu.locator('[data-ytcq-action="picture-in-picture"]').click();

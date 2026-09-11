@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "이 브라우저 또는 채팅 창에서는 사용할 수 없습니다.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "참여자",
     "onboardingMenuTimestamps": "타임스탬프",

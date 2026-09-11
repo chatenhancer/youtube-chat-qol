@@ -27,6 +27,17 @@ chrome.runtime.onConnect.addListener((port) => {
 
   addActiveChatPort(tabId, port);
 
+  // The chat frame reconnects after an extension reload, but its owning page
+  // can retain an invalid PiP controller. Reinjection preserves healthy ones.
+  if (typeof port.sender?.frameId === 'number' && port.sender.frameId > 0) {
+    void chrome.scripting?.executeScript({
+      target: { tabId, frameIds: [0] },
+      files: ['watch-page.js']
+    }).catch(() => {
+      // The owning tab may have closed or navigated outside our site access.
+    });
+  }
+
   const handleMessage = (message: ActiveChatKeepAliveMessage) => {
     if (message?.type !== ACTIVE_CHAT_PING_TYPE) return;
     // Receiving the ping is enough to keep the event-driven service worker busy.

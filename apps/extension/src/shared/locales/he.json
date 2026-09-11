@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "לא זמין בדפדפן או בחלון הצ'אט הזה.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "משתתפים",
     "onboardingMenuTimestamps": "חותמות זמן",

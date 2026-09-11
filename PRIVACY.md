@@ -1,6 +1,6 @@
 # Privacy
 
-Last updated: July 24, 2026
+Last updated: September 11, 2026
 
 Chat Enhancer for YouTube is a browser extension for YouTube live chat. It is designed to add small chat features without replacing YouTube chat or collecting analytics.
 
@@ -14,11 +14,13 @@ The short version:
 
 ## Where the extension runs
 
-The extension runs only on YouTube live chat and live chat replay pages that the extension is allowed to access.
+The extension runs on YouTube live chat and live chat replay pages. It also runs on YouTube pages to support video + chat picture-in-picture.
 
 The extension uses permission to save its own settings and data in your browser. It also uses access to the specific websites needed for its features to work: YouTube live chat pages, Google Translate's translation service, and the opt-in Chat Enhancer Playground game server.
 
-The extension does not request general browsing-history, tab-reading, scripting, or web-navigation permissions.
+In Chrome and Edge, the `scripting` permission reconnects video + chat picture-in-picture after an extension reload or update without refreshing the YouTube tab. The extension does not request general browsing-history, tab-reading, or web-navigation permissions.
+
+This permission also lets the extension attach to YouTube chats that are already open when you install or enable it.
 
 ## Data stored in your browser
 

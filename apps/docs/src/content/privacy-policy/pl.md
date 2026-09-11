@@ -6,7 +6,7 @@ description: "Jak Chat Enhancer for YouTube obsługuje lokalne przechowywanie, t
 
 # Prywatność
 
-Ostatnia aktualizacja: 24 lipca 2026
+Ostatnia aktualizacja: 11 września 2026
 
 Chat Enhancer for YouTube to rozszerzenie przeglądarki dla czatu na żywo YouTube. Zostało zaprojektowane, aby dodawać drobne funkcje czatu bez zastępowania czatu YouTube ani zbierania analityki.
 
@@ -20,11 +20,13 @@ W skrócie:
 
 ## Gdzie działa rozszerzenie
 
-Rozszerzenie działa tylko na stronach czatu na żywo YouTube i powtórek czatu na żywo, do których rozszerzenie ma pozwolenie na dostęp.
+Rozszerzenie działa na stronach czatu na żywo YouTube i powtórek czatu na żywo. Działa też na stronach YouTube, aby obsługiwać tryb obrazu w obrazie z filmem i czatem.
 
 Rozszerzenie używa uprawnienia do zapisywania własnych ustawień i danych w Twojej przeglądarce. Używa też dostępu do konkretnych witryn potrzebnych do działania funkcji: stron czatu na żywo YouTube, usługi tłumaczenia Google Translate oraz opcjonalnego serwera gier Chat Enhancer Playground.
 
-Rozszerzenie nie prosi o ogólne uprawnienia do historii przeglądania, czytania kart, skryptów ani nawigacji internetowej.
+W Chrome i Edge uprawnienie `scripting` przywraca połączenie trybu obrazu w obrazie z filmem i czatem po ponownym załadowaniu lub aktualizacji rozszerzenia, bez odświeżania karty YouTube. Rozszerzenie nie prosi o ogólne uprawnienia do historii przeglądania, czytania kart ani nawigacji internetowej.
+
+To uprawnienie pozwala też rozszerzeniu łączyć się z czatami YouTube, które są już otwarte w chwili jego instalacji lub włączenia.
 
 ## Dane przechowywane w Twojej przeglądarce
 

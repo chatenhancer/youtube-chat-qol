@@ -311,14 +311,30 @@
 }
 
 .ytcq-lite-message #author-name.ytcq-lite-author-name.owner {
-  border-radius: 2px;
+  border-radius: 8px;
   padding: 2px 4px;
-  color: var(--yt-live-chat-owner-text-color, rgba(0, 0, 0, 0.87));
-  background: var(--yt-live-chat-owner-background-color, #ffd600);
+  line-height: normal;
+  color: var(
+    --yt-sys-color-baseline--text-primary-inverse,
+    var(--yt-live-chat-author-chip-owner-text-color, rgba(0, 0, 0, 0.87))
+  );
+  background: var(
+    --yt-sys-color-baseline--text-primary,
+    var(--yt-live-chat-author-chip-owner-background-color, #ffd600)
+  );
+}
+
+.ytcq-lite-author-name.owner .ytcq-lite-author-chip-badges {
+  display: inline;
+  margin: 0;
+  overflow: visible;
 }
 
 .ytcq-lite-author-name.owner .ytcq-lite-author-badge {
+  display: inline-block;
+  margin: 0 -2px 0 2px;
   color: inherit;
+  vertical-align: sub;
 }
 
 .ytcq-lite-author-name:hover,

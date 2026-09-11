@@ -3,17 +3,17 @@
  * live chat frame is open. This helps Chrome defer extension updates until the
  * user leaves chat, instead of invalidating the content script mid-stream.
  */
-import { findChatInput, getChatInputText, replaceChatInput } from '../youtube/chat-input';
+import { restoreReconnectDraft, saveReconnectDraft } from '../youtube/reconnect-draft';
 import { hideEnhancedEffect } from './enhanced-effect';
 import { registerFeature, suspendFeatures } from '../content/dispatcher';
+import { CONTENT_INSTANCE_ATTRIBUTE, CONTENT_REATTACHMENT_ATTRIBUTE } from '../shared/content-instance';
 
 const ACTIVE_CHAT_PORT_NAME = 'ytcq:active-chat';
 const ACTIVE_CHAT_PING_TYPE = 'ytcq:active-chat-ping';
 const ACTIVE_CHAT_PING_INTERVAL_MS = 25_000;
 const ACTIVE_CHAT_RECONNECT_DELAY_MS = 250;
-const RECONNECT_DRAFT_STORAGE_KEY = 'ytcqReconnectDraft';
+const ACTIVE_CHAT_RELOAD_DELAY_MS = 5_000;
 const RECONNECT_ANCHOR_CLASS = 'ytcq-reconnect-anchor';
-const DRAFT_RESTORE_DELAYS_MS = [300, 800, 1500, 3000, 5000];
 
 let keepAlivePort: chrome.runtime.Port | null = null;
 let keepAliveTimer = 0;
@@ -21,11 +21,6 @@ let reconnectTimer = 0;
 let reconnectPending = false;
 let reloadPending = false;
 let keepAliveStopped = false;
-
-interface ReconnectDraft {
-  text: string;
-  url: string;
-}
 
 registerFeature({
   page: {
@@ -109,8 +104,26 @@ function scheduleActiveChatReconnect(): void {
 
   reconnectTimer = window.setTimeout(() => {
     reconnectTimer = 0;
+    if (document.visibilityState === 'hidden') return;
     if (connectActiveChatPort()) return;
-    reloadDisconnectedChat();
+
+    const instance = document.documentElement.getAttribute(CONTENT_INSTANCE_ATTRIBUTE);
+    if (!instance || document.documentElement.getAttribute(CONTENT_REATTACHMENT_ATTRIBUTE) !== instance) {
+      // Disabling the extension starts no replacement. Restore native chat
+      // promptly, including a feed discarded by Lite mode and injected styles.
+      reloadDisconnectedChat();
+      return;
+    }
+
+    // Only wait when the new background has announced an actual handoff.
+    // The replacement's normal cleanup cancels this fallback.
+    reconnectTimer = window.setTimeout(() => {
+      reconnectTimer = 0;
+      if (document.documentElement.getAttribute(CONTENT_INSTANCE_ATTRIBUTE) !== instance) return;
+      if (document.visibilityState === 'hidden') return;
+      if (connectActiveChatPort()) return;
+      reloadDisconnectedChat();
+    }, ACTIVE_CHAT_RELOAD_DELAY_MS);
   }, ACTIVE_CHAT_RECONNECT_DELAY_MS);
 }
 
@@ -141,77 +154,4 @@ function clearReconnectTimer(): void {
   if (!reconnectTimer) return;
   window.clearTimeout(reconnectTimer);
   reconnectTimer = 0;
-}
-
-function saveReconnectDraft(): void {
-  const text = getChatInputText();
-  if (!text.trim()) return;
-
-  setSessionStorageValue(RECONNECT_DRAFT_STORAGE_KEY, JSON.stringify({
-    text,
-    url: location.href
-  } satisfies ReconnectDraft));
-}
-
-function restoreReconnectDraft(attempt = 0): void {
-  const draft = readReconnectDraft();
-  if (!draft) return;
-
-  if (draft.url !== location.href) {
-    removeSessionStorageValue(RECONNECT_DRAFT_STORAGE_KEY);
-    return;
-  }
-
-  const input = findChatInput();
-  if (input && !getChatInputText().trim()) {
-    replaceChatInput(draft.text);
-    removeSessionStorageValue(RECONNECT_DRAFT_STORAGE_KEY);
-    return;
-  }
-
-  const delay = DRAFT_RESTORE_DELAYS_MS[attempt];
-  if (delay === undefined) return;
-
-  window.setTimeout(() => restoreReconnectDraft(attempt + 1), delay);
-}
-
-function readReconnectDraft(): ReconnectDraft | null {
-  const raw = getSessionStorageValue(RECONNECT_DRAFT_STORAGE_KEY);
-  if (!raw) return null;
-
-  try {
-    const parsed = JSON.parse(raw) as Partial<ReconnectDraft>;
-    if (typeof parsed.text !== 'string' || typeof parsed.url !== 'string') return null;
-    return {
-      text: parsed.text,
-      url: parsed.url
-    };
-  } catch {
-    removeSessionStorageValue(RECONNECT_DRAFT_STORAGE_KEY);
-    return null;
-  }
-}
-
-function getSessionStorageValue(key: string): string {
-  try {
-    return window.sessionStorage.getItem(key) || '';
-  } catch {
-    return '';
-  }
-}
-
-function setSessionStorageValue(key: string, value: string): void {
-  try {
-    window.sessionStorage.setItem(key, value);
-  } catch {
-    // Draft preservation is best-effort; reconnect should still be available.
-  }
-}
-
-function removeSessionStorageValue(key: string): void {
-  try {
-    window.sessionStorage.removeItem(key);
-  } catch {
-    // Ignore storage failures.
-  }
 }

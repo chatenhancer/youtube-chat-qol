@@ -267,7 +267,7 @@ ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-paper-item {
   }
 }
 
-ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item:is(:hover, :focus-visible) .ytcq-paper-item {
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item:not([aria-disabled="true"]):is(:hover, :focus-visible) .ytcq-paper-item {
   background: var(--ytcq-grid-hover);
 }
 
@@ -299,4 +299,12 @@ ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-menu-label {
   white-space: normal;
   overflow: visible;
   overflow-wrap: anywhere;
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item[aria-disabled="true"] .ytcq-paper-item {
+  cursor: default;
+}
+
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item[aria-disabled="true"] :is(.ytcq-menu-icon, .ytcq-menu-label) {
+  opacity: 0.45;
 }

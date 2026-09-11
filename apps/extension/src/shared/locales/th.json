@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "ไม่พร้อมใช้งานในเบราว์เซอร์หรือหน้าต่างแชทนี้",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "ผู้เข้าร่วม",
     "onboardingMenuTimestamps": "การประทับเวลา",

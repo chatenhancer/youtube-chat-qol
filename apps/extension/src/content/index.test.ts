@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../shared/options';
+import { CONTENT_INSTANCE_ATTRIBUTE, CONTENT_REATTACHMENT_ATTRIBUTE } from '../shared/content-instance';
 import type { FeatureMutationBatch } from './dispatcher';
 
 const lifecycleMocks = vi.hoisted(() => ({
@@ -264,6 +265,8 @@ describe('content script entrypoint wiring', () => {
 
   it('suspends older content script instances when a newer one claims the document', async () => {
     await import('./index');
+    document.documentElement.setAttribute(CONTENT_REATTACHMENT_ATTRIBUTE,
+      document.documentElement.getAttribute(CONTENT_INSTANCE_ATTRIBUTE)!);
     const firstDomObserver = observerCallbacks[0];
     const firstDomDisconnect = observerDisconnects[0];
     const firstStorageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.at(-1)?.[0];
@@ -276,6 +279,7 @@ describe('content script entrypoint wiring', () => {
     vi.resetModules();
     await import('./index');
 
+    expect(document.documentElement.hasAttribute(CONTENT_REATTACHMENT_ATTRIBUTE)).toBe(false);
     expect(firstDomDisconnect).toHaveBeenCalledOnce();
     expect(chrome.storage.onChanged.removeListener).toHaveBeenCalledWith(firstStorageListener);
     expect(chrome.runtime.onMessage.removeListener).toHaveBeenCalledWith(firstRuntimeListener);
@@ -301,6 +305,24 @@ describe('content script entrypoint wiring', () => {
       })
     ], {} as MutationObserver);
     expect(lifecycleMocks.handleFeatureMutations).toHaveBeenCalledOnce();
+  });
+
+  it('stops stale feature timers even after Chrome removes the old runtime API', async () => {
+    await import('./index');
+    lifecycleMocks.suspendFeatures.mockClear();
+    chatFeedRecordStoreMocks.stopYouTubeChatFeedRecordStore.mockClear();
+    vi.stubGlobal('chrome', { ...chrome, runtime: undefined });
+    try {
+      document.documentElement.setAttribute('data-ytcq-content-instance', 'replacement');
+      document.dispatchEvent(new CustomEvent('ytcq:content-instance-claim', {
+        detail: { id: 'replacement' }
+      }));
+      expect(chatFeedRecordStoreMocks.stopYouTubeChatFeedRecordStore).toHaveBeenCalledOnce();
+      expect(lifecycleMocks.suspendFeatures).toHaveBeenCalledOnce();
+      expect(observerDisconnects[0]).toHaveBeenCalledOnce();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('recovers visible messages after the tab returns to the foreground', async () => {
@@ -377,8 +399,11 @@ describe('content script entrypoint wiring', () => {
 
     const messageListener = vi.mocked(chrome.runtime.onMessage.addListener).mock.calls.at(-1)?.[0];
     const sendResponse = vi.fn();
+    document.documentElement.setAttribute(CONTENT_REATTACHMENT_ATTRIBUTE,
+      document.documentElement.getAttribute(CONTENT_INSTANCE_ATTRIBUTE)!);
     messageListener?.({ type: 'ytcq:chat-attached-ping' }, {} as chrome.runtime.MessageSender, sendResponse);
     expect(sendResponse).toHaveBeenCalledWith({ attached: true });
+    expect(document.documentElement.hasAttribute(CONTENT_REATTACHMENT_ATTRIBUTE)).toBe(false);
 
     messageListener?.({ type: 'ytcq:reset-page' }, {} as chrome.runtime.MessageSender, vi.fn());
 

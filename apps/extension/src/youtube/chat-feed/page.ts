@@ -39,10 +39,11 @@ import {
   type YouTubeChatContextMenuPageBridge
 } from './page-context-menu';
 import { isYouTubeChatFeedPath } from './pages';
+import { watchContentStylesheet } from './content-lifetime';
 
 const YOUTUBE_CHAT_FEED_TRANSPORT_STATE_KEY = Symbol.for('ytcq:lite-chat-transport:v1');
 // Long-lived tabs replace an older adapter when its control behavior changes.
-const YOUTUBE_CHAT_FEED_TRANSPORT_REVISION = 6 as const;
+const YOUTUBE_CHAT_FEED_TRANSPORT_REVISION = 7 as const;
 
 interface PendingChatFeedResponse {
   receivedAt: number;
@@ -52,6 +53,7 @@ interface PendingChatFeedResponse {
 }
 
 interface ChatFeedTransportState {
+  cleanupContentLifetime: () => void;
   contextMenus: YouTubeChatContextMenuPageBridge;
   controlResolved: boolean;
   consumers: Set<YouTubeChatFeedConsumer>;
@@ -162,6 +164,7 @@ function startYouTubeChatFeedTransport(): void {
   } as typeof window.fetch;
 
   Object.assign(state, {
+    cleanupContentLifetime: watchContentStylesheet(),
     contextMenus: createYouTubeChatContextMenuPageBridge(),
     controlResolved: false,
     consumers: new Set<YouTubeChatFeedConsumer>(),
@@ -523,6 +526,7 @@ function isChatFeedTransportState(value: unknown): value is ChatFeedTransportSta
   if (!value || typeof value !== 'object') return false;
   const state = value as Partial<ChatFeedTransportState>;
   return state.revision === YOUTUBE_CHAT_FEED_TRANSPORT_REVISION &&
+    typeof state.cleanupContentLifetime === 'function' &&
     typeof state.contextMenus?.apply === 'function' &&
     typeof state.contextMenus?.destroy === 'function' &&
     state.consumers instanceof Set &&
@@ -535,6 +539,7 @@ function isChatFeedTransportState(value: unknown): value is ChatFeedTransportSta
 function removePreviousYouTubeChatFeedTransport(value: unknown): void {
   if (!value || typeof value !== 'object') return;
   const state = value as {
+    cleanupContentLifetime?: () => void;
     controlResolved?: boolean;
     enabled?: boolean;
     contextMenus?: { destroy?: () => void };
@@ -547,6 +552,7 @@ function removePreviousYouTubeChatFeedTransport(value: unknown): void {
     window.removeEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, state.handleControl);
   }
   state.contextMenus?.destroy?.();
+  state.cleanupContentLifetime?.();
   state.controlResolved = true;
   state.enabled = false;
   if (

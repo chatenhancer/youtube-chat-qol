@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../shared/options';
 import { setOptions } from '../../shared/state';
+import * as pictureInPicture from '../picture-in-picture/bridge';
 
 const soundMocks = vi.hoisted(() => ({ playAlertSoundPreview: vi.fn() }));
 vi.mock('../../shared/sounds/alert-sounds', () => soundMocks);
@@ -50,6 +51,33 @@ describe('chat settings grid', () => {
     expect(saveOptions).toHaveBeenNthCalledWith(2, { sound: true });
     expect(soundMocks.playAlertSoundPreview).toHaveBeenCalledOnce();
     expect(menu.isConnected).toBe(true);
+  });
+
+  it('fills the unavailable PiP slot with a disabled tile that cannot activate', () => {
+    const toggle = vi.spyOn(pictureInPicture, 'togglePictureInPicture');
+    const { menu } = openMenu();
+    const item = menu.querySelector<HTMLElement>('[data-ytcq-action="picture-in-picture"]')!;
+
+    expect(menu.querySelectorAll('.ytcq-settings-grid .ytcq-settings-item')).toHaveLength(4);
+    expect(item.textContent).toBe('Floating player');
+    expect(item.getAttribute('aria-disabled')).toBe('true');
+    expect(item.title).toBe('Not available in this browser or chat window.');
+    item.click();
+    key(item, 'Enter');
+    key(item, ' ');
+    expect(toggle).not.toHaveBeenCalled();
+  });
+
+  it('keeps PiP usable when the current chat supports it', () => {
+    vi.spyOn(pictureInPicture, 'canTogglePictureInPicture').mockReturnValue(true);
+    const toggle = vi.spyOn(pictureInPicture, 'togglePictureInPicture').mockImplementation(() => {});
+    const { menu } = openMenu();
+    const item = menu.querySelector<HTMLElement>('[data-ytcq-action="picture-in-picture"]')!;
+
+    expect(item.hasAttribute('aria-disabled')).toBe(false);
+    expect(item.title).toBe('Open video and chat in an always-on-top window.');
+    item.click();
+    expect(toggle).toHaveBeenCalledOnce();
   });
 
   it('disables sound without playing the preview', () => {
@@ -113,8 +141,8 @@ describe('chat settings grid', () => {
     key(rows[2], 'ArrowUp');
     expect(document.activeElement).toBe(rows[0]);
     key(rows[0], 'End');
-    expect(document.activeElement).toBe(rows[2]);
-    key(rows[2], 'ArrowDown');
+    expect(document.activeElement).toBe(rows[3]);
+    key(rows[3], 'ArrowDown');
     expect(document.activeElement).toBe(menu.querySelector('yt-live-chat-toggle-renderer'));
     rows[0].focus();
     key(rows[0], 'ArrowUp');

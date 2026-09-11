@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "目前的瀏覽器或聊天室視窗不支援此功能。",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "參與者",
     "onboardingMenuTimestamps": "時間戳記",

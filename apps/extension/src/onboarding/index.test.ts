@@ -66,6 +66,17 @@ describe('onboarding settings', () => {
     expect(displayRow.hidden).toBe(true);
   });
 
+  it('matches the disabled PiP tile in browsers without picture-in-picture support', async () => {
+    await import('./index');
+    const item = document.querySelector<HTMLElement>(
+      '#previewSettingsMenu [data-ytcq-action="picture-in-picture"]'
+    )!;
+
+    expect(item.getAttribute('aria-disabled')).toBe('true');
+    item.click();
+    expect(document.querySelector('.preview-pip-info-visible')).toBeNull();
+  });
+
   it('uses the localized translated prefix in the below-message preview', async () => {
     vi.mocked(chrome.i18n.getMessage).mockImplementation((key: string) =>
       key === 'translated' ? 'Traduit :' : key

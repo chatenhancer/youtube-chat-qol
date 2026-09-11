@@ -6,7 +6,7 @@ description: "Cách Chat Enhancer for YouTube xử lý lưu trữ cục bộ, b�
 
 # Quyền riêng tư
 
-Cập nhật lần cuối: ngày 24 tháng 7 năm 2026
+Cập nhật lần cuối: ngày 11 tháng 9 năm 2026
 
 Chat Enhancer for YouTube là tiện ích trình duyệt dành cho live chat YouTube. Tiện ích được thiết kế để thêm các tính năng chat nhỏ mà không thay thế chat YouTube hoặc thu thập phân tích.
 
@@ -20,11 +20,13 @@ Bản tóm tắt:
 
 ## Tiện ích chạy ở đâu
 
-Tiện ích chỉ chạy trên các trang live chat YouTube và replay live chat mà tiện ích được phép truy cập.
+Tiện ích chạy trên các trang live chat YouTube và replay live chat. Tiện ích cũng chạy trên các trang YouTube để hỗ trợ chế độ hình trong hình cho video và trò chuyện.
 
 Tiện ích sử dụng quyền để lưu cài đặt và dữ liệu riêng của tiện ích trong trình duyệt của bạn. Tiện ích cũng sử dụng quyền truy cập vào các trang web cụ thể cần thiết để các tính năng hoạt động: trang live chat YouTube, dịch vụ dịch của Google Translate và máy chủ trò chơi Chat Enhancer Playground tùy chọn.
 
-Tiện ích không yêu cầu các quyền chung về lịch sử duyệt web, đọc tab, scripting hoặc điều hướng web.
+Trong Chrome và Edge, quyền `scripting` kết nối lại chế độ hình trong hình cho video và trò chuyện sau khi tiện ích được tải lại hoặc cập nhật, mà không cần làm mới tab YouTube. Tiện ích không yêu cầu các quyền chung về lịch sử duyệt web, đọc tab hoặc điều hướng web.
+
+Quyền này cũng cho phép tiện ích kết nối với các cuộc trò chuyện YouTube đã mở khi bạn cài đặt hoặc bật tiện ích.
 
 ## Dữ liệu được lưu trong trình duyệt của bạn
 

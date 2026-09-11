@@ -4,6 +4,12 @@ import {
   liteBookmarkReplayLinkScenario
 } from '../../scenarios/bookmarks-replay';
 import { delayedChatPanelNavigationScenario } from '../../scenarios/navigation';
+import {
+  attachEnabledExtensionScenario,
+  attachEnabledExtensionLiteScenario,
+  reconnectEnabledExtensionScenario,
+  reconnectEnabledExtensionLiteScenario
+} from '../../scenarios/extension-attachment';
 import { inboxStaysOpenOnWatchPageClickScenario } from '../../scenarios/inbox';
 import { nativeContinuationRendererScenario } from '../../scenarios/native-renderer';
 import { popupResetScenario } from '../../scenarios/popup-reset';
@@ -29,6 +35,30 @@ const interceptedSendReason =
 
 export const targetSpecificScenarios: readonly YouTubeScenario[] = [
   {
+    title: 'enabling the extension attaches to an existing stream without reloading playback or drafts',
+    run: attachEnabledExtensionScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Uses Chrome extension controls to enable the extension after the watch page has loaded.'
+  },
+  {
+    title: 'enabling the extension attaches Lite mode to an existing stream without reloading playback or drafts',
+    run: attachEnabledExtensionLiteScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Checks late feed startup with the saved Lite preference and a real extension enable action.'
+  },
+  {
+    title: 'disabling the extension promptly restores native chat and re-enabling restores the draft',
+    run: reconnectEnabledExtensionScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Checks prompt cleanup through real Chrome controls and attachment after the extension is enabled again.'
+  },
+  {
+    title: 'disabling the extension in Lite mode promptly restores native chat and re-enabling restores the draft',
+    run: reconnectEnabledExtensionLiteScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Checks restoration of the discarded native feed and removal of Aero styling after a real disable.'
+  },
+  {
     title: 'video + chat PiP moves the paused native player and chat and returns them to the tab',
     run: pictureInPictureLiveScenario,
     on: [target.liveLoggedOut],
@@ -41,7 +71,7 @@ export const targetSpecificScenarios: readonly YouTubeScenario[] = [
     reason: 'Requires working YouTube media playback in a prepared browser profile.'
   },
   {
-    title: 'video + chat PiP preserves playback, drafts, and normal chat sizing',
+    title: 'video + chat PiP preserves playback, drafts, and chat sizing after an extension reload',
     run: pictureInPictureScenario,
     on: [target.mockLiveLoggedIn],
     reason: 'Requires a deterministic watch page and a real Document PiP window.'

@@ -6,7 +6,7 @@ description: "Chat Enhancer for YouTube 如何处理本地存储、翻译、Play
 
 # 隐私
 
-最后更新：2026 年 7 月 24 日
+最后更新：2026 年 9 月 11 日
 
 Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展。它旨在为聊天添加小功能，而不是取代 YouTube 聊天或收集分析数据。
 
@@ -20,11 +20,13 @@ Chat Enhancer for YouTube 是一款用于 YouTube 实时聊天的浏览器扩展
 
 ## 扩展在哪里运行
 
-扩展只在扩展被允许访问的 YouTube 实时聊天和实时聊天回放页面上运行。
+扩展在 YouTube 实时聊天和实时聊天回放页面上运行，也会在 YouTube 页面上运行，以支持视频与聊天画中画。
 
 扩展使用权限在你的浏览器中保存自己的设置和数据。它还会访问功能运行所需的特定网站：YouTube 实时聊天页面、Google Translate 的翻译服务，以及可选加入的 Chat Enhancer Playground 游戏服务器。
 
-扩展不会请求通用的浏览历史、标签页读取、脚本执行或网页导航权限。
+在 Chrome 和 Edge 中，`scripting` 权限用于在扩展重新加载或更新后重新连接视频与聊天画中画，无需刷新 YouTube 标签页。扩展不会请求通用的浏览历史、标签页读取或网页导航权限。
+
+此权限还允许扩展在安装或启用时连接到已经打开的 YouTube 聊天。
 
 ## 存储在你浏览器中的数据
 

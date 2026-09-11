@@ -795,6 +795,43 @@ describe('Lite mode controller', () => {
     expect(document.querySelector('.ytcq-lite-root')).toBeNull();
   });
 
+  it.each([false, true])(
+    'keeps messages in their original slot after extension cleanup and restart (nested: %s)',
+    (nested) => {
+      const chatRenderer = document.querySelector('yt-live-chat-renderer')!;
+      const nativeList = document.querySelector('yt-live-chat-item-list-renderer')!;
+      const input = document.querySelector('yt-live-chat-message-input-renderer')!;
+      if (nested) {
+        const contents = document.createElement('div');
+        const chat = document.createElement('div');
+        chat.id = 'chat';
+        const actionPanel = document.createElement('div');
+        actionPanel.id = 'action-panel';
+        const inputPanel = document.createElement('div');
+        inputPanel.append(input);
+        chat.append(nativeList, actionPanel);
+        contents.append(chat, inputPanel);
+        chatRenderer.append(contents);
+      }
+      const listParent = nativeList.parentElement;
+      const nextPanel = nativeList.nextElementSibling;
+      input.textContent = 'Unsent draft';
+
+      startLiteMode();
+      cleanupLiteMode();
+      expect(nativeList.isConnected).toBe(false);
+      startLiteMode();
+
+      const roots = document.querySelectorAll('.ytcq-lite-root');
+      expect(roots).toHaveLength(1);
+      expect(roots[0].parentElement).toBe(listParent);
+      expect(roots[0].nextElementSibling).toBe(nextPanel);
+      expect(input.isConnected).toBe(true);
+      expect(input.textContent).toBe('Unsent draft');
+      expect(requestNativeChatRestoreMock).not.toHaveBeenCalled();
+    }
+  );
+
   it('requests a native reload for invalid sequencing after discard', () => {
     startLiteMode({ clearCooldown: true });
     dispatchBatch(createBatch(2, [{ type: 'upsert', record: createRecord('one', 'One') }]));

@@ -111,7 +111,7 @@ export function cleanupStaleLiteModeDom(): void {
         const connectedNativeList = findNativeList();
         if (connectedNativeList) revealNativeList(connectedNativeList);
         else {
-          mountNativeList(retainedNativeList);
+          mountChatList(retainedNativeList);
           revealNativeList(retainedNativeList);
         }
       }
@@ -150,14 +150,27 @@ export function getNativePresentationEndId(nativeList: HTMLElement): string {
   return '';
 }
 
-function mountNativeList(nativeList: HTMLElement): void {
-  const chatRenderer = document.querySelector<HTMLElement>('yt-live-chat-renderer');
-  if (!chatRenderer) {
-    (document.body || document.documentElement).append(nativeList);
+/** Mounts a replacement feed even when an extension reload left no native list. */
+export function mountChatList(list: HTMLElement): void {
+  const nativeList = findNativeList();
+  if (nativeList?.parentNode) {
+    nativeList.before(list);
     return;
   }
-  const input = chatRenderer.querySelector<HTMLElement>('yt-live-chat-message-input-renderer');
-  chatRenderer.insertBefore(nativeList, input?.parentElement === chatRenderer ? input : null);
+
+  const chatRenderer = document.querySelector<HTMLElement>('yt-live-chat-renderer');
+  if (!chatRenderer) {
+    (document.body || document.documentElement).append(list);
+    return;
+  }
+  // Current YouTube nests the feed inside #chat; older layouts put it beside
+  // the composer. Preserve that slot after Lite has discarded the native host.
+  const container = chatRenderer.querySelector<HTMLElement>('#chat') || chatRenderer;
+  const input = container.querySelector('yt-live-chat-message-input-renderer');
+  const followingPanel = Array.from(container.children).find(
+    (child) => child.id === 'action-panel' || child.contains(input)
+  );
+  container.insertBefore(list, followingPanel || null);
 }
 
 function revealNativeList(nativeList: HTMLElement): void {

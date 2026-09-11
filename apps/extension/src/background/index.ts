@@ -6,6 +6,7 @@
  */
 import './action-status';
 import './active-chat-keepalive';
+import './attach-open-chats';
 import './onboarding';
 import './playground';
 import './profile-avatar';

@@ -16,6 +16,7 @@ interface MenuActionItemOptions {
   iconPath: string;
   iconViewBox?: string;
   title?: string;
+  disabled?: boolean;
   onClick: (event: Event) => void;
 }
 
@@ -34,12 +35,13 @@ export function createMenuActionItem({
   iconPath,
   iconViewBox,
   title,
+  disabled = false,
   onClick
 }: MenuActionItemOptions): HTMLElement {
   const handleActivation = (event: Event): void => {
     event.preventDefault();
     event.stopPropagation();
-    onClick(event);
+    if (!disabled) onClick(event);
   };
   const item = el<HTMLDivElement>(
     <div
@@ -60,6 +62,7 @@ export function createMenuActionItem({
   if (action) item.setAttribute('data-ytcq-action', action);
   if (setting) item.setAttribute('data-ytcq-setting', setting);
   if (title) item.title = title;
+  if (disabled) item.setAttribute('aria-disabled', 'true');
   item.appendChild(createPaperItem({ label, iconPath, iconViewBox, title }));
   return item;
 }

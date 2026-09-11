@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "در این مرورگر یا پنجرهٔ گفتگو در دسترس نیست.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "شرکت‌کنندگان",
     "onboardingMenuTimestamps": "مهرهای زمانی",

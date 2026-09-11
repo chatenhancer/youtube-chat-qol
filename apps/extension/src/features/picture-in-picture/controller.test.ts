@@ -83,12 +83,22 @@ describe('watch-page picture-in-picture lifecycle', () => {
     }
   );
 
-  it('replaces an old controller without duplicating the request handler', async () => {
+  it('reuses a healthy controller without duplicating the request handler', async () => {
     requestWindow.mockRejectedValue(new Error('Opening denied'));
     initPictureInPictureController();
     initPictureInPictureController();
     document.dispatchEvent(new Event(PIP_TOGGLE_EVENT));
     expect(requestWindow).toHaveBeenCalledOnce();
     await Promise.resolve();
+  });
+
+  it('preserves a pending PiP request when a healthy controller is reinjected', () => {
+    requestWindow.mockReturnValue(new Promise(() => {}));
+    initPictureInPictureController();
+    document.dispatchEvent(new Event(PIP_TOGGLE_EVENT));
+    initPictureInPictureController();
+    // A second click cancels the same pending request instead of opening another.
+    document.dispatchEvent(new Event(PIP_TOGGLE_EVENT));
+    expect(requestWindow).toHaveBeenCalledOnce();
   });
 });

@@ -1,10 +1,35 @@
 // @vitest-environment node
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('background active chat keepalive', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
+    vi.stubGlobal('chrome', {
+      ...chrome,
+      scripting: { executeScript: vi.fn().mockResolvedValue([]) }
+    });
+  });
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('reconnects the owning page controller when an embedded chat connects', async () => {
+    await import('./active-chat-keepalive');
+    getConnectListener()(createPort({ name: 'ytcq:active-chat', tabId: 41, frameId: 7 }));
+
+    expect(chrome.scripting.executeScript).toHaveBeenCalledWith({
+      target: { tabId: 41, frameIds: [0] },
+      files: ['watch-page.js']
+    });
+  });
+
+  it('keeps chat connected if the owning page is unavailable for reinjection', async () => {
+    vi.mocked(chrome.scripting.executeScript).mockRejectedValue(new Error('Tab closed'));
+    await import('./active-chat-keepalive');
+    getConnectListener()(createPort({ name: 'ytcq:active-chat', tabId: 41, frameId: 7 }));
+    await Promise.resolve();
+
+    expect((await import('./chat-tab-state')).getActiveChatTabIds()).toEqual([41]);
   });
 
   it('tracks connected active chat ports by tab', async () => {
@@ -13,6 +38,7 @@ describe('background active chat keepalive', () => {
 
     getConnectListener()(port);
     expect((await import('./chat-tab-state')).getActiveChatTabIds()).toEqual([41]);
+    expect(chrome.scripting.executeScript).not.toHaveBeenCalled();
 
     port.disconnect();
     expect((await import('./chat-tab-state')).getActiveChatTabIds()).toEqual([]);
@@ -68,10 +94,12 @@ function getConnectListener(): (port: chrome.runtime.Port) => void {
 
 function createPort({
   name,
-  tabId
+  tabId,
+  frameId = 0
 }: {
   name: string;
   tabId?: number;
+  frameId?: number;
 }): chrome.runtime.Port & {
   disconnect: () => void;
 } {
@@ -89,7 +117,7 @@ function createPort({
       removeListener: vi.fn()
     },
     postMessage: vi.fn(),
-    sender: tabId === undefined ? {} : { tab: { id: tabId } },
+    sender: tabId === undefined ? {} : { tab: { id: tabId }, frameId },
     disconnect: () => {
       disconnectListeners.forEach((listener) => listener());
     }

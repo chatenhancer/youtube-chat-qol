@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "इस ब्राउज़र या चैट विंडो में उपलब्ध नहीं है।",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "प्रतिभागी",
     "onboardingMenuTimestamps": "टाइमस्टैंप",

@@ -6,7 +6,7 @@ description: "Chat Enhancer for YouTube 如何處理本機儲存、翻譯、Play
 
 # 隱私權
 
-最後更新：2026 年 7 月 24 日
+最後更新：2026 年 9 月 11 日
 
 Chat Enhancer for YouTube 是一款用於 YouTube 即時聊天室的瀏覽器擴充功能。它旨在為聊天室加入小功能，而不是取代 YouTube 聊天或收集分析資料。
 
@@ -20,11 +20,13 @@ Chat Enhancer for YouTube 是一款用於 YouTube 即時聊天室的瀏覽器擴
 
 ## 擴充功能在哪裡執行
 
-擴充功能只會在擴充功能被允許存取的 YouTube 即時聊天室和即時聊天室重播頁面上執行。
+擴充功能會在 YouTube 即時聊天室和即時聊天室重播頁面上執行，也會在 YouTube 頁面上執行，以支援影片與聊天子母畫面。
 
 擴充功能使用權限在你的瀏覽器中儲存自己的設定和資料。它也會存取功能運作所需的特定網站：YouTube 即時聊天室頁面、Google Translate 的翻譯服務，以及選擇加入的 Chat Enhancer Playground 遊戲伺服器。
 
-擴充功能不會要求一般瀏覽記錄、讀取分頁、scripting 或 web navigation 權限。
+在 Chrome 和 Edge 中，`scripting` 權限用於在擴充功能重新載入或更新後重新連接影片與聊天子母畫面，無須重新整理 YouTube 分頁。擴充功能不會要求一般瀏覽記錄、讀取分頁或網頁導覽權限。
+
+這項權限也讓擴充功能能在安裝或啟用時，連接到已經開啟的 YouTube 聊天室。
 
 ## 儲存在你瀏覽器中的資料
 

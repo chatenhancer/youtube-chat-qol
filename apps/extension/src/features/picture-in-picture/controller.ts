@@ -19,8 +19,10 @@ import { copyPageStyles, createPipPlaceholder, createPipStyles } from './ui';
 const CLAIM_EVENT = 'ytcq:pip-controller-claim';
 
 export function initPictureInPictureController(): void {
-  if (window !== window.top) return;
-  document.dispatchEvent(new Event(CLAIM_EVENT));
+  if (window !== window.top || document.documentElement.hasAttribute(PIP_WINDOW_ATTRIBUTE)) return;
+  // Chat also reconnects when moved into PiP. Keep the current window and its
+  // restoration handlers whenever this page still has a valid controller.
+  if (!document.dispatchEvent(new Event(CLAIM_EVENT, { cancelable: true }))) return;
   const api = getDocumentPictureInPicture(window);
   if (!api?.requestWindow) return;
 
@@ -41,7 +43,10 @@ export function initPictureInPictureController(): void {
     lifetime.abort();
     document.documentElement.removeAttribute(PIP_AVAILABLE_ATTRIBUTE);
   };
-  document.addEventListener(CLAIM_EVENT, dispose, { signal: lifetime.signal });
+  document.addEventListener(CLAIM_EVENT, (event) => {
+    if (event.cancelable && chrome.runtime?.id) event.preventDefault();
+    else dispose();
+  }, { signal: lifetime.signal });
   document.addEventListener('yt-navigate-start', stop, { signal: lifetime.signal });
   window.addEventListener('pagehide', dispose, { signal: lifetime.signal });
   document.addEventListener(

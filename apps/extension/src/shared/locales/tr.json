@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "Bu tarayıcıda veya sohbet penceresinde kullanılamıyor.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "Katılımcılar",
     "onboardingMenuTimestamps": "Zaman damgaları",

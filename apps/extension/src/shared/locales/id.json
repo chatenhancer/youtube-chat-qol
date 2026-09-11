@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "Tidak tersedia di browser atau jendela chat ini.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "Peserta",
     "onboardingMenuTimestamps": "Stempel waktu",

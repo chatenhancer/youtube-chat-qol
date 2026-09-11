@@ -111,18 +111,19 @@ function createSettingsMenuItems(): HTMLElement[] {
     liteModeItem.querySelector('.ytcq-menu-icon')?.replaceChildren(liteModeIcon);
     items.push(liteModeItem);
   }
-  if (canTogglePictureInPicture()) {
-    items.push(createMenuActionItem({
-      action: 'picture-in-picture',
-      label: t(isPictureInPictureChat() ? 'returnVideoChat' : 'videoChatPip'),
-      title: t(isPictureInPictureChat() ? 'returnVideoChat' : 'videoChatPipTooltip'),
-      iconPath: PIP_ICON_PATH,
-      onClick: () => {
-        closeMenu();
-        togglePictureInPicture();
-      }
-    }));
-  }
+  const pipAvailable = canTogglePictureInPicture();
+  items.push(createMenuActionItem({
+    action: 'picture-in-picture',
+    label: t(isPictureInPictureChat() ? 'returnVideoChat' : 'videoChatPip'),
+    title: t(!pipAvailable ? 'videoChatPipUnavailable'
+      : isPictureInPictureChat() ? 'returnVideoChat' : 'videoChatPipTooltip'),
+    iconPath: PIP_ICON_PATH,
+    disabled: !pipAvailable,
+    onClick: () => {
+      closeMenu();
+      togglePictureInPicture();
+    }
+  }));
   return items;
 }
 

@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "Niet beschikbaar in deze browser of dit chatvenster.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "Deelnemers",
     "onboardingMenuTimestamps": "Tijdstempels",

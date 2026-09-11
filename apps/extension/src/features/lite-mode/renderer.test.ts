@@ -104,8 +104,8 @@ describe('Lite chat renderer', () => {
     expect(author.classList.contains('owner')).toBe(true);
     expect(author.querySelector('#chip-badges')).not.toBeNull();
     expect(
-      author.querySelector('.ytcq-lite-verified-badge-icon path')?.getAttribute('d')
-    ).toContain('M9 16.2');
+      author.querySelector('#chip-badges .ytcq-lite-author-badge')?.getAttribute('aria-label')
+    ).toBe('Verified');
     expect(row.querySelector('#chat-badges')?.childElementCount).toBe(0);
   });
 

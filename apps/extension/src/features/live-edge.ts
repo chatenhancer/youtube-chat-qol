@@ -21,7 +21,7 @@ function initLiveEdgeRecovery(): void {
 }
 
 function cleanupStaleLiveEdgeRecovery(): void {
-  chrome.runtime.onMessage.removeListener(handleLiveEdgeMessage);
+  chrome.runtime?.onMessage.removeListener(handleLiveEdgeMessage);
 }
 
 function handleLiveEdgeMessage(message: { type?: string }): false {

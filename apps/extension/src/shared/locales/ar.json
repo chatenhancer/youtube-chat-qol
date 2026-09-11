@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "غير متاح في هذا المتصفح أو نافذة الدردشة هذه.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "المشاركون",
     "onboardingMenuTimestamps": "الطوابع الزمنية",

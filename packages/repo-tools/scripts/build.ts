@@ -301,6 +301,11 @@ function createManifest(target) {
     if (script.css) script.css = script.css.map(stripBuildPrefix);
   }
 
+  if (target === 'chrome' || target === 'edge') {
+    // Attach to existing chats and reconnect the watch-page PiP controller.
+    manifest.permissions.push('scripting');
+  }
+
   const usesLocalPlaygroundBackend = isLocalPlaygroundBackendOrigin(playgroundBackendOrigin);
   if (usesLocalPlaygroundBackend) {
     manifest.host_permissions = [

@@ -625,11 +625,6 @@
   font-weight: 700 !important;
 }
 
-:root[data-ytcq-chat-skin="aero"] .ytcq-lite-message #author-name.owner {
-  color: rgba(0, 0, 0, 0.87) !important;
-  background: #ffd600 !important;
-}
-
 :root[data-ytcq-chat-skin="aero"] :where(
   yt-live-chat-text-message-renderer #message-container,
   .ytcq-lite-message-text #message-container

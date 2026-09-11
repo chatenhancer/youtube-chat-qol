@@ -6,7 +6,7 @@ description: "Hoe Chat Enhancer for YouTube lokale opslag, vertaling, Playground
 
 # Privacy
 
-Laatst bijgewerkt: 24 juli 2026
+Laatst bijgewerkt: 11 september 2026
 
 Chat Enhancer for YouTube is een browserextensie voor YouTube-livechat. De extensie is ontworpen om kleine chatfuncties toe te voegen zonder YouTube-chat te vervangen of analytics te verzamelen.
 
@@ -20,11 +20,13 @@ De korte versie:
 
 ## Waar de extensie draait
 
-De extensie draait alleen op YouTube-livechat- en livechatreplaypagina’s waartoe de extensie toegang mag hebben.
+De extensie draait op YouTube-livechat- en livechatreplaypagina’s. Ze draait ook op YouTube-pagina’s om beeld-in-beeld voor video en chat te ondersteunen.
 
 De extensie gebruikt een machtiging om eigen instellingen en gegevens in je browser op te slaan. De extensie gebruikt ook toegang tot de specifieke websites die nodig zijn voor de functies: YouTube-livechatpagina’s, de vertaaldienst van Google Translate en de opt-in Chat Enhancer Playground-gameserver.
 
-De extensie vraagt geen algemene machtigingen voor browsegeschiedenis, tabbladen lezen, scripting of webnavigatie.
+In Chrome en Edge herstelt de machtiging `scripting` de verbinding voor beeld-in-beeld met video en chat nadat de extensie opnieuw is geladen of bijgewerkt, zonder het YouTube-tabblad te vernieuwen. De extensie vraagt geen algemene machtigingen voor browsegeschiedenis, tabbladen lezen of webnavigatie.
+
+Met deze machtiging kan de extensie ook verbinding maken met YouTube-chats die al openstaan wanneer je de extensie installeert of inschakelt.
 
 ## Gegevens die in je browser worden opgeslagen
 

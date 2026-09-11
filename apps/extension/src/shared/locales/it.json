@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "Non disponibile in questo browser o in questa finestra della chat.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "Partecipanti",
     "onboardingMenuTimestamps": "Timestamp",

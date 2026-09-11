@@ -16,6 +16,7 @@ import {
   getNativePresentationEndId,
   inspectDetachedNativeLists,
   isNativeFeedDiscarded,
+  mountChatList,
   NATIVE_HIDDEN_CLASS,
   NATIVE_LIST_SELECTOR,
   NATIVE_PENDING_SEED_CLASS,
@@ -150,7 +151,7 @@ export function startLiteMode(options: StartLiteModeOptions = {}): void {
       }
     }
   });
-  mountLiteRoot();
+  mountChatList(renderer.root);
   const initialRecords = initialFeedState.records;
   if (initialRecords.length) {
     applyStoreActions(
@@ -352,24 +353,6 @@ function handleLiteChatBatch(batch: YouTubeChatFeedBatch): void {
 
 function handleLiteChatFeedError(error: YouTubeChatFeedError): void {
   failLiteMode(error);
-}
-
-function mountLiteRoot(): void {
-  const root = renderer?.root;
-  if (!root) return;
-  const nativeList = findNativeList();
-  if (nativeList?.parentNode) {
-    nativeList.parentNode.insertBefore(root, nativeList);
-    return;
-  }
-
-  const chatRenderer = document.querySelector<HTMLElement>('yt-live-chat-renderer');
-  if (chatRenderer) {
-    const input = chatRenderer.querySelector<HTMLElement>('yt-live-chat-message-input-renderer');
-    chatRenderer.insertBefore(root, input?.parentElement === chatRenderer ? input : null);
-    return;
-  }
-  (document.body || document.documentElement).append(root);
 }
 
 function applyStoreActions(

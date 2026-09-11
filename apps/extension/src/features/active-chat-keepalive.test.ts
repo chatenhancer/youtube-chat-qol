@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { CONTENT_INSTANCE_ATTRIBUTE, CONTENT_REATTACHMENT_ATTRIBUTE } from '../shared/content-instance';
 
 const chatInputMocks = vi.hoisted(() => ({
   input: null as HTMLElement | null,
@@ -31,6 +32,8 @@ describe('active chat keepalive', () => {
     vi.resetModules();
     vi.useFakeTimers();
     document.body.replaceChildren();
+    document.documentElement.removeAttribute(CONTENT_INSTANCE_ATTRIBUTE);
+    document.documentElement.removeAttribute(CONTENT_REATTACHMENT_ATTRIBUTE);
     window.sessionStorage.clear();
     chatInputMocks.input = null;
     chatInputMocks.text = '';
@@ -41,6 +44,8 @@ describe('active chat keepalive', () => {
   afterEach(() => {
     vi.useRealTimers();
     document.body.replaceChildren();
+    document.documentElement.removeAttribute(CONTENT_INSTANCE_ATTRIBUTE);
+    document.documentElement.removeAttribute(CONTENT_REATTACHMENT_ATTRIBUTE);
     delete (chrome.runtime as Partial<typeof chrome.runtime>).connect;
   });
 
@@ -73,11 +78,13 @@ describe('active chat keepalive', () => {
     expect(connect).toHaveBeenCalledOnce();
   });
 
-  it('reloads chat when reconnecting fails after a disconnect', async () => {
+  it('allows reattachment time before preserving the draft and reloading disconnected chat', async () => {
+    markReattachmentPending();
+    chatInputMocks.text = 'draft while reconnecting';
     const firstPort = createMockPort();
     const connect = vi.fn()
       .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
-      .mockImplementationOnce(() => {
+      .mockImplementation(() => {
         throw new Error('Extension context invalidated.');
       });
     chrome.runtime.connect = connect;
@@ -88,8 +95,64 @@ describe('active chat keepalive', () => {
     await vi.advanceTimersByTimeAsync(250);
 
     expect(connect).toHaveBeenCalledTimes(2);
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toBeNull();
+    await vi.advanceTimersByTimeAsync(4_999);
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toBeNull();
+
+    await vi.advanceTimersByTimeAsync(1);
+    expect(connect).toHaveBeenCalledTimes(3);
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toContain('draft while reconnecting');
     expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
     expect(enhancedEffectMocks.hideEnhancedEffect).toHaveBeenCalled();
+  });
+
+  it('cancels the pending reload when a replacement instance cleans up the old one', async () => {
+    markReattachmentPending();
+    chatInputMocks.text = 'draft preserved by attachment';
+    const firstPort = createMockPort();
+    const connect = vi.fn()
+      .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
+      .mockImplementation(() => {
+        throw new Error('Extension context invalidated.');
+      });
+    chrome.runtime.connect = connect;
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+    const { cleanupFeatures, registerFeature } = await import('../content/dispatcher');
+    const cleanup = vi.fn();
+    registerFeature({ page: { cleanup } });
+
+    startActiveChatKeepAlive();
+    firstPort.disconnect();
+    await vi.advanceTimersByTimeAsync(1_000);
+    cleanupFeatures();
+    cleanup.mockClear();
+    await vi.advanceTimersByTimeAsync(10_000);
+
+    expect(cleanup).not.toHaveBeenCalled();
+    expect(connect).toHaveBeenCalledTimes(2);
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toBeNull();
+  });
+
+  it('retries the connection before falling back to a chat reload', async () => {
+    markReattachmentPending();
+    chatInputMocks.text = 'draft preserved by reconnecting';
+    const firstPort = createMockPort();
+    const nextPort = createMockPort();
+    const connect = vi.fn()
+      .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
+      .mockImplementationOnce(() => {
+        throw new Error('Background unavailable.');
+      })
+      .mockReturnValue(nextPort as unknown as chrome.runtime.Port);
+    chrome.runtime.connect = connect;
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    firstPort.disconnect();
+    await vi.advanceTimersByTimeAsync(5_250);
+
+    expect(nextPort.postMessage).toHaveBeenCalledOnce();
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toBeNull();
   });
 
   it('cleans stale reconnect anchors left by older content script instances', async () => {
@@ -150,7 +213,7 @@ describe('active chat keepalive', () => {
     expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
   });
 
-  it('suspends feature UI before reloading disconnected chat', async () => {
+  it('promptly removes disconnected UI when no replacement is attaching', async () => {
     const staleFeatureUi = document.createElement('div');
     staleFeatureUi.className = 'ytcq-stale-feature-ui';
     document.body.append(staleFeatureUi);
@@ -209,7 +272,7 @@ describe('active chat keepalive', () => {
     expect(chrome.runtime.connect).toHaveBeenCalledTimes(2);
   });
 
-  it('waits until the tab is visible before showing a pending reconnect notice', async () => {
+  it('waits until the tab is visible before trying to reconnect', async () => {
     setVisibilityState('hidden');
     const firstPort = createMockPort();
     const connect = vi.fn()
@@ -235,6 +298,53 @@ describe('active chat keepalive', () => {
     expect(connect).toHaveBeenCalledTimes(2);
     expect(document.querySelector('.ytcq-reconnect-button')).toBeNull();
     expect(enhancedEffectMocks.hideEnhancedEffect).toHaveBeenCalled();
+  });
+
+  it('does not reload if the tab becomes hidden while waiting for reattachment', async () => {
+    markReattachmentPending();
+    chatInputMocks.text = 'draft in a background tab';
+    const firstPort = createMockPort();
+    const connect = vi.fn()
+      .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
+      .mockImplementation(() => {
+        throw new Error('Extension context invalidated.');
+      });
+    chrome.runtime.connect = connect;
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+    const { handleFeatureVisibilityChanged } = await import('../content/dispatcher');
+
+    startActiveChatKeepAlive();
+    firstPort.disconnect();
+    await vi.advanceTimersByTimeAsync(250);
+    setVisibilityState('hidden');
+    handleFeatureVisibilityChanged('hidden');
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(connect).toHaveBeenCalledTimes(2);
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toBeNull();
+
+    setVisibilityState('visible');
+    handleFeatureVisibilityChanged('visible');
+    await vi.advanceTimersByTimeAsync(5_250);
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toContain('draft in a background tab');
+  });
+
+  it('does not delay disabling because of a handoff marker from an older instance', async () => {
+    document.documentElement.setAttribute(CONTENT_INSTANCE_ATTRIBUTE, 'current');
+    document.documentElement.setAttribute(CONTENT_REATTACHMENT_ATTRIBUTE, 'older');
+    chatInputMocks.text = 'draft before disabling';
+    const firstPort = createMockPort();
+    chrome.runtime.connect = vi.fn()
+      .mockReturnValueOnce(firstPort as unknown as chrome.runtime.Port)
+      .mockImplementation(() => {
+        throw new Error('Extension context invalidated.');
+      });
+    const { startActiveChatKeepAlive } = await import('./active-chat-keepalive');
+
+    startActiveChatKeepAlive();
+    firstPort.disconnect();
+    await vi.advanceTimersByTimeAsync(250);
+
+    expect(window.sessionStorage.getItem('ytcqReconnectDraft')).toContain('draft before disabling');
   });
 
   it('restores reconnect drafts for the same chat URL and removes mismatched drafts', async () => {
@@ -343,6 +453,11 @@ describe('active chat keepalive', () => {
     getItemSpy.mockRestore();
   });
 });
+
+function markReattachmentPending(): void {
+  document.documentElement.setAttribute(CONTENT_INSTANCE_ATTRIBUTE, 'previous');
+  document.documentElement.setAttribute(CONTENT_REATTACHMENT_ATTRIBUTE, 'previous');
+}
 
 function createMockPort(): MockPort {
   const disconnectListeners: (() => void)[] = [];

@@ -32,6 +32,11 @@ import {
   type ChatSkinTheme
 } from '../shared/chat-skins';
 import { DEFAULT_MESSAGE_DENSITY } from '../shared/message-density';
+import {
+  CONTENT_INSTANCE_ATTRIBUTE,
+  CONTENT_INSTANCE_CLAIM_EVENT,
+  CONTENT_REATTACHMENT_ATTRIBUTE
+} from '../shared/content-instance';
 import { isPictureInPictureChat } from '../features/picture-in-picture/bridge';
 import { getOptions, setOptions } from '../shared/state';
 import { initUiLocaleFromDocument } from '../shared/i18n';
@@ -48,8 +53,6 @@ interface NormalizedMutationBatch {
   featureBatch: FeatureMutationBatch;
 }
 
-const CONTENT_INSTANCE_ATTRIBUTE = 'data-ytcq-content-instance';
-const CONTENT_INSTANCE_CLAIM_EVENT = 'ytcq:content-instance-claim';
 const CONTENT_INSTANCE_ID = `${Date.now()}-${Math.random()}`;
 const CHAT_SKIN_ATTRIBUTE = 'data-ytcq-chat-skin';
 const CHAT_SKIN_THEME_ATTRIBUTE = 'data-ytcq-chat-skin-theme';
@@ -111,6 +114,7 @@ function handleRuntimeMessage(
 ): false {
   if (!isCurrentContentInstance()) return false;
   if (message?.type === 'ytcq:chat-attached-ping') {
+    document.documentElement.removeAttribute(CONTENT_REATTACHMENT_ATTRIBUTE);
     sendResponse({ attached: true });
     return false;
   }
@@ -365,6 +369,7 @@ function resetPageState(): void {
 
 function claimContentInstance(): void {
   document.addEventListener(CONTENT_INSTANCE_CLAIM_EVENT, handleContentInstanceClaim);
+  document.documentElement.removeAttribute(CONTENT_REATTACHMENT_ATTRIBUTE);
   document.documentElement.setAttribute(CONTENT_INSTANCE_ATTRIBUTE, CONTENT_INSTANCE_ID);
   document.dispatchEvent(new CustomEvent(CONTENT_INSTANCE_CLAIM_EVENT, {
     detail: { id: CONTENT_INSTANCE_ID }
@@ -396,8 +401,8 @@ function suspendContentInstance(): void {
   observer = null;
   document.removeEventListener('visibilitychange', handleVisibilityChange);
   document.removeEventListener(CONTENT_INSTANCE_CLAIM_EVENT, handleContentInstanceClaim);
-  chrome.storage.onChanged.removeListener(handleStorageChanged);
-  chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
+  chrome.storage?.onChanged.removeListener(handleStorageChanged);
+  chrome.runtime?.onMessage.removeListener(handleRuntimeMessage);
   stopYouTubeChatFeedRecordStore();
   suspendFeatures();
 }

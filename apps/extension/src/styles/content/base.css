@@ -2,6 +2,11 @@
  * Shared content-script base styles for extension-owned controls and rounded
  * surface defaults inside YouTube live chat.
  */
+/* CSS removal restores the inline zero height, notifying the page-world guard. */
+#ytcq-content-lifetime {
+  height: 1px !important;
+}
+
 :where(button[class^="ytcq-"], button[class*=" ytcq-"]) {
   -webkit-appearance: none;
   appearance: none;

@@ -6,7 +6,7 @@ description: "Comment Chat Enhancer for YouTube gère le stockage local, la trad
 
 # Politique de confidentialité
 
-Dernière mise à jour : 24 juillet 2026
+Dernière mise à jour : 11 septembre 2026
 
 Chat Enhancer for YouTube est une extension de navigateur pour le chat en direct YouTube. Elle est conçue pour ajouter de petites fonctions au chat sans remplacer le chat YouTube ni collecter d’analyses.
 
@@ -20,11 +20,13 @@ Version courte :
 
 ## Où l’extension s’exécute
 
-L’extension s’exécute uniquement sur les pages de chat en direct YouTube et de replay de chat en direct auxquelles l’extension est autorisée à accéder.
+L’extension s’exécute sur les pages de chat en direct YouTube et de replay du chat. Elle s’exécute aussi sur les pages YouTube pour prendre en charge la vidéo et le chat en mode image dans l’image.
 
 L’extension utilise une autorisation pour enregistrer ses propres paramètres et données dans votre navigateur. Elle utilise aussi l’accès aux sites précis nécessaires au fonctionnement de ses fonctions : pages de chat en direct YouTube, service de traduction Google Translate et serveur de jeu Chat Enhancer Playground opt-in.
 
-L’extension ne demande pas d’autorisations générales d’historique de navigation, de lecture des onglets, de scripting ou de navigation web.
+Dans Chrome et Edge, l’autorisation `scripting` rétablit le mode image dans l’image pour la vidéo et le chat après un rechargement ou une mise à jour de l’extension, sans actualiser l’onglet YouTube. L’extension ne demande pas d’autorisations générales d’historique de navigation, de lecture des onglets ou de navigation web.
+
+Cette autorisation permet aussi à l’extension de se connecter aux chats YouTube déjà ouverts lorsque vous l’installez ou l’activez.
 
 ## Données stockées dans votre navigateur
 

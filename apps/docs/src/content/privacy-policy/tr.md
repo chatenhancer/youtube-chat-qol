@@ -6,7 +6,7 @@ description: "Chat Enhancer for YouTube yerel depolamayı, çeviriyi, Playground
 
 # Gizlilik
 
-Son güncelleme: 24 Temmuz 2026
+Son güncelleme: 11 Eylül 2026
 
 Chat Enhancer for YouTube, YouTube canlı sohbeti için bir tarayıcı uzantısıdır. YouTube sohbetinin yerini almadan veya analitik toplamadan küçük sohbet özellikleri eklemek için tasarlanmıştır.
 
@@ -20,11 +20,13 @@ Kısa sürüm:
 
 ## Uzantının çalıştığı yer
 
-Uzantı yalnızca erişmesine izin verilen YouTube canlı sohbet ve canlı sohbet tekrar sayfalarında çalışır.
+Uzantı, YouTube canlı sohbet ve canlı sohbet tekrar sayfalarında çalışır. Video ve sohbet için resim içinde resim modunu desteklemek üzere YouTube sayfalarında da çalışır.
 
 Uzantı, kendi ayarlarını ve verilerini tarayıcınızda kaydetmek için izin kullanır. Ayrıca özelliklerinin çalışması için gereken belirli web sitelerine erişim kullanır: YouTube canlı sohbet sayfaları, Google Translate’in çeviri hizmeti ve isteğe bağlı Chat Enhancer Playground oyun sunucusu.
 
-Uzantı genel gezinme geçmişi, sekme okuma, scripting veya web navigation izinleri istemez.
+Chrome ve Edge’de `scripting` izni, uzantı yeniden yüklendikten veya güncellendikten sonra YouTube sekmesini yenilemeden video ve sohbetin resim içinde resim moduna yeniden bağlanmasını sağlar. Uzantı genel gezinme geçmişi, sekme okuma veya web gezintisi izinleri istemez.
+
+Bu izin, uzantıyı yüklediğinizde veya etkinleştirdiğinizde zaten açık olan YouTube sohbetlerine bağlanmasını da sağlar.
 
 ## Tarayıcınızda saklanan veriler
 

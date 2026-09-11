@@ -515,7 +515,7 @@ describe('YouTube chat feed page transport', () => {
       revision?: number;
       wrapper?: typeof window.fetch;
     };
-    expect(replacementState.revision).toBe(6);
+    expect(replacementState.revision).toBe(7);
     expect(replacementState.consumers).toBeInstanceOf(Set);
     expect(window.fetch).toBe(replacementState.wrapper);
     expect(window.fetch).not.toBe(legacyWrapper);
@@ -1516,6 +1516,7 @@ async function waitForLiteChatBatchCount(
 function cleanupLiteChatTransport(): void {
   const registry = window as unknown as Record<PropertyKey, unknown>;
   const state = registry[LITE_CHAT_TRANSPORT_STATE_KEY] as {
+    cleanupContentLifetime?: () => void;
     contextMenus?: { destroy?: () => void };
     handleControl?: (event: Event) => void;
     wrapper?: typeof window.fetch;
@@ -1525,6 +1526,7 @@ function cleanupLiteChatTransport(): void {
     window.removeEventListener(YOUTUBE_CHAT_FEED_CONTROL_EVENT, state.handleControl);
   }
   state?.contextMenus?.destroy?.();
+  state?.cleanupContentLifetime?.();
   Reflect.deleteProperty(registry, LITE_CHAT_TRANSPORT_STATE_KEY);
   if (originalWindowFetch) {
     window.fetch = originalWindowFetch;

@@ -1,5 +1,6 @@
 {
   "messages": {
+    "videoChatPipUnavailable": "Không khả dụng trong trình duyệt hoặc cửa sổ trò chuyện này.",
     "chatEnhancer": "Chat Enhancer",
     "onboardingMenuParticipants": "Người tham gia",
     "onboardingMenuTimestamps": "Dấu thời gian",

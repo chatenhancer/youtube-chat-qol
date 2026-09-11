@@ -48,14 +48,13 @@ export async function initMenuPreview(
     setSettingsToggleChecked(translate, Boolean(controls.targetLanguage.value));
   });
   const items = [translate, sound, lite];
-  if ('documentPictureInPicture' in window) {
-    const pip = createMenuActionItem({
-      action: 'picture-in-picture', label: t('videoChatPip'), iconPath: PIP_ICON_PATH,
-      title: t('videoChatPipTooltip'),
-      onClick: () => root.classList.toggle('preview-pip-info-visible')
-    });
-    items.push(pip);
-  }
+  const pipAvailable = 'documentPictureInPicture' in window;
+  items.push(createMenuActionItem({
+    action: 'picture-in-picture', label: t('videoChatPip'), iconPath: PIP_ICON_PATH,
+    title: t(pipAvailable ? 'videoChatPipTooltip' : 'videoChatPipUnavailable'),
+    disabled: !pipAvailable,
+    onClick: () => root.classList.toggle('preview-pip-info-visible')
+  }));
   const menu = document.createElement('ytd-menu-popup-renderer');
   menu.id = 'previewSettingsMenu';
   menu.className = 'preview-settings-menu ytcq-live-chat-menu-size-repaired';
@@ -70,7 +69,7 @@ export async function initMenuPreview(
   // Keep the PiP explanation's link next in the keyboard order after its row.
   root.insertBefore(menu, root.querySelector('.preview-tooltip-layer'));
   const pipTooltip = root.querySelector<HTMLElement>('#previewPipTooltip');
-  if (pipTooltip && 'documentPictureInPicture' in window) {
+  if (pipTooltip && pipAvailable) {
     // Follow the menu's real size so translated labels keep the explanation
     // below the popup with its arrow centered.
     const positionTooltip = (): void => {
