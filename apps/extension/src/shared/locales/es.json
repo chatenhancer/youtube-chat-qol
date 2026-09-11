@@ -685,7 +685,7 @@
       "message": "Restaurar marcador"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Este menú permite activar y desactivar rápidamente los ajustes de Chat Enhancer, junto con los ajustes propios de YouTube."
+      "message": "Haz clic en el icono de Chat Enhancer para abrir los ajustes rápidos."
     },
     "onboardingBookmarkTooltip": {
       "message": "Guarda este mensaje en la pestaña Marcadores de la extensión, incluso después de salir de la transmisión. Haz clic de nuevo para quitarlo."

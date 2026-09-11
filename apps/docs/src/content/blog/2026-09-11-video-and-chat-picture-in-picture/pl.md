@@ -24,9 +24,8 @@ Przesuń je w wygodne miejsce i oglądaj dalej. Nadal możesz czytać wiadomośc
 
 Na stronie oglądania YouTube z otwartym czatem na żywo:
 
-1. Otwórz **Więcej opcji** w nagłówku czatu.
-2. Wybierz **Chat Enhancer**.
-3. Wybierz **Wideo i czat PiP**.
+1. Kliknij ikonę **Chat Enhancer** u góry czatu.
+2. Wybierz **Wideo i czat PiP**.
 
 :::
 

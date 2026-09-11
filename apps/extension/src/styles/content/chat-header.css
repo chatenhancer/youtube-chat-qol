@@ -8,7 +8,7 @@ yt-live-chat-participant-renderer .ytcq-profile-enabled {
   cursor: pointer;
 }
 
-yt-live-chat-header-renderer .ytcq-inbox-button,
+yt-live-chat-header-renderer :is(.ytcq-inbox-button, .ytcq-settings-button),
 yt-live-chat-header-renderer .ytcq-games-button {
   position: relative;
   display: inline-flex;
@@ -27,15 +27,29 @@ yt-live-chat-header-renderer .ytcq-games-button {
   vertical-align: middle;
 }
 
-yt-live-chat-header-renderer .ytcq-inbox-button:hover,
-yt-live-chat-header-renderer .ytcq-inbox-button:focus,
+yt-live-chat-header-renderer .ytcq-settings-button {
+  flex: 0 0 40px;
+}
+
+@media (max-width: 360px) {
+  /* Leave room for YouTube's chat selector and Top fans in narrow PiP panes. */
+  :root:not([data-ytcq-onboarding]) yt-live-chat-header-renderer :is(.ytcq-settings-button, .ytcq-inbox-button, .ytcq-games-button) {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+  }
+}
+
+yt-live-chat-header-renderer :is(.ytcq-inbox-button, .ytcq-settings-button):hover,
+yt-live-chat-header-renderer :is(.ytcq-inbox-button, .ytcq-settings-button):focus,
 yt-live-chat-header-renderer .ytcq-games-button:hover,
 yt-live-chat-header-renderer .ytcq-games-button:focus {
   background: var(--ytcq-chat-header-icon-hover-background);
   outline: none;
 }
 
-yt-live-chat-header-renderer .ytcq-inbox-button svg,
+yt-live-chat-header-renderer :is(.ytcq-inbox-button, .ytcq-settings-button) svg,
 yt-live-chat-header-renderer .ytcq-games-button svg {
   display: block;
   width: 24px;

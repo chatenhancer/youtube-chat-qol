@@ -685,7 +685,7 @@
       "message": "Bladwijzer herstellen"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Dit menu bevat schakelaars om Chat Enhancer-instellingen snel aan of uit te zetten, naast de eigen instellingen van YouTube."
+      "message": "Klik op het Chat Enhancer-pictogram om de snelle instellingen te openen."
     },
     "onboardingBookmarkTooltip": {
       "message": "Bewaar dit bericht op het tabblad Bladwijzers van de extensie, ook nadat je de stream verlaat. Klik nogmaals om het te verwijderen."

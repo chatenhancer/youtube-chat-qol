@@ -1,49 +1,32 @@
 /*
- * Extension controls inserted into YouTube chat settings and message menus.
+ * Chat Enhancer quick settings and controls in YouTube message menus.
  */
 ytd-menu-popup-renderer.ytcq-live-chat-menu-size-repaired {
   width: max-content !important;
   max-width: min(360px, calc(100vw - 16px)) !important;
 }
 
-ytd-menu-popup-renderer.ytcq-settings-expanded-menu {
-  max-height: min(80vh, 360px) !important;
-  /* Override YouTube's popup scrolling; the inner list owns scrolling. */
-  overflow: hidden !important;
-  transform: translateY(var(--ytcq-context-shift-y, 0px));
-}
-
-ytd-menu-popup-renderer.ytcq-settings-expanded-menu #items {
+.ytcq-settings-menu {
+  position: fixed;
+  z-index: var(--ytcq-layer-popover);
   box-sizing: border-box;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 16px));
   max-height: min(80vh, 360px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: auto;
+  padding: 8px 0;
+  border-radius: 12px;
+  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #0f0f0f));
+  background: var(--yt-spec-menu-background, var(--yt-sys-color-baseline--menu-background, var(--yt-live-chat-background-color, #fff)));
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
 }
 
-ytd-menu-popup-renderer.ytcq-settings-expanded-menu:not(.ytcq-settings-submenu-open) .ytcq-settings-submenu-item,
-ytd-menu-popup-renderer.ytcq-settings-submenu-open #items > :not(.ytcq-settings-submenu-item) {
-  display: none !important;
+.ytcq-settings-menu .ytcq-settings-item {
+  outline: none;
 }
 
-ytd-menu-popup-renderer [data-ytcq-action="settings-back"] {
-  box-shadow: inset 0 -1px var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.2));
-}
-
-ytd-menu-popup-renderer .ytcq-submenu-chevron {
-  width: 20px;
-  height: 20px;
-  flex: none;
-  fill: currentColor;
-  opacity: 0.86;
-  transform: rotate(180deg);
-}
-
-ytd-menu-popup-renderer:dir(rtl) .ytcq-submenu-chevron {
-  transform: none;
-}
-
-ytd-menu-popup-renderer:dir(rtl) [data-ytcq-action="settings-back"] .ytcq-menu-icon {
-  transform: rotate(180deg);
+.ytcq-settings-menu .ytcq-settings-item:focus-visible .ytcq-paper-item {
+  background: var(--ytcq-menu-hover-background);
 }
 
 ytd-menu-popup-renderer.ytcq-context-expanded-menu {
@@ -57,8 +40,8 @@ ytd-menu-popup-renderer.ytcq-context-expanded-menu #items {
   overflow-x: hidden;
 }
 
-ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item,
-ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-settings-item .ytcq-paper-item,
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-item .ytcq-paper-item {
   --ytcq-menu-hover-background: var(--yt-spec-touch-response, var(--yt-spec-10-percent-layer, rgba(128, 128, 128, 0.16)));
   cursor: pointer;
   min-height: 40px;
@@ -76,46 +59,26 @@ ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item {
   outline: none;
 }
 
-/* Match YouTube's 36px settings rows on both pages of the popup. */
-ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item {
+/* Keep quick settings as compact as YouTube's native menu rows. */
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-settings-item .ytcq-paper-item {
   min-height: 36px;
 }
 
-ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item:hover,
-ytd-menu-popup-renderer .ytcq-settings-item .ytcq-paper-item:focus-visible,
-ytd-menu-popup-renderer .ytcq-context-item .ytcq-paper-item:hover {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-settings-item .ytcq-paper-item:hover,
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-settings-item .ytcq-paper-item:focus-visible,
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-item .ytcq-paper-item:hover {
   background: var(--ytcq-menu-hover-background);
 }
 
-/* The back row is a compact navigation header, with hover on its arrow only. */
-ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-paper-item {
-  padding-inline-start: 14px;
-  /* Balance YouTube's 8px inset above the row against the divider below. */
-  padding-block-end: 8px;
-  gap: 8px;
-}
-
-ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-menu-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  opacity: 1;
-}
-
-ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-paper-item:is(:hover, :focus-visible) {
-  background: transparent;
-}
-
-ytd-menu-popup-renderer [data-ytcq-action="settings-back"] .ytcq-paper-item:is(:hover, :focus-visible) .ytcq-menu-icon {
-  background: var(--ytcq-menu-hover-background);
-}
-
-ytd-menu-popup-renderer [data-ytcq-action="picture-in-picture"] .ytcq-menu-label {
+.ytcq-settings-menu .ytcq-menu-label {
+  /* Pad wrapped labels while single-line rows keep YouTube's compact height. */
+  padding-block: 4px;
   white-space: normal;
+  hyphens: auto;
   overflow-wrap: anywhere;
 }
 
-ytd-menu-popup-renderer .ytcq-context-split-item .ytcq-paper-item {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-item .ytcq-paper-item {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 9px minmax(0, 1fr);
   gap: 0;
@@ -124,15 +87,15 @@ ytd-menu-popup-renderer .ytcq-context-split-item .ytcq-paper-item {
   cursor: default;
 }
 
-ytd-menu-popup-renderer .ytcq-context-split-item .ytcq-paper-item:hover {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-item .ytcq-paper-item:hover {
   background: transparent;
 }
 
-ytd-menu-popup-renderer .ytcq-context-split-row {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-row {
   justify-content: initial;
 }
 
-ytd-menu-popup-renderer .ytcq-context-split-button {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -147,13 +110,13 @@ ytd-menu-popup-renderer .ytcq-context-split-button {
   cursor: pointer;
 }
 
-ytd-menu-popup-renderer .ytcq-context-split-button:hover,
-ytd-menu-popup-renderer .ytcq-context-split-button:focus {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-button:hover,
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-button:focus {
   background: var(--ytcq-menu-hover-background);
   outline: none;
 }
 
-ytd-menu-popup-renderer .ytcq-context-split-divider {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-context-split-divider {
   width: 1px;
   height: 20px;
   margin: 0 4px;
@@ -161,7 +124,7 @@ ytd-menu-popup-renderer .ytcq-context-split-divider {
   flex: 0 0 auto;
 }
 
-ytd-menu-popup-renderer .ytcq-menu-icon {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon {
   width: 24px;
   height: 24px;
   color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, currentColor));
@@ -173,50 +136,50 @@ ytd-menu-popup-renderer .ytcq-menu-icon {
   opacity: 0.86;
 }
 
-ytd-menu-popup-renderer .ytcq-menu-icon svg {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon svg {
   display: block;
   width: 24px;
   height: 24px;
   pointer-events: none;
 }
 
-ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon.ytcq-bell-ringing svg {
   transform-origin: 50% 16%;
   animation: ytcq-bell-ring 620ms ease-in-out;
 }
 
-ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing .ytcq-bell-clapper {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon.ytcq-bell-ringing .ytcq-bell-clapper {
   animation: ytcq-bell-clapper-swing 620ms ease-in-out;
 }
 
-ytd-menu-popup-renderer .ytcq-translate-menu-icon {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon {
   transform-origin: center;
 }
 
-ytd-menu-popup-renderer .ytcq-translate-menu-icon .ytcq-translate-source-mark,
-ytd-menu-popup-renderer .ytcq-translate-menu-icon .ytcq-translate-target-mark {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon .ytcq-translate-source-mark,
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon .ytcq-translate-target-mark {
   transform-box: fill-box;
   transform-origin: center;
 }
 
-ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse {
   animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
-ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark {
   animation: ytcq-translation-source-pop 560ms ease-out;
 }
 
-ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
   animation: ytcq-translation-target-pop 560ms ease-out 60ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing svg,
-  ytd-menu-popup-renderer .ytcq-menu-icon.ytcq-bell-ringing .ytcq-bell-clapper,
-  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse,
-  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
-  ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark,
+  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon.ytcq-bell-ringing svg,
+  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-icon.ytcq-bell-ringing .ytcq-bell-clapper,
+  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse,
+  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
+  :is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-translate-target-mark,
   .ytcq-composer-translate-icon.ytcq-translation-pulse,
   .ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-source-mark,
   .ytcq-composer-translate-icon.ytcq-translation-pulse .ytcq-translate-target-mark {
@@ -224,18 +187,18 @@ ytd-menu-popup-renderer .ytcq-translate-menu-icon.ytcq-translation-pulse .ytcq-t
   }
 }
 
-ytd-menu-popup-renderer .ytcq-menu-label {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-label {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-ytd-menu-popup-renderer .ytcq-toggle-item .ytcq-paper-item {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-toggle-item .ytcq-paper-item {
   gap: 16px;
 }
 
-ytd-menu-popup-renderer .ytcq-menu-toggle {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-toggle {
   position: relative;
   display: inline-flex;
   width: 34px;
@@ -247,7 +210,7 @@ ytd-menu-popup-renderer .ytcq-menu-toggle {
   opacity: 0.82;
 }
 
-ytd-menu-popup-renderer .ytcq-menu-toggle::after {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-menu-toggle::after {
   content: "";
   position: absolute;
   top: -3px;
@@ -260,11 +223,11 @@ ytd-menu-popup-renderer .ytcq-menu-toggle::after {
   transition: transform 120ms ease, background 120ms ease;
 }
 
-ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle {
   background: var(--paper-toggle-button-checked-bar-color, rgba(62, 166, 255, 0.45));
 }
 
-ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle::after {
+:is(ytd-menu-popup-renderer, .ytcq-settings-menu) .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle::after {
   transform: translateX(14px);
   background: var(--paper-toggle-button-checked-button-color, var(--yt-spec-call-to-action, #3ea6ff));
 }

@@ -12,45 +12,42 @@ import {
   openSettingsMenu
 } from '../support/menu-openers';
 import type { BrowserScenario, ChatSurface } from './types';
-
-export const settingsMenuScenario: BrowserScenario = async ({ chat, page }) => {
-  const menu = await openSettingsMenu(chat);
-  const entry = menu.locator('[data-ytcq-action="chat-enhancer"]');
-  const nativeRows = menu.locator('#items > :not(.ytcq-settings-item)');
-  const nativeCount = await nativeRows.count();
-  await expect(menu.locator('.ytcq-settings-item:visible')).toHaveCount(1);
-  await expect(entry).toHaveText('Chat Enhancer');
-  const nativeRow = (await nativeRows.first().boundingBox())!;
-  const labelColor = await entry.locator('.ytcq-paper-item').evaluate(element => getComputedStyle(element).color);
-  await expect(entry.locator('.ytcq-submenu-chevron')).toHaveCSS('fill', labelColor);
-  await entry.press('Enter');
+export const settingsMenuScenario: BrowserScenario = async ({ chat }) => {
+  const nativeMenu = await openSettingsMenu(chat);
+  await expect(nativeMenu.locator('.ytcq-settings-item')).toHaveCount(0);
+  const nativeRow = (await nativeMenu.locator('#items > *').first().boundingBox())!;
+  await closeOpenMenus(chat);
+  const button = chat.locator('.ytcq-settings-button');
+  await expect(button).toHaveCount(1);
+  await button.hover();
+  await expect(chat.locator('.ytcq-settings-menu')).toHaveCount(0);
+  await button.press('Enter');
+  const menu = chat.locator('.ytcq-settings-menu');
   await expectSettingsMenuControlsInjected(menu);
-  const backRow = (await menu.locator('[data-ytcq-action="settings-back"]').boundingBox())!;
-  expect(backRow.height).toBeCloseTo(nativeRow.height, 0);
-  expect(backRow.y).toBeCloseTo(nativeRow.y, 0);
-  await expect(nativeRows.first()).toBeHidden();
-  const translate = menu.locator('[data-ytcq-setting="targetLanguage"] .ytcq-paper-item');
+  await expect(button).toHaveAttribute('aria-expanded', 'true');
+  await expect(menu.locator('[data-ytcq-action="settings-back"]')).toHaveCount(0);
+  const translate = menu.locator('[data-ytcq-setting="targetLanguage"]');
   await expect(translate).toBeFocused();
+  const settingRowHeights = await menu.locator('[data-ytcq-setting]').evaluateAll(rows =>
+    rows.map(row => row.getBoundingClientRect().height)
+  );
+  for (const height of settingRowHeights) expect(height).toBeCloseTo(nativeRow.height, 0);
   await translate.press('ArrowDown');
-  const sound = menu.locator('[data-ytcq-setting="sound"] .ytcq-paper-item');
+  const sound = menu.locator('[data-ytcq-setting="sound"]');
   await expect(sound).toBeFocused();
   await sound.press('Escape');
-  await expect(entry).toBeVisible();
-  await expect(nativeRows).toHaveCount(nativeCount);
-  await expect(nativeRows.first()).toBeVisible();
-  await entry.press('ArrowRight');
-  await expect(translate).toBeVisible();
-  await menu.locator('[data-ytcq-action="settings-back"]').click();
-  await expect(entry).toBeVisible();
-  await entry.click();
-  await closeNativeMenuStep(chat, 'Close settings menu');
-  const reopened = await openSettingsMenu(chat);
-  await expect(reopened.locator('.ytcq-settings-item:visible')).toHaveCount(1);
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await reopened.locator('[data-ytcq-action="chat-enhancer"]').click();
-  expect(await reopened.locator('#items').evaluate(list => list.getAnimations().length)).toBe(0);
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await closeNativeMenuStep(chat, 'Close reopened settings menu');
+  await expect(menu).toHaveCount(0);
+  await expect(button).toBeFocused();
+  await button.press('ArrowDown');
+  await expect(translate).toBeFocused();
+  await button.click();
+  await expect(menu).toHaveCount(0);
+  await button.click();
+  await chat.locator('#live-chat-header-context-menu').getByRole('button').click();
+  await expect(menu).toHaveCount(0);
+  await expect(nativeMenu).toBeVisible();
+  await expect(nativeMenu.locator('.ytcq-settings-item')).toHaveCount(0);
+  await closeOpenMenus(chat);
 };
 
 export const settingsMenuButtonTargetScenario: BrowserScenario = async ({ chat }) => {
@@ -150,17 +147,16 @@ export async function expectSettingsMenuControlsInjected(menu: Locator): Promise
 
   await test.step('Verify extension settings are inside the visible menu area', async () => {
     await expect.poll(async () => menu.evaluate((element) => {
-      const list = element.querySelector<HTMLElement>('#items');
-      const items = Array.from(element.querySelectorAll<HTMLElement>('.ytcq-settings-submenu-item'));
-      if (!list || items.length < 2) return false;
+      const items = Array.from(element.querySelectorAll<HTMLElement>('.ytcq-settings-item'));
+      if (items.length < 2) return false;
 
-      const bounds = list.getBoundingClientRect();
+      const bounds = element.getBoundingClientRect();
       return items.every((item) => {
         const rect = item.getBoundingClientRect();
         return rect.top >= bounds.top - 1 && rect.bottom <= bounds.bottom + 1;
       });
     }), {
-      message: 'Expected extension settings rows to be visible without scrolling the native menu.'
+      message: 'Expected quick settings rows to fit inside the menu.'
     }).toBe(true);
   });
 }

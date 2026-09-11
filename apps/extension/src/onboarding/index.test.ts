@@ -21,6 +21,10 @@ describe('onboarding settings', () => {
   beforeEach(async () => {
     vi.resetModules();
     vi.useFakeTimers();
+    vi.stubGlobal('ResizeObserver', class {
+      observe = vi.fn();
+      disconnect = vi.fn();
+    });
     document.open();
     document.write(onboardingHtml);
     document.close();
@@ -32,6 +36,7 @@ describe('onboarding settings', () => {
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.useRealTimers();
   });
 

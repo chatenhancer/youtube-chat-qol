@@ -688,7 +688,7 @@
       "message": "Restore bookmark"
     },
     "onboardingChatMenuTooltip": {
-      "message": "This menu contains quick toggles for Chat Enhancer settings alongside YouTube’s own settings."
+      "message": "Click the Chat Enhancer icon to open quick settings."
     },
     "onboardingBookmarkTooltip": {
       "message": "Save this message in the extension’s Bookmarks tab, even after leaving the stream. Click again to remove it."

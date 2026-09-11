@@ -685,7 +685,7 @@
       "message": "Restaurer le favori"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Ce menu permet d’activer ou de désactiver rapidement les réglages de Chat Enhancer, aux côtés des paramètres propres à YouTube."
+      "message": "Cliquez sur l’icône Chat Enhancer pour ouvrir les réglages rapides."
     },
     "onboardingBookmarkTooltip": {
       "message": "Enregistrez ce message dans l’onglet Favoris de l’extension pour le retrouver après le direct. Cliquez à nouveau pour le retirer."

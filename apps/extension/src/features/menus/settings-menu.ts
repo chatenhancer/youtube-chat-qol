@@ -1,9 +1,6 @@
 /**
- * Live chat settings menu integration.
- *
- * Adds extension controls into YouTube's existing chat settings popup instead
- * of building a separate in-chat settings surface. Keep this menu to quick
- * stream-time toggles; detailed settings belong in the extension popup.
+ * Quick settings shared by the dedicated Chat Enhancer menu.
+ * Detailed settings remain in the browser extension popup.
  */
 import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } from '../../shared/options';
 import { getOptions } from '../../shared/state';
@@ -13,6 +10,7 @@ import {
   MATERIAL_ICON_VIEW_BOX,
   SOUND_BELL_ICON_PATH,
   TRANSLATE_ICON_PATH,
+  createBoltIcon,
   createSoundBellIcon,
   createSplitTranslateIcon
 } from '../../shared/icons';
@@ -20,14 +18,13 @@ import { isSupportedLiteModePage } from '../lite-mode/bootstrap';
 import { playAlertSoundPreview } from '../../shared/sounds/alert-sounds';
 import { animateSettingIcon, SETTING_ICON_ANIMATIONS } from '../../shared/setting-icon-animations';
 import { registerFeature } from '../../content/dispatcher';
-import { clampMenuToViewport, closeMenu, createMenuActionItem, createMenuToggleItem } from './common';
+import { createMenuActionItem, createMenuToggleItem } from './common';
 import {
   canTogglePictureInPicture,
   isPictureInPictureChat,
   togglePictureInPicture
 } from '../picture-in-picture/bridge';
 import { PIP_ICON_PATH } from '../picture-in-picture/ui';
-import { appendSettingsSubmenu, resetSettingsSubmenus } from './settings-submenu';
 
 type SaveOptions = (values: Partial<Options>) => void;
 
@@ -36,7 +33,8 @@ let saveOptions: SaveOptions = () => {};
 registerFeature({
   page: {
     init: ({ saveOptions }) => configureSettingsMenu(saveOptions),
-    optionsChanged: refreshSettingsMenus
+    optionsChanged: refreshSettingsMenus,
+    reset: refreshSettingsMenus
   }
 });
 
@@ -44,12 +42,8 @@ export function configureSettingsMenu(callback: SaveOptions): void {
   saveOptions = callback;
 }
 
-export function enhanceSettingsMenu(menu: HTMLElement): void {
-  const list = menu.querySelector('#items');
-  if (!list || list.querySelector(':scope .ytcq-settings-item')) return;
-
+export function createSettingsMenuItems(close: () => void): HTMLElement[] {
   const options = getOptions();
-  prepareSettingsMenu(menu);
   let translateItem: HTMLElement | null = null;
   translateItem = createMenuToggleItem({
     setting: 'targetLanguage',
@@ -88,14 +82,24 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
   renderSoundMenuIcon(soundItem, options.sound);
   const items = [translateItem, soundItem];
   if (isSupportedLiteModePage()) {
-    items.push(createMenuToggleItem({
+    const liteModeIcon = createBoltIcon({
+      drawMaskId: `ytcq-menu-lite-mode-draw-mask-${crypto.randomUUID()}`
+    });
+    liteModeIcon.classList.add('lite-mode-icon');
+    const liteModeItem = createMenuToggleItem({
       setting: 'liteModeEnabled',
       label: t('liteMode'),
       checked: options.liteModeEnabled,
       iconPath: BOLT_ICON_PATH,
       iconViewBox: MATERIAL_ICON_VIEW_BOX,
-      onClick: () => saveOptions({ liteModeEnabled: !getOptions().liteModeEnabled })
-    }));
+      onClick: () => {
+        const enabled = !getOptions().liteModeEnabled;
+        if (enabled) animateSettingIcon(liteModeIcon, SETTING_ICON_ANIMATIONS.liteMode);
+        saveOptions({ liteModeEnabled: enabled });
+      }
+    });
+    liteModeItem.querySelector('.ytcq-menu-icon')?.replaceChildren(liteModeIcon);
+    items.push(liteModeItem);
   }
   if (canTogglePictureInPicture()) {
     items.push(createMenuActionItem({
@@ -103,14 +107,12 @@ export function enhanceSettingsMenu(menu: HTMLElement): void {
       label: t(isPictureInPictureChat() ? 'returnVideoChat' : 'videoChatPip'),
       iconPath: PIP_ICON_PATH,
       onClick: () => {
-        closeMenu();
+        close();
         togglePictureInPicture();
       }
     }));
   }
-  appendSettingsSubmenu(menu, items);
-  refreshSettingsMenus();
-  clampMenuToViewport(menu);
+  return items;
 }
 
 export function refreshSettingsMenus(): void {
@@ -135,7 +137,13 @@ export function refreshSettingsMenus(): void {
 }
 
 export function cleanupStaleSettingsMenuSurfaces(): void {
-  resetSettingsSubmenus();
+  // Firefox can keep the previous extension's injected submenu after reload.
+  document.querySelectorAll('.ytcq-settings-expanded-menu').forEach((menu) => {
+    menu.classList.remove('ytcq-settings-expanded-menu', 'ytcq-settings-submenu-open');
+    for (const animation of menu.querySelector('#items')?.getAnimations?.() || []) {
+      if (animation.id === 'ytcq-settings-page') animation.cancel();
+    }
+  });
   document.querySelectorAll('.ytcq-settings-item').forEach((item) => item.remove());
 }
 
@@ -176,13 +184,4 @@ function prepareTranslateMenuIcon(item: HTMLElement): void {
 function animateTranslateMenuIcon(item: HTMLElement): void {
   const icon = item.querySelector<HTMLElement>('.ytcq-translate-menu-icon');
   animateSettingIcon(icon, SETTING_ICON_ANIMATIONS.translation);
-}
-
-function prepareSettingsMenu(menu: HTMLElement): void {
-  menu.classList.add('ytcq-settings-expanded-menu');
-  menu.classList.remove('ytcq-context-expanded-menu');
-  menu.style.setProperty('--ytcq-context-shift-y', '0px');
-  menu.style.removeProperty('width');
-  menu.style.removeProperty('min-width');
-  menu.style.removeProperty('max-width');
 }

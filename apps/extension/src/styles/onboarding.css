@@ -657,14 +657,16 @@ optgroup {
 .preview-games-tooltip::before,
 .preview-inbox-tooltip::before {
   top: -5px;
-  inset-inline-end: 89px;
   border-top: 1px solid var(--preview-callout-border);
   border-left: 1px solid var(--preview-callout-border);
   transform: rotate(45deg);
 }
 
-.preview-games-tooltip::before {
-  inset-inline-end: 129px;
+.preview-chat-menu-tooltip::before,
+.preview-games-tooltip::before,
+.preview-inbox-tooltip::before {
+  left: var(--preview-header-arrow-left, 50%);
+  inset-inline-end: auto;
 }
 
 .preview-draft-translator-tooltip {
@@ -699,8 +701,8 @@ optgroup {
 
 .chat-preview:has(#previewMenuButton:hover):not(:has(#previewSettingsMenu:not([hidden]))) .preview-chat-menu-tooltip,
 .chat-preview:has([data-ytcq-action="picture-in-picture"]:is(:hover, :focus-within)) .preview-pip-tooltip,
-.chat-preview.preview-pip-info-visible:has(#previewSettingsMenu.ytcq-settings-submenu-open:not([hidden])) .preview-pip-tooltip,
-.chat-preview:has(#previewSettingsMenu.ytcq-settings-submenu-open:not([hidden])) .preview-pip-tooltip:is(:hover, :focus-within),
+.chat-preview.preview-pip-info-visible:has(#previewSettingsMenu:not([hidden])) .preview-pip-tooltip,
+.chat-preview:has(#previewSettingsMenu:not([hidden])) .preview-pip-tooltip:is(:hover, :focus-within),
 .chat-preview:has(#previewGamesIcon:hover) .preview-games-tooltip,
 .chat-preview:has(#previewInboxIcon:not([aria-expanded="true"]):hover) .preview-inbox-tooltip,
 .chat-preview:has(#previewComposerTranslateIcon:hover) .preview-draft-translator-tooltip,
@@ -721,11 +723,10 @@ optgroup {
   line-height: 22px;
 }
 
-ytd-menu-popup-renderer.preview-settings-menu {
+.ytcq-settings-menu.preview-settings-menu {
   position: absolute;
   z-index: 6;
   top: 52px;
-  inset-inline-end: 8px;
   display: block;
   width: max-content;
   max-width: calc(100% - 16px);
@@ -740,18 +741,6 @@ ytd-menu-popup-renderer.preview-settings-menu {
 
 .preview-settings-menu[hidden] {
   display: none !important;
-}
-
-.preview-settings-menu #items {
-  padding: 8px 0;
-}
-
-.preview-settings-menu .preview-native-menu-item .ytcq-paper-item {
-  cursor: default;
-}
-
-.preview-settings-menu .preview-native-menu-item .ytcq-paper-item:hover {
-  background: transparent;
 }
 
 .preview-top-chat svg {

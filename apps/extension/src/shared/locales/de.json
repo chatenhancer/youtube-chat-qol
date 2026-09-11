@@ -685,7 +685,7 @@
       "message": "Lesezeichen wiederherstellen"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Dieses Menü enthält Schnellschalter für Chat Enhancer sowie die eigenen Einstellungen von YouTube."
+      "message": "Klicke auf das Chat Enhancer-Symbol, um die Schnelleinstellungen zu öffnen."
     },
     "onboardingBookmarkTooltip": {
       "message": "Speichere diese Nachricht im Tab „Lesezeichen“ der Erweiterung, auch über den Stream hinaus. Klicke erneut, um sie zu entfernen."

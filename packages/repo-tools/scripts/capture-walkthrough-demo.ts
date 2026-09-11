@@ -381,17 +381,10 @@ async function recordWalkthrough(page, chat, context, recorder) {
 async function sectionTranslateChat(page, chat, context, recorder) {
   await focusChatHeader(page, chat, recorder, { showFocus: false });
   await positionDemoChatAtMessage(chat, 'translate-2');
-  const settingsButton = chat.locator([
-    'yt-live-chat-header-renderer #live-chat-header-context-menu button',
-    'yt-live-chat-header-renderer #live-chat-header-context-menu yt-icon-button',
-    'yt-live-chat-header-renderer #live-chat-header-context-menu'
-  ].join(',')).first();
+  const settingsButton = chat.locator('yt-live-chat-header-renderer .ytcq-settings-button');
   const settingsMenu = await openChatSettingsMenu(page, chat, recorder, settingsButton, {
     caption: getWalkthroughClickCaption('translateLiveChat')
   });
-  await clickWithCursor(page, settingsMenu.locator('[data-ytcq-action="chat-enhancer"]'), recorder, 'Chat Enhancer menu');
-  await captureStableLocatorState(settingsMenu, recorder, 'Chat Enhancer submenu');
-  await keepMenuWithinFrameViewport(settingsMenu);
   const translateSetting = settingsMenu.locator('.ytcq-settings-item[data-ytcq-setting="targetLanguage"]').first();
   await highlightLocator(page, translateSetting, recorder, 8);
   await recorder.hold(240);
@@ -437,61 +430,12 @@ async function sectionTranslateChat(page, chat, context, recorder) {
 }
 
 async function openChatSettingsMenu(page, chat, recorder, settingsButton, firstClickOptions) {
-  const markerSelector = '[data-ytcq-action="chat-enhancer"]';
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    await closeNativeMenus(chat);
-    await clickWithCursor(page, settingsButton, recorder, 'chat settings button', attempt === 0
-      ? firstClickOptions
-      : { afterClickHoldMs: 260, durationMs: 420 });
-
-    await poll(async () => {
-      return Boolean(await findVisibleMenu(chat, markerSelector).catch(() => null));
-    }, {
-      label: 'chat settings menu',
-      timeout: 3_000
-    }).catch(() => undefined);
-
-    const menu = await findVisibleMenu(chat, markerSelector).catch(() => null);
-    if (menu) {
-      await keepMenuWithinFrameViewport(menu);
-      await captureStableLocatorState(menu, recorder, 'chat settings menu');
-      return menu;
-    }
-
-    await clickChatSettingsButtonDirectly(settingsButton);
-    const fallbackMenu = await findVisibleMenu(chat, markerSelector).catch(() => null);
-    if (fallbackMenu) {
-      await keepMenuWithinFrameViewport(fallbackMenu);
-      await captureStableLocatorState(fallbackMenu, recorder, 'chat settings fallback menu');
-      return fallbackMenu;
-    }
-  }
-
-  throw new Error('Timed out waiting for chat settings menu.');
-}
-
-async function clickChatSettingsButtonDirectly(settingsButton) {
-  await settingsButton.evaluate((element) => {
-    if (!(element instanceof HTMLElement)) return;
-    const target = element.matches('button, yt-icon-button')
-      ? element
-      : element.querySelector('button, yt-icon-button') || element;
-    if (!(target instanceof HTMLElement)) return;
-    const eventOptions = {
-      bubbles: true,
-      button: 0,
-      buttons: 1,
-      cancelable: true,
-      composed: true,
-      pointerId: 1,
-      pointerType: 'mouse'
-    };
-    target.dispatchEvent(new PointerEvent('pointerdown', eventOptions));
-    target.dispatchEvent(new MouseEvent('mousedown', eventOptions));
-    target.dispatchEvent(new PointerEvent('pointerup', { ...eventOptions, buttons: 0 }));
-    target.dispatchEvent(new MouseEvent('mouseup', { ...eventOptions, buttons: 0 }));
-    target.click();
-  }).catch(() => undefined);
+  await closeNativeMenus(chat);
+  await clickWithCursor(page, settingsButton, recorder, 'Chat Enhancer button', firstClickOptions);
+  const menu = chat.locator('.ytcq-settings-menu');
+  await menu.waitFor({ state: 'visible', timeout: 3_000 });
+  await captureStableLocatorState(menu, recorder, 'Chat Enhancer menu');
+  return menu;
 }
 
 async function sectionComposerTranslation(page, chat, recorder) {
@@ -2126,7 +2070,7 @@ async function closeNativeMenus(chat) {
   }).catch(() => undefined);
   for (let index = 0; index < 3; index += 1) {
     await chat.locator('body').press('Escape').catch(() => undefined);
-    const menu = await findVisibleNativeMenu(chat).catch(() => null);
+    const menu = await findVisibleMenuToClose(chat).catch(() => null);
     if (!menu) break;
     await menu.press('Escape').catch(() => undefined);
   }
@@ -2163,30 +2107,8 @@ async function closeGamesPanelIfPresent(chat) {
   }
 }
 
-async function keepMenuWithinFrameViewport(menu) {
-  await menu.evaluate((element) => {
-    if (!(element instanceof HTMLElement)) return;
-    const rect = element.getBoundingClientRect();
-    const viewportPadding = 8;
-    const nextTop = Math.max(
-      viewportPadding,
-      Math.min(rect.top, window.innerHeight - rect.height - viewportPadding)
-    );
-    const nextLeft = Math.max(
-      viewportPadding,
-      Math.min(rect.left, window.innerWidth - rect.width - viewportPadding)
-    );
-    element.style.position = 'fixed';
-    element.style.inset = 'auto';
-    element.style.top = `${nextTop}px`;
-    element.style.left = `${nextLeft}px`;
-    element.style.right = 'auto';
-    element.style.bottom = 'auto';
-  });
-}
-
-async function findVisibleNativeMenu(chat) {
-  const menus = chat.locator(menuPopupSelector);
+async function findVisibleMenuToClose(chat) {
+  const menus = chat.locator(`${menuPopupSelector}, .ytcq-settings-menu`);
   const count = await menus.count();
   for (let index = count - 1; index >= 0; index -= 1) {
     const menu = menus.nth(index);

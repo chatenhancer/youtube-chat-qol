@@ -2,8 +2,8 @@
  * Menu router.
  *
  * YouTube renders chat settings and message context actions with the same popup
- * renderer. This module classifies each popup after Polymer stamps its children
- * and routes it to the correct enhancer.
+ * renderer. This module recognizes message menus after Polymer stamps their
+ * children, keeping the native chat settings menu separate.
  */
 import { registerFeature } from '../../content/dispatcher';
 import { CHAT_HEADER_SELECTOR } from '../../youtube/selectors';
@@ -12,8 +12,7 @@ import {
   enhanceMessageContextMenu,
   isRecentActiveContextMessage
 } from './message-menu';
-import { cleanupStaleSettingsMenuSurfaces, enhanceSettingsMenu, refreshSettingsMenus } from './settings-menu';
-import { handleSettingsSubmenuKeyDown, resetSettingsSubmenus } from './settings-submenu';
+import './settings-button';
 
 const LIVE_CHAT_MENU_MARKER_SELECTOR = [
   'yt-live-chat-toggle-renderer',
@@ -29,26 +28,20 @@ let headerMenuRequested = false;
 registerFeature({
   page: {
     init: () => {
-      window.addEventListener('keydown', handleSettingsSubmenuKeyDown, {
-        capture: true, signal: menuListeners.signal
-      });
       // New YouTube menus can omit the timestamps toggle. Remember the native
       // trigger instead of depending on localized labels or private commands.
       document.addEventListener('click', (event) => {
         if (event.target instanceof Element && event.target.closest('ytd-menu-popup-renderer')) return;
-        resetSettingsSubmenus();
         headerMenuRequested = event.target instanceof Element && Boolean(
           event.target.closest(`${CHAT_HEADER_SELECTOR} #live-chat-header-context-menu`)
         );
       }, { capture: true, signal: menuListeners.signal });
       document.addEventListener('contextmenu', () => {
         headerMenuRequested = false;
-        resetSettingsSubmenus();
       }, { capture: true, signal: menuListeners.signal });
     },
     boot: initMenus,
-    cleanup: cleanupStaleMenuSurfaces,
-    reset: refreshSettingsMenus
+    cleanup: cleanupStaleMenuSurfaces
   },
   mutation: handleMenuMutations
 });
@@ -61,9 +54,7 @@ export function enhanceMenu(menu: Element): void {
   if (!(menu instanceof HTMLElement)) return;
   window.setTimeout(() => {
     const repairedLiveChatMenu = repairLiveChatMenuSize(menu);
-    if (isChatSettingsMenu(menu)) {
-      enhanceSettingsMenu(menu);
-    } else if (isMessageContextMenu(menu)) {
+    if (isMessageContextMenu(menu)) {
       enhanceMessageContextMenu(menu);
     }
     if (repairedLiveChatMenu) {
@@ -77,7 +68,6 @@ export function cleanupStaleMenuSurfaces(): void {
   menuListeners = new AbortController();
   headerMenuRequested = false;
   cleanupStaleMessageMenuSurfaces();
-  cleanupStaleSettingsMenuSurfaces();
 }
 
 function handleMenuMutations({ addedElements, mutations }: {

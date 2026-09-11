@@ -20,13 +20,12 @@ Move it to a convenient corner and keep watching. You can still read and reply i
 
 :::media-left
 
-![The Chat Enhancer submenu with the Video + chat PiP option visible. All chat names, avatars, and messages are fictional.](./menu.png) {shadow=smooth}
+![The Chat Enhancer menu with the Video + chat PiP option visible. All chat names, avatars, and messages are fictional.](./menu.png) {shadow=smooth}
 
 On a YouTube watch page with live chat open:
 
-1. Click **More options**, the three dots at the top of chat.
-2. Open **Chat Enhancer**.
-3. Choose **Video + chat PiP**.
+1. Click the **Chat Enhancer** icon at the top of chat.
+2. Choose **Video + chat PiP**.
 
 :::
 

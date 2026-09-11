@@ -20,21 +20,8 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     await expect(onboarding.locator('#onboardingTargetLanguage')).toHaveValue('ja');
     await onboarding.locator('#previewMenuButton').click();
     const menu = onboarding.locator('#previewSettingsMenu');
-    const nativeRows = menu.locator('.preview-native-menu-item');
-    await expect(nativeRows).toHaveText([
-      'Participants', 'Timestamps', 'Reactions', 'Popout chat', 'Send feedback'
-    ]);
-    for (const row of await nativeRows.all()) await expect(row).toBeDisabled();
-    const entry = menu.locator('[data-ytcq-action="chat-enhancer"]');
-    await expect(entry.locator('.ytcq-paper-item')).toBeFocused();
-    const timestamps = menu.getByRole('menuitemcheckbox', { name: 'Timestamps', exact: true });
-    const bounds = await timestamps.boundingBox();
-    if (!bounds) throw new Error('Native menu preview is not visible.');
-    await onboarding.mouse.click(bounds.x + bounds.width - 20, bounds.y + bounds.height / 2);
-    await expect(timestamps).toHaveAttribute('aria-checked', 'false');
-    await expect(entry).toHaveAttribute('aria-expanded', 'false');
-    await menu.locator('[data-ytcq-action="chat-enhancer"]').click();
-    await expect(menu.locator('.preview-native-menu-item:visible')).toHaveCount(0);
+    await expect(menu.locator('[data-ytcq-setting="targetLanguage"]')).toBeFocused();
+    await expect(menu.locator('.preview-native-menu-item')).toHaveCount(0);
     const lite = menu.locator('[data-ytcq-setting="liteModeEnabled"]');
     await expect(lite).toHaveAttribute('aria-checked', 'true');
     const translate = menu.locator('[data-ytcq-setting="targetLanguage"]');
@@ -50,10 +37,7 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     await expect(lite).toHaveAttribute('aria-checked', 'false');
     await lite.click();
     await expect(onboarding.locator('#onboardingLiteModeEnabled')).toBeChecked();
-    await menu.locator('[data-ytcq-action="settings-back"]').click();
-    await expect(menu.locator('.preview-native-menu-item:visible')).toHaveCount(5);
-    await expect(menu.locator('[data-ytcq-action="chat-enhancer"]')).toBeVisible();
-    await menu.locator('[data-ytcq-action="chat-enhancer"]').press('Escape');
+    await lite.press('Escape');
     await expect(menu).toBeHidden();
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-skin', 'system');
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-theme', 'light');

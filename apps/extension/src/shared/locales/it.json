@@ -688,7 +688,7 @@
       "message": "Ripristina segnalibro"
     },
     "onboardingChatMenuTooltip": {
-      "message": "Questo menu include comandi rapidi per attivare o disattivare le impostazioni di Chat Enhancer, insieme alle impostazioni di YouTube."
+      "message": "Fai clic sull’icona di Chat Enhancer per aprire le impostazioni rapide."
     },
     "onboardingBookmarkTooltip": {
       "message": "Salva questo messaggio nella scheda Segnalibri dell’estensione per ritrovarlo anche dopo la diretta. Fai di nuovo clic per rimuoverlo."

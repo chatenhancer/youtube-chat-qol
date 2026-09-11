@@ -685,7 +685,7 @@
       "message": "還原書籤"
     },
     "onboardingChatMenuTooltip": {
-      "message": "此選單除了 YouTube 內建的設定，還提供可快速切換 Chat Enhancer 設定的開關。"
+      "message": "點選 Chat Enhancer 圖示以開啟快速設定。"
     },
     "onboardingBookmarkTooltip": {
       "message": "將這則訊息儲存在擴充功能的「書籤」分頁中，離開直播後也能找到。再次點擊即可移除。"

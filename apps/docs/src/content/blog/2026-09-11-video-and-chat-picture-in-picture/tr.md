@@ -24,9 +24,8 @@ Pencereyi uygun bir köşeye taşıyıp izlemeye devam edin. YouTube sekmesine d
 
 Canlı sohbetin açık olduğu bir YouTube izleme sayfasında:
 
-1. Sohbet başlığındaki **Diğer seçenekler** menüsünü açın.
-2. **Chat Enhancer** seçeneğini seçin.
-3. **Video + sohbet PiP** seçeneğini seçin.
+1. Sohbetin üst kısmındaki **Chat Enhancer** simgesine tıklayın.
+2. **Video + sohbet PiP** seçeneğini seçin.
 
 :::
 

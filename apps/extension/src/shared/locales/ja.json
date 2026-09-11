@@ -688,7 +688,7 @@
       "message": "ブックマークを復元"
     },
     "onboardingChatMenuTooltip": {
-      "message": "このメニューには、YouTube 標準の設定に加えて、Chat Enhancer の設定をすばやく切り替えるスイッチがあります。"
+      "message": "Chat Enhancer アイコンをクリックすると、クイック設定が開きます。"
     },
     "onboardingBookmarkTooltip": {
       "message": "このメッセージを拡張機能の「ブックマーク」タブに保存すると、配信を離れた後も見返せます。もう一度クリックすると削除できます。"

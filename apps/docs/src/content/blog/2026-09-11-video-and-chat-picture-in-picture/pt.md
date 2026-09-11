@@ -20,13 +20,12 @@ Mova a janela para um canto conveniente e continue assistindo. Você pode ler e 
 
 :::media-left
 
-![O submenu do Chat Enhancer com a opção Vídeo + chat PiP visível. Todos os nomes, avatares e mensagens do chat são fictícios.](./menu.png) {shadow=smooth}
+![O menu do Chat Enhancer com a opção Vídeo + chat PiP visível. Todos os nomes, avatares e mensagens do chat são fictícios.](./menu.png) {shadow=smooth}
 
 Em uma página de vídeo do YouTube com o chat ao vivo aberto:
 
-1. Clique em **Mais opções**, os três pontos no topo do chat.
-2. Abra **Chat Enhancer**.
-3. Escolha **Vídeo + chat PiP**.
+1. Clique no ícone do **Chat Enhancer** no topo do chat.
+2. Escolha **Vídeo + chat PiP**.
 
 :::
 

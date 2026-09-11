@@ -1,239 +1,178 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { handleFeatureMutations } from '../../content/dispatcher';
 import { DEFAULT_OPTIONS } from '../../shared/options';
 import { setOptions } from '../../shared/state';
-import { handleSettingsSubmenuKeyDown } from './settings-submenu';
 
-const soundMocks = vi.hoisted(() => ({
-  playAlertSoundPreview: vi.fn()
-}));
-
+const soundMocks = vi.hoisted(() => ({ playAlertSoundPreview: vi.fn() }));
 vi.mock('../../shared/sounds/alert-sounds', () => soundMocks);
 vi.mock('../lite-mode/bootstrap', () => ({ isSupportedLiteModePage: () => true }));
 
-import {
-  cleanupStaleSettingsMenuSurfaces,
-  configureSettingsMenu,
-  enhanceSettingsMenu,
-  refreshSettingsMenus
-} from './settings-menu';
+import { configureSettingsMenu, refreshSettingsMenus } from './settings-menu';
+import { cleanupSettingsButton, wireSettingsButton } from './settings-button';
 
-describe('chat settings menu integration', () => {
+describe('dedicated chat settings menu', () => {
   beforeEach(() => {
     document.body.replaceChildren();
     soundMocks.playAlertSoundPreview.mockClear();
     setOptions({ ...DEFAULT_OPTIONS });
+    configureSettingsMenu(vi.fn());
     vi.useRealTimers();
-    window.addEventListener('keydown', handleSettingsSubmenuKeyDown, { capture: true });
   });
 
   afterEach(() => {
-    window.removeEventListener('keydown', handleSettingsSubmenuKeyDown, { capture: true });
-    cleanupStaleSettingsMenuSurfaces();
+    cleanupSettingsButton();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
-  it('groups quick settings under one Chat Enhancer entry', () => {
-    const saveOptions = vi.fn();
-    const menu = createSettingsMenu();
-    document.body.append(menu);
-    configureSettingsMenu(saveOptions);
-
-    enhanceSettingsMenu(menu);
-    const entry = menu.querySelector<HTMLElement>('[data-ytcq-action="chat-enhancer"]')!;
-    expect(entry.textContent).toBe('Chat Enhancer');
-    expect(entry.getAttribute('aria-expanded')).toBe('false');
-    entry.click();
-    expect(entry.getAttribute('aria-expanded')).toBe('true');
-    const items = menu.querySelectorAll<HTMLElement>('[data-ytcq-setting]');
-
-    expect(items).toHaveLength(3);
-    expect(items[0].getAttribute('data-ytcq-setting')).toBe('targetLanguage');
-    expect(items[0].querySelector('.ytcq-menu-label')?.textContent).toBe('Translate');
-    expect(items[0].getAttribute('aria-checked')).toBe('false');
-    expect(items[1].getAttribute('data-ytcq-setting')).toBe('sound');
-    expect(items[1].querySelector('.ytcq-menu-label')?.textContent).toBe('Alert sounds');
-    expect(items[1].getAttribute('aria-checked')).toBe('true');
-    expect(items[2].getAttribute('data-ytcq-setting')).toBe('liteModeEnabled');
-    expect(items[2].getAttribute('aria-checked')).toBe('false');
+  it('opens the quick settings directly from one outline-logo button', () => {
+    const { button, menu } = openMenu();
+    expect(button.title).toBe('Chat Enhancer');
+    expect(button.querySelector('svg [fill="none"]')).not.toBeNull();
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(menu.getAttribute('role')).toBe('menu');
+    expect(menu.querySelector('[data-ytcq-action="settings-back"]')).toBeNull();
+    const items = menu.querySelectorAll<HTMLElement>('[role="menuitemcheckbox"]');
+    expect(Array.from(items, item => item.getAttribute('data-ytcq-setting')))
+      .toEqual(['targetLanguage', 'sound', 'liteModeEnabled']);
+    expect(Array.from(items, item => item.textContent)).toEqual(['Translate', 'Alert sounds', 'Lite mode']);
+    expect(document.activeElement).toBe(items[0]);
+    expect(document.querySelector('ytd-menu-popup-renderer .ytcq-settings-item')).toBeNull();
   });
 
-  it('saves translation and sound changes from toggle clicks', () => {
+  it('saves the existing translation and sound preferences while staying open', () => {
     const saveOptions = vi.fn();
-    const menu = createSettingsMenu();
-    document.body.append(menu);
     configureSettingsMenu(saveOptions);
-    setOptions({
-      ...DEFAULT_OPTIONS,
-      lastTranslationTarget: 'ja',
-      sound: false
-    });
-
-    enhanceSettingsMenu(menu);
-    menu.querySelector<HTMLElement>('[data-ytcq-action="chat-enhancer"]')!.click();
-    const translateItem = menu.querySelector<HTMLElement>('[data-ytcq-setting="targetLanguage"]')!;
-    const soundItem = menu.querySelector<HTMLElement>('[data-ytcq-setting="sound"]')!;
-    translateItem.click();
-    soundItem.click();
-
-    expect(saveOptions).toHaveBeenNthCalledWith(1, {
-      targetLanguage: 'ja',
-      lastTranslationTarget: 'ja'
-    });
+    setOptions({ ...DEFAULT_OPTIONS, lastTranslationTarget: 'ja', sound: false });
+    const { menu } = openMenu();
+    menu.querySelector<HTMLElement>('[data-ytcq-setting="targetLanguage"]')!.click();
+    menu.querySelector<HTMLElement>('[data-ytcq-setting="sound"]')!.click();
+    expect(saveOptions).toHaveBeenNthCalledWith(1, { targetLanguage: 'ja', lastTranslationTarget: 'ja' });
     expect(saveOptions).toHaveBeenNthCalledWith(2, { sound: true });
     expect(soundMocks.playAlertSoundPreview).toHaveBeenCalledOnce();
+    expect(menu.isConnected).toBe(true);
   });
 
   it('disables sound without playing the preview', () => {
     const saveOptions = vi.fn();
-    const menu = createSettingsMenu();
-    document.body.append(menu);
     configureSettingsMenu(saveOptions);
-    setOptions({
-      ...DEFAULT_OPTIONS,
-      sound: true
-    });
-
-    enhanceSettingsMenu(menu);
-    menu.querySelector<HTMLElement>('[data-ytcq-action="chat-enhancer"]')!.click();
+    const { menu } = openMenu();
     menu.querySelector<HTMLElement>('[data-ytcq-setting="sound"]')!.click();
-
     expect(saveOptions).toHaveBeenCalledWith({ sound: false });
     expect(soundMocks.playAlertSoundPreview).not.toHaveBeenCalled();
   });
 
-  it('uses the existing Lite mode preference for both directions', () => {
+  it.each([false, true])('animates only when enabling Lite mode, respecting reduced motion (%s)', reducedMotion => {
+    vi.useFakeTimers();
+    vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: reducedMotion } as MediaQueryList);
     const saveOptions = vi.fn();
-    const menu = createSettingsMenu();
-    document.body.append(menu);
     configureSettingsMenu(saveOptions);
-    enhanceSettingsMenu(menu);
-    menu.querySelector<HTMLElement>('[data-ytcq-action="chat-enhancer"]')!.click();
+    const { menu } = openMenu();
     const item = menu.querySelector<HTMLElement>('[data-ytcq-setting="liteModeEnabled"]')!;
+    const icon = item.querySelector('.lite-mode-icon')!;
+    expect(icon.classList.contains('ytcq-bolt-redraw')).toBe(false);
     item.click();
+    expect(icon.classList.contains('ytcq-bolt-redraw')).toBe(!reducedMotion);
     expect(saveOptions).toHaveBeenLastCalledWith({ liteModeEnabled: true });
     setOptions({ ...DEFAULT_OPTIONS, liteModeEnabled: true });
     refreshSettingsMenus();
     expect(item.getAttribute('aria-checked')).toBe('true');
+    vi.advanceTimersByTime(600);
+    expect(icon.classList.contains('ytcq-bolt-redraw')).toBe(false);
     item.click();
     expect(saveOptions).toHaveBeenLastCalledWith({ liteModeEnabled: false });
+    expect(icon.classList.contains('ytcq-bolt-redraw')).toBe(false);
   });
 
-  it('disables translation from its menu toggle', () => {
+  it('disables translation and refreshes open rows from saved options', () => {
     const saveOptions = vi.fn();
-    const menu = createSettingsMenu();
-    document.body.append(menu);
     configureSettingsMenu(saveOptions);
-    setOptions({
-      ...DEFAULT_OPTIONS,
-      targetLanguage: 'ja',
-      lastTranslationTarget: 'ja'
-    });
-
-    enhanceSettingsMenu(menu);
-    menu.querySelector<HTMLElement>('[data-ytcq-action="chat-enhancer"]')!.click();
-    menu.querySelector<HTMLElement>('[data-ytcq-setting="targetLanguage"]')!.click();
-
-    expect(saveOptions).toHaveBeenCalledWith({
-      targetLanguage: ''
-    });
-  });
-
-  it('refreshes existing menu labels and checked state from current options', () => {
-    const menu = createSettingsMenu();
-    document.body.append(menu);
-    enhanceSettingsMenu(menu);
-
-    setOptions({
-      ...DEFAULT_OPTIONS,
-      targetLanguage: 'ko',
-      sound: false
-    });
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'ko' });
+    const { menu } = openMenu();
+    const translate = menu.querySelector<HTMLElement>('[data-ytcq-setting="targetLanguage"]')!;
+    translate.click();
+    expect(saveOptions).toHaveBeenCalledWith({ targetLanguage: '' });
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage: '', sound: false });
     refreshSettingsMenus();
-
-    expect(menu.querySelector('[data-ytcq-setting="targetLanguage"]')?.getAttribute('aria-checked')).toBe('true');
+    expect(translate.getAttribute('aria-checked')).toBe('false');
     expect(menu.querySelector('[data-ytcq-setting="sound"]')?.getAttribute('aria-checked')).toBe('false');
   });
 
-  it('ignores malformed existing setting rows while refreshing', () => {
-    const malformed = document.createElement('div');
-    malformed.className = 'ytcq-settings-item';
-    malformed.setAttribute('data-ytcq-setting', 'sound');
-    const unknown = document.createElement('div');
-    unknown.className = 'ytcq-settings-item';
-    unknown.setAttribute('data-ytcq-setting', 'unknown');
-    const label = document.createElement('span');
-    label.className = 'ytcq-menu-label';
-    label.textContent = 'Unknown setting';
-    unknown.append(label);
-    document.body.append(malformed);
-    document.body.append(unknown);
-
-    expect(() => refreshSettingsMenus()).not.toThrow();
-    expect(label.textContent).toBe('Unknown setting');
+  it.each(['ltr', 'rtl'])('supports keyboard opening, navigation, Escape and Tab in %s', direction => {
+    const { button, menu } = openMenu();
+    button.style.direction = direction;
+    const rows = menu.querySelectorAll<HTMLElement>('.ytcq-settings-item');
+    key(rows[0], 'ArrowDown');
+    expect(document.activeElement).toBe(rows[1]);
+    key(rows[1], 'End');
+    expect(document.activeElement).toBe(rows[2]);
+    key(rows[2], 'Home');
+    expect(document.activeElement).toBe(rows[0]);
+    key(rows[0], 'ArrowUp');
+    expect(document.activeElement).toBe(rows[2]);
+    key(rows[2], 'Escape');
+    expect(menu.isConnected).toBe(false);
+    expect(document.activeElement).toBe(button);
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    key(button, 'ArrowUp');
+    const reopened = document.querySelector<HTMLElement>('.ytcq-settings-menu')!;
+    const last = reopened.querySelector<HTMLElement>('.ytcq-settings-item:last-child')!;
+    expect(document.activeElement).toBe(last);
+    key(last, 'Tab');
+    expect(reopened.isConnected).toBe(false);
+    expect(document.activeElement).toBe(button);
   });
 
-  it('does not duplicate controls and can clean them up', () => {
-    const menu = createSettingsMenu();
-    document.body.append(menu);
-
-    enhanceSettingsMenu(menu);
-    enhanceSettingsMenu(menu);
-    expect(menu.querySelectorAll('[data-ytcq-action="chat-enhancer"]')).toHaveLength(1);
-    expect(menu.querySelectorAll('[data-ytcq-setting]')).toHaveLength(3);
-
-    cleanupStaleSettingsMenuSurfaces();
-    expect(menu.querySelectorAll('.ytcq-settings-item')).toHaveLength(0);
+  it('closes on the trigger, outside clicks and focus moving outside', () => {
+    const { button, menu } = openMenu();
+    button.click();
+    expect(menu.isConnected).toBe(false);
+    button.click();
+    document.querySelector<HTMLButtonElement>('#native-menu-button')!.click();
+    expect(document.querySelector('.ytcq-settings-menu')).toBeNull();
+    button.click();
+    document.querySelector<HTMLButtonElement>('#native-menu-button')!.focus();
+    expect(document.querySelector('.ytcq-settings-menu')).toBeNull();
   });
 
-  it.each(['ltr', 'rtl'])('supports keyboard navigation and preserves native rows in %s', (direction) => {
-    const menu = createSettingsMenu();
-    menu.style.direction = direction;
-    document.body.append(menu);
-    const native = menu.querySelector('yt-live-chat-toggle-renderer');
-    enhanceSettingsMenu(menu);
-    const entry = menu.querySelector<HTMLElement>('[data-ytcq-action="chat-enhancer"]')!;
-    const translate = menu.querySelector<HTMLElement>('[data-ytcq-setting="targetLanguage"]')!;
-    const sound = menu.querySelector<HTMLElement>('[data-ytcq-setting="sound"]')!;
-    const key = (item: HTMLElement, value: string): void => {
-      item.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true, cancelable: true }));
-    };
-    key(entry, direction === 'rtl' ? 'ArrowLeft' : 'ArrowRight');
-    expect(document.activeElement).toBe(translate.querySelector('.ytcq-paper-item'));
-    key(translate, 'ArrowDown');
-    expect(document.activeElement).toBe(sound.querySelector('.ytcq-paper-item'));
-    const nativeEscape = vi.fn();
-    menu.addEventListener('keydown', nativeEscape);
-    key(sound, 'Escape');
-    expect(nativeEscape).not.toHaveBeenCalled();
-    expect(entry.getAttribute('aria-expanded')).toBe('false');
-    expect(document.activeElement).toBe(entry.querySelector('.ytcq-paper-item'));
-    expect(menu.querySelector('yt-live-chat-toggle-renderer')).toBe(native);
-    entry.click();
-    menu.querySelector<HTMLElement>('[data-ytcq-action="settings-back"]')!.click();
-    expect(entry.getAttribute('aria-expanded')).toBe('false');
-    expect(document.activeElement).toBe(entry.querySelector('.ytcq-paper-item'));
+  it('does not duplicate buttons and rewires a replaced YouTube header', async () => {
+    vi.useFakeTimers();
+    const { button, menu } = openMenu();
+    wireSettingsButton();
+    expect(document.querySelectorAll('.ytcq-settings-button')).toHaveLength(1);
+    expect(document.querySelector('.ytcq-settings-button')).toBe(button);
+    const header = document.querySelector('yt-live-chat-header-renderer')!;
+    const replacement = header.cloneNode(false) as HTMLElement;
+    header.replaceWith(replacement);
+    handleFeatureMutations({ addedElements: [replacement], mutations: [] });
+    await vi.runAllTimersAsync();
+    expect(menu.isConnected).toBe(false);
+    expect(replacement.querySelectorAll('.ytcq-settings-button')).toHaveLength(1);
+    expect(replacement.querySelector('.ytcq-settings-button')).not.toBe(button);
   });
 
-  it('ignores menus without item lists or with existing extension controls', () => {
-    const withoutItems = document.createElement('ytd-menu-popup-renderer');
-    const withExistingItem = createSettingsMenu();
-    withExistingItem.querySelector('#items')!.append(document.createElement('div'));
-    withExistingItem.querySelector('#items div')!.className = 'ytcq-settings-item';
-
-    enhanceSettingsMenu(withoutItems);
-    enhanceSettingsMenu(withExistingItem);
-
-    expect(withoutItems.querySelector('.ytcq-settings-item')).toBeNull();
-    expect(withExistingItem.querySelectorAll('.ytcq-settings-item')).toHaveLength(1);
+  it('removes old injected submenu rows on reload while preserving native rows', () => {
+    openMenu();
+    const nativeMenu = document.querySelector('ytd-menu-popup-renderer')!;
+    nativeMenu.className = 'ytcq-settings-expanded-menu ytcq-settings-submenu-open';
+    nativeMenu.innerHTML = '<div id="items"><yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer><div class="ytcq-settings-item"></div></div>';
+    cleanupSettingsButton();
+    expect(nativeMenu.querySelector('yt-live-chat-toggle-renderer')).not.toBeNull();
+    expect(nativeMenu.className).toBe('');
+    expect(document.querySelectorAll('.ytcq-settings-button, .ytcq-settings-menu, .ytcq-settings-item')).toHaveLength(0);
   });
 });
 
-function createSettingsMenu(): HTMLElement {
-  const menu = document.createElement('ytd-menu-popup-renderer');
-  menu.innerHTML = `
-    <div id="items">
-      <yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer>
-    </div>
-  `;
-  return menu;
+function openMenu(): { button: HTMLButtonElement; menu: HTMLElement } {
+  document.body.innerHTML = '<yt-live-chat-header-renderer><div id="live-chat-header-context-menu">'
+    + '<button id="native-menu-button">More options</button></div></yt-live-chat-header-renderer>'
+    + '<ytd-menu-popup-renderer><div id="items"><yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer></div></ytd-menu-popup-renderer>';
+  wireSettingsButton();
+  const button = document.querySelector<HTMLButtonElement>('.ytcq-settings-button')!;
+  button.click();
+  return { button, menu: document.querySelector<HTMLElement>('.ytcq-settings-menu')! };
+}
+
+function key(element: HTMLElement, value: string): void {
+  element.dispatchEvent(new KeyboardEvent('keydown', { key: value, bubbles: true, cancelable: true }));
 }

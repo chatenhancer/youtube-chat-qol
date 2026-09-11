@@ -24,9 +24,8 @@ Pindahkan ke sudut yang nyaman dan lanjutkan menonton. Anda tetap bisa membaca d
 
 Di halaman tontonan YouTube dengan live chat terbuka:
 
-1. Buka **Opsi lainnya** di bagian atas chat.
-2. Pilih **Chat Enhancer**.
-3. Pilih **Video + chat PiP**.
+1. Klik ikon **Chat Enhancer** di bagian atas chat.
+2. Pilih **Video + chat PiP**.
 
 :::
 

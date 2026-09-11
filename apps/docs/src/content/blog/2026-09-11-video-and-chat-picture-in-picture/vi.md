@@ -24,9 +24,8 @@ Di chuyển cửa sổ đến một góc thuận tiện rồi tiếp tục xem. 
 
 Trên trang xem YouTube có trò chuyện trực tiếp đang mở:
 
-1. Mở **Tùy chọn khác** ở đầu khung trò chuyện.
-2. Chọn **Chat Enhancer**.
-3. Chọn **Video + trò chuyện PiP**.
+1. Nhấp vào biểu tượng **Chat Enhancer** ở đầu khung trò chuyện.
+2. Chọn **Video + trò chuyện PiP**.
 
 :::
 

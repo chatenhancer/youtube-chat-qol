@@ -106,7 +106,6 @@ export const onboardingTooltipScenario: ExtensionScenario = async ({ context }) 
 
     await onboarding.locator('#previewMenuButton').click();
     const menu = onboarding.locator('#previewSettingsMenu');
-    await menu.locator('[data-ytcq-action="chat-enhancer"]').click();
     const pip = menu.locator('[data-ytcq-action="picture-in-picture"]');
     const tooltip = onboarding.locator('#previewPipTooltip');
     const learnMore = tooltip.getByRole('link', { name: 'Learn more', exact: true });
@@ -131,7 +130,7 @@ export const onboardingTooltipScenario: ExtensionScenario = async ({ context }) 
     }
     await onboarding.locator('.preview-title').hover();
     await expect(tooltip).toBeHidden();
-    await pip.locator('.ytcq-paper-item').focus();
+    await pip.focus();
     await onboarding.keyboard.press('Tab');
     await expect(learnMore).toBeFocused();
     await expect(tooltip).toHaveCSS('opacity', '1');
@@ -141,7 +140,6 @@ export const onboardingTooltipScenario: ExtensionScenario = async ({ context }) 
     await expect(onboarding.locator('#previewMenuButton')).toBeFocused();
 
     await onboarding.locator('#previewMenuButton').click();
-    await menu.locator('[data-ytcq-action="chat-enhancer"]').click();
     await pip.hover();
     const blogUrl = 'https://chatenhancer.com/blog/video-and-chat-picture-in-picture/';
     await expect(learnMore).toHaveAttribute('href', blogUrl);

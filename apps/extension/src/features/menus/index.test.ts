@@ -2,17 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   bootFeatures,
   initFeatures,
-  handleFeatureMutations,
-  resetFeatures
+  handleFeatureMutations
 } from '../../content/dispatcher';
 
 const menuMocks = vi.hoisted(() => ({
   cleanupStaleMessageMenuSurfaces: vi.fn(),
   enhanceMessageContextMenu: vi.fn(),
-  isRecentActiveContextMessage: vi.fn(),
-  cleanupStaleSettingsMenuSurfaces: vi.fn(),
-  enhanceSettingsMenu: vi.fn(),
-  refreshSettingsMenus: vi.fn()
+  isRecentActiveContextMessage: vi.fn()
 }));
 
 vi.mock('./message-menu', () => ({
@@ -21,11 +17,7 @@ vi.mock('./message-menu', () => ({
   isRecentActiveContextMessage: menuMocks.isRecentActiveContextMessage
 }));
 
-vi.mock('./settings-menu', () => ({
-  cleanupStaleSettingsMenuSurfaces: menuMocks.cleanupStaleSettingsMenuSurfaces,
-  enhanceSettingsMenu: menuMocks.enhanceSettingsMenu,
-  refreshSettingsMenus: menuMocks.refreshSettingsMenus
-}));
+vi.mock('./settings-button', () => ({}));
 
 import { cleanupStaleMenuSurfaces, enhanceMenu } from './index';
 
@@ -36,9 +28,6 @@ describe('menu router', () => {
     menuMocks.cleanupStaleMessageMenuSurfaces.mockClear();
     menuMocks.enhanceMessageContextMenu.mockClear();
     menuMocks.isRecentActiveContextMessage.mockReset();
-    menuMocks.cleanupStaleSettingsMenuSurfaces.mockClear();
-    menuMocks.enhanceSettingsMenu.mockClear();
-    menuMocks.refreshSettingsMenus.mockClear();
   });
 
   afterEach(() => {
@@ -46,8 +35,9 @@ describe('menu router', () => {
     vi.useRealTimers();
   });
 
-  it('recognizes header menus without a toggle and resets for message actions', async () => {
+  it('keeps native header menus free of extension rows and still enhances message actions', async () => {
     initFeatures({ saveOptions: vi.fn() });
+    menuMocks.isRecentActiveContextMessage.mockReturnValue(true);
     document.body.innerHTML = '<yt-live-chat-header-renderer>'
       + '<div id="live-chat-header-context-menu"><button>More options</button></div>'
       + '</yt-live-chat-header-renderer><button id="message-menu">Message actions</button>';
@@ -55,18 +45,17 @@ describe('menu router', () => {
     const headerMenu = createMenu('<div id="items"><ytd-menu-service-item-renderer></ytd-menu-service-item-renderer></div>');
     enhanceMenu(headerMenu);
     await vi.runAllTimersAsync();
-    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(headerMenu);
 
+    expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
     document.querySelector<HTMLButtonElement>('#message-menu')!.click();
     menuMocks.isRecentActiveContextMessage.mockReturnValue(true);
     const messageMenu = createMenu('<div id="items"><ytd-menu-service-item-renderer></ytd-menu-service-item-renderer></div>');
     enhanceMenu(messageMenu);
     await vi.runAllTimersAsync();
     expect(menuMocks.enhanceMessageContextMenu).toHaveBeenCalledWith(messageMenu);
-    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledTimes(1);
   });
 
-  it('routes chat settings menus to the settings enhancer', async () => {
+  it('leaves native chat settings controls unchanged', async () => {
     const menu = createMenu(`
       <div id="items">
         <yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer>
@@ -76,7 +65,6 @@ describe('menu router', () => {
     enhanceMenu(menu);
     await vi.runAllTimersAsync();
 
-    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(menu);
     expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
   });
 
@@ -92,7 +80,6 @@ describe('menu router', () => {
     await vi.runAllTimersAsync();
 
     expect(menuMocks.enhanceMessageContextMenu).toHaveBeenCalledWith(menu);
-    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
   });
 
   it('ignores non-menu elements and inactive message menus', async () => {
@@ -108,7 +95,6 @@ describe('menu router', () => {
     await vi.runAllTimersAsync();
 
     expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
-    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
   });
 
   it('clears stale native width caps from live chat menus even when no enhancer is routed', async () => {
@@ -132,7 +118,6 @@ describe('menu router', () => {
     expect(menu.style.minWidth).toBe('');
     expect(menu.style.maxWidth).toBe('');
     expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
-    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
   });
 
   it('shifts repaired live chat menus left when YouTube anchors them past the chat edge', async () => {
@@ -171,7 +156,6 @@ describe('menu router', () => {
     expect(dropdown.style.left).toBe('260px');
     expect(dropdown.style.right).toBe('auto');
     expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
-    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
   });
 
   it('leaves unrelated menu popup width caps alone', async () => {
@@ -189,34 +173,27 @@ describe('menu router', () => {
     expect(menu.classList.contains('ytcq-live-chat-menu-size-repaired')).toBe(false);
     expect(menu.style.maxWidth).toBe('65.5625px');
     expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
-    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
   });
 
   it('cleans all routed menu surfaces', () => {
     cleanupStaleMenuSurfaces();
 
     expect(menuMocks.cleanupStaleMessageMenuSurfaces).toHaveBeenCalledOnce();
-    expect(menuMocks.cleanupStaleSettingsMenuSurfaces).toHaveBeenCalledOnce();
   });
 
   it('scans already-open menus during feature boot', async () => {
     const menu = createMenu(`
       <div id="items">
-        <yt-live-chat-toggle-renderer></yt-live-chat-toggle-renderer>
+        <ytd-menu-service-item-renderer></ytd-menu-service-item-renderer>
       </div>
     `);
     document.body.append(menu);
 
+    menuMocks.isRecentActiveContextMessage.mockReturnValue(true);
     bootFeatures();
     await vi.runAllTimersAsync();
+    expect(menuMocks.enhanceMessageContextMenu).toHaveBeenCalledWith(menu);
 
-    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(menu);
-  });
-
-  it('refreshes settings menus during feature reset', () => {
-    resetFeatures();
-
-    expect(menuMocks.refreshSettingsMenus).toHaveBeenCalledOnce();
   });
 
   it('routes menus from mutation targets, added popups, containing popups, and descendants', async () => {
@@ -258,8 +235,6 @@ describe('menu router', () => {
     await vi.runAllTimersAsync();
 
     expect(menuMocks.enhanceMessageContextMenu).toHaveBeenCalledWith(targetMenu);
-    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(addedMenu);
-    expect(menuMocks.enhanceSettingsMenu).toHaveBeenCalledWith(descendantMenu);
   });
 
   it('ignores unrelated mutations and added elements', async () => {
@@ -277,7 +252,6 @@ describe('menu router', () => {
     await vi.runAllTimersAsync();
 
     expect(menuMocks.enhanceMessageContextMenu).not.toHaveBeenCalled();
-    expect(menuMocks.enhanceSettingsMenu).not.toHaveBeenCalled();
   });
 });
 

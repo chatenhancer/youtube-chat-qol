@@ -17,7 +17,7 @@ import { cleanVisibleText } from './text';
 
 const MENU_POPUP_SELECTOR = 'ytd-menu-popup-renderer';
 const MESSAGE_TARGET_ATTRIBUTE = 'data-ytcq-test-menu-target';
-const SETTINGS_MENU_MARKER_SELECTOR = 'yt-live-chat-toggle-renderer, .ytcq-settings-item';
+const SETTINGS_MENU_MARKER_SELECTOR = 'yt-live-chat-toggle-renderer, ytd-menu-service-item-renderer, ytd-menu-navigation-item-renderer';
 const MESSAGE_MENU_MARKER_SELECTOR = [
   'ytd-menu-service-item-renderer',
   'ytd-menu-navigation-item-renderer',
@@ -52,10 +52,11 @@ export async function openSettingsMenu(chat: ChatSurface): Promise<Locator> {
 }
 
 export async function openChatEnhancerMenu(chat: ChatSurface): Promise<Locator> {
-  const menu = await openSettingsMenu(chat);
-  await test.step('Open Chat Enhancer submenu', async () => {
-    await menu.locator('[data-ytcq-action="chat-enhancer"]').click();
-    await expect(menu.locator('[data-ytcq-action="settings-back"]')).toBeVisible();
+  await closeOpenMenus(chat);
+  const menu = chat.locator('.ytcq-settings-menu');
+  await test.step('Open the Chat Enhancer header menu', async () => {
+    await chat.locator('yt-live-chat-header-renderer .ytcq-settings-button').click();
+    await expect(menu).toBeVisible();
   });
   return menu;
 }
@@ -142,7 +143,7 @@ async function releaseMessageTarget(message: Locator): Promise<void> {
 
 export async function closeOpenMenus(chat: ChatSurface): Promise<void> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
-    const menu = await findVisibleNativeMenu(chat);
+    const menu = await findVisibleMenuToClose(chat);
     if (!menu) return;
     await menu.press('Escape').catch(() => undefined);
     await chat.locator('body').press('Escape').catch(() => undefined);
@@ -150,8 +151,8 @@ export async function closeOpenMenus(chat: ChatSurface): Promise<void> {
   }
 }
 
-async function findVisibleNativeMenu(chat: ChatSurface): Promise<Locator | null> {
-  const menus = chat.locator(MENU_POPUP_SELECTOR);
+async function findVisibleMenuToClose(chat: ChatSurface): Promise<Locator | null> {
+  const menus = chat.locator(`${MENU_POPUP_SELECTOR}, .ytcq-settings-menu`);
   const count = await menus.count();
 
   for (let index = count - 1; index >= 0; index -= 1) {
