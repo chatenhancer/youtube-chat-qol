@@ -229,7 +229,8 @@ ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle
   outline: none;
 }
 
-:root:is([dark], [data-ytcq-chat-skin-theme="dark"]) .ytcq-settings-grid {
+:root:is([dark], [data-ytcq-chat-skin-theme="dark"]) .ytcq-settings-grid,
+.chat-preview[data-chat-theme="dark"] .ytcq-settings-grid {
   --ytcq-grid-background: rgba(255, 255, 255, 0.055);
   --ytcq-grid-hover: rgba(255, 255, 255, 0.09);
   --ytcq-grid-active: rgba(62, 166, 255, 0.18);
