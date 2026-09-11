@@ -3,8 +3,13 @@ import type { BrowserScenario } from './types';
 import { fixtureLoggedInLiveChatUrl } from '../support/live-chat-fixture';
 import { openChatEnhancerMenu } from '../support/menu-openers';
 import { NORMAL_CHAT_MESSAGE_SELECTOR } from '../support/chat-surface';
+import { openLiveChat, startVideoPlaybackIfPaused } from '../support/youtube-page';
 
 export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, context, chat }) => {
+  // Earlier chat-only scenarios reuse this page without requiring a healthy player.
+  // Start fresh and establish playback before testing that PiP preserves it.
+  await openLiveChat(page, page.url());
+  await startVideoPlaybackIfPaused(page);
   const close = chat.locator('yt-live-chat-header-renderer #close-button button');
   await expect(close).toBeVisible();
   const input = chat.locator('#input[contenteditable]');

@@ -210,10 +210,17 @@ export async function startVideoPlaybackIfPaused(page: Page): Promise<void> {
 
   await expect
     .poll(async () => !(await isVideoPaused(video)), {
-      message: 'Expected replay video playback to start so chat replay messages can render.',
+      message: 'Expected YouTube video playback to start.',
       timeout: 10_000
     })
     .toBe(true);
+  const time = await video.evaluate((element: HTMLVideoElement) => element.currentTime);
+  await expect
+    .poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime), {
+      message: 'Expected YouTube video time to advance before testing playback.',
+      timeout: 10_000
+    })
+    .toBeGreaterThan(time);
 }
 
 export async function waitForYouTubeContentVideo(page: Page): Promise<void> {
