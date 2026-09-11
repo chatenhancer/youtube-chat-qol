@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
 import type { BrowserScenario, BrowserScenarioSession } from './types';
 import { fixtureLoggedInLiveChatUrl } from '../support/live-chat-fixture';
 import { openChatEnhancerMenu } from '../support/menu-openers';
@@ -127,29 +127,13 @@ async function verifyNativePictureInPicture(
     const placeholder = page.locator('.ytcq-pip-video-placeholder');
     expect((await placeholder.boundingBox())!.height).toBeGreaterThan(100);
     expect((await page.locator('.ytcq-pip-chat-placeholder').boundingBox())!.height).toBeGreaterThan(100);
-    const returnButton = placeholder.locator('.ytcq-pip-return-button');
+    const returnButton = placeholder.getByRole('button', { name: 'Return to tab', exact: true });
     await expect(returnButton).toHaveCSS('border-radius', '20px');
     await expect(returnButton).toHaveCSS('height', '40px');
-    // Keep CI diagnostics limited to this extension-owned control.
-    const returnButtonState = await returnButton.evaluate((button) => ({
-      label: button.textContent?.trim(),
-      language: document.documentElement.lang,
-      visibility: document.visibilityState,
-      ariaHidden: Boolean(button.closest('[aria-hidden="true"]')),
-      inert: Boolean(button.closest('[inert]'))
-    }));
-    test.info().annotations.push({
-      type: 'pip-return-button',
-      description: JSON.stringify({
-        ...returnButtonState,
-        englishNameMatches: await placeholder.getByRole('button', { name: 'Return to tab' }).count()
-      })
-    });
     await page.bringToFront();
     await returnButton.click();
     await expect.poll(() => pip.isClosed()).toBe(true);
-    // A YouTube error can hide its video and controls while the player remains visible.
-    await expect(page.locator('#movie_player')).toBeVisible();
+    // Logged-out playback errors can hide YouTube's entire original player container.
     if (testPlayback) await expect(page.locator('#movie_player video')).toBeVisible();
     expect(await nativePlayer.evaluate((element) => document.querySelector('#movie_player') === element)).toBe(true);
     await expect(page.locator('#movie_player video')).toHaveJSProperty('paused', !testPlayback);
@@ -178,14 +162,20 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
         :root { --yt-live-chat-header-bottom-border: 1px solid rgba(0, 0, 0, 0.1); }
         :root[dark] { --yt-live-chat-header-bottom-border: 1px solid rgba(255, 255, 255, 0.2); }
         body { display:flex; margin:0; background:#fff; }
+        #player, #player-container { position:relative; width:640px; height:360px; }
+        #player-container { z-index:0; }
+        #error-screen { display:none; position:absolute; inset:0; z-index:1; background:#000; }
+        #player.unavailable #player-container { visibility:hidden; }
+        #player.unavailable #error-screen { display:block; }
         #movie_player { position:relative; width:640px; height:360px; }
         video { width:100%; height:100%; }
         .ytp-chrome-bottom { position:absolute; bottom:0; left:12px; width:616px; background:#222; }
         ytd-live-chat-frame, iframe { position:relative; display:block; width:400px; height:800px; border:0; }
       </style>
-      <div id="movie_player"><video muted></video>
+      <div id="player"><div id="player-container"><div id="movie_player"><video muted></video>
         <div class="ytp-chrome-bottom"><button class="ytp-play-button">Play / pause</button></div>
-      </div>
+      </div></div>
+      <div id="error-screen">This video is unavailable</div></div>
       <ytd-live-chat-frame><iframe id="chatframe" src="${fixtureLoggedInLiveChatUrl}&v=pip-test-01"></iframe></ytd-live-chat-frame>
     </html>`
   }));
@@ -293,13 +283,23 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
     await expect.poll(() => next.isClosed()).toBe(true);
     await expect(chat.locator('.ytcq-inbox-button')).toBeVisible();
 
+    // YouTube hides the player and shows an error overlay; our return action must stay usable.
+    await page.locator('#player').evaluate((element) => {
+      element.classList.add('unavailable');
+    });
     // The user can return before the borrowed chat has finished restoring.
     const quickOpened = context.waitForEvent('page');
     await (await openChatEnhancerMenu(chat)).locator('[data-ytcq-action="picture-in-picture"]').click();
     const quick = await quickOpened;
     await expect(quick.frameLocator('#chatframe').locator('#input[contenteditable]')).toBeVisible();
-    await page.locator('.ytcq-pip-video-placeholder button').click();
+    await page.locator('.ytcq-pip-video-placeholder').getByRole('button', { name: 'Return to tab', exact: true }).click();
     await expect.poll(() => quick.isClosed()).toBe(true);
+    await expect(page.locator('.ytcq-pip-placeholder')).toHaveCount(0);
+    await expect(page.locator('#player-container')).toHaveCSS('visibility', 'hidden');
+    await expect(page.locator('#error-screen')).toBeVisible();
+    await page.locator('#player').evaluate((element) => {
+      element.classList.remove('unavailable');
+    });
     await expect(chat.locator('#input[contenteditable]')).toHaveText('Unsent from PiP');
 
     const lastOpened = context.waitForEvent('page');

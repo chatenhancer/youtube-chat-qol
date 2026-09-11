@@ -128,7 +128,9 @@ function moveToPictureInPicture(
   let restored = false;
   player.before(playerAnchor);
   frame.before(frameAnchor);
-  player.after(placeholder);
+  // Playback errors hide the inner player container and cover it with an overlay.
+  // Keep our return action above both, without changing YouTube's error state.
+  (player.closest('#player') ?? player.parentElement!).append(placeholder);
   frame.after(chatPlaceholder);
 
   const restore = (): void => {
