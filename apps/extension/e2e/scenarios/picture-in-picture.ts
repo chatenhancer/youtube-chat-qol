@@ -1,15 +1,44 @@
 import { expect } from '@playwright/test';
-import type { BrowserScenario } from './types';
+import type { BrowserScenario, BrowserScenarioSession } from './types';
 import { fixtureLoggedInLiveChatUrl } from '../support/live-chat-fixture';
 import { openChatEnhancerMenu } from '../support/menu-openers';
 import { NORMAL_CHAT_MESSAGE_SELECTOR } from '../support/chat-surface';
 import { openLiveChat, startVideoPlaybackIfPaused } from '../support/youtube-page';
 
 export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, context, chat }) => {
-  // Earlier chat-only scenarios reuse this page without requiring a healthy player.
-  // Start fresh and establish playback before testing that PiP preserves it.
-  await openLiveChat(page, page.url());
-  await startVideoPlaybackIfPaused(page);
+  await runPictureInPictureLiveScenario({ page, context, chat }, false);
+};
+
+export const pictureInPictureLivePlaybackScenario: BrowserScenario = async ({ page, context, chat }) => {
+  await runPictureInPictureLiveScenario({ page, context, chat }, true);
+};
+
+async function runPictureInPictureLiveScenario(
+  { page: watchPage, context }: BrowserScenarioSession,
+  testPlayback: boolean
+): Promise<void> {
+  // Pausing a pre-roll in the shared tab would block later chat-only tests.
+  const page = await context.newPage();
+  try {
+    const chat = await openLiveChat(page, watchPage.url());
+    await verifyNativePictureInPicture({ page, context, chat }, testPlayback);
+  } finally {
+    await page.close();
+  }
+}
+
+async function verifyNativePictureInPicture(
+  { page, context, chat }: BrowserScenarioSession,
+  testPlayback: boolean
+): Promise<void> {
+  if (testPlayback) {
+    await startVideoPlaybackIfPaused(page);
+  } else {
+    // Public CI can load native chat while YouTube media never starts. Exercise
+    // the paused player there; the mock and signed-in scenarios cover playback.
+    await page.locator('#movie_player video').evaluate((video: HTMLVideoElement) => video.pause());
+  }
+  const nativePlayer = await page.locator('#movie_player').evaluateHandle((element) => element);
   const close = chat.locator('yt-live-chat-header-renderer #close-button button');
   await expect(close).toBeVisible();
   const input = chat.locator('#input[contenteditable]');
@@ -31,22 +60,27 @@ export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, cont
       await expect(pipChat.locator('#input[contenteditable]')).toHaveText('Unsent before PiP');
       await pipChat.locator('#input[contenteditable]').fill('Unsent from PiP');
     }
-    await expect(pip.locator('video')).toHaveJSProperty('paused', false);
+    expect(await nativePlayer.evaluate((element) =>
+      element.isConnected && element.ownerDocument.documentElement.hasAttribute('data-ytcq-pip-window')
+    )).toBe(true);
+    await expect(pip.locator('video')).toHaveJSProperty('paused', !testPlayback);
     await expect(pip.locator('video')).toHaveJSProperty('controls', false);
     const player = pip.locator('#movie_player');
     await player.hover();
-    await player.locator('.ytp-play-button').click();
-    await expect(pip.locator('video')).toHaveJSProperty('paused', true);
-    await player.locator('.ytp-play-button').click();
-    await expect(pip.locator('video')).toHaveJSProperty('paused', false);
-    await player.locator('.ytp-settings-button').click();
-    await player.getByRole('menuitem', { name: /^Quality/ }).click();
-    await expect(player.getByRole('heading', { name: 'Quality', exact: true })).toBeVisible();
-    await player.getByRole('menuitemradio', { checked: true }).click();
-    await player.press('k');
-    await expect(pip.locator('video')).toHaveJSProperty('paused', true);
-    await player.press('k');
-    await expect(pip.locator('video')).toHaveJSProperty('paused', false);
+    if (testPlayback) {
+      await player.locator('.ytp-play-button').click();
+      await expect(pip.locator('video')).toHaveJSProperty('paused', true);
+      await player.locator('.ytp-play-button').click();
+      await expect(pip.locator('video')).toHaveJSProperty('paused', false);
+      await player.locator('.ytp-settings-button').click();
+      await player.getByRole('menuitem', { name: /^Quality/ }).click();
+      await expect(player.getByRole('heading', { name: 'Quality', exact: true })).toBeVisible();
+      await player.getByRole('menuitemradio', { checked: true }).click();
+      await player.press('k');
+      await expect(pip.locator('video')).toHaveJSProperty('paused', true);
+      await player.press('k');
+      await expect(pip.locator('video')).toHaveJSProperty('paused', false);
+    }
     await expect(player).toHaveCSS('background-color', 'rgb(0, 0, 0)');
     await pip.setViewportSize({ width: 1100, height: 650 });
     await player.hover();
@@ -60,7 +94,7 @@ export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, cont
     const replay = await pipChat.locator('html').evaluate(
       (element) => element.ownerDocument.location.pathname === '/live_chat_replay'
     );
-    if (replay) {
+    if (testPlayback && replay) {
       const seek = (await player.getByRole('slider', { name: 'Seek slider', exact: true }).boundingBox())!;
       await pip.mouse.move(seek.x + 2, seek.y + seek.height / 2);
       await pip.mouse.down();
@@ -71,7 +105,7 @@ export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, cont
     }
     const captions = player.locator('.ytp-subtitles-button');
     if (
-      await captions.isVisible() && await captions.isEnabled() &&
+      testPlayback && await captions.isVisible() && await captions.isEnabled() &&
       !(await captions.getAttribute('aria-label'))?.includes('unavailable')
     ) {
       const pressed = await captions.getAttribute('aria-pressed');
@@ -81,9 +115,11 @@ export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, cont
       await expect(captions).toHaveAttribute('aria-pressed', pressed || 'false');
     }
     await pip.setViewportSize({ width: 460, height: 640 });
-    const time = await pip.locator('video').evaluate((video: HTMLVideoElement) => video.currentTime);
-    await expect.poll(() => pip.locator('video').evaluate((video: HTMLVideoElement) => video.currentTime))
-      .toBeGreaterThan(time);
+    if (testPlayback) {
+      const time = await pip.locator('video').evaluate((video: HTMLVideoElement) => video.currentTime);
+      await expect.poll(() => pip.locator('video').evaluate((video: HTMLVideoElement) => video.currentTime))
+        .toBeGreaterThan(time);
+    }
     const placeholder = page.locator('.ytcq-pip-video-placeholder');
     expect((await placeholder.boundingBox())!.height).toBeGreaterThan(100);
     expect((await page.locator('.ytcq-pip-chat-placeholder').boundingBox())!.height).toBeGreaterThan(100);
@@ -92,6 +128,8 @@ export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, cont
     await placeholder.getByRole('button', { name: 'Return to tab' }).click();
     await expect.poll(() => pip.isClosed()).toBe(true);
     await expect(page.locator('#movie_player video')).toBeVisible();
+    expect(await nativePlayer.evaluate((element) => document.querySelector('#movie_player') === element)).toBe(true);
+    await expect(page.locator('#movie_player video')).toHaveJSProperty('paused', !testPlayback);
     await expect(page.locator('#movie_player video')).toHaveJSProperty('controls', false);
     await expect(chat.locator('.ytcq-inbox-button')).toBeVisible();
     await expect(close).toBeVisible();
@@ -102,9 +140,10 @@ export const pictureInPictureLiveScenario: BrowserScenario = async ({ page, cont
     }
   } finally {
     if (!pip.isClosed()) await pip.close();
+    await nativePlayer.dispose();
     if (hasComposer && await input.isVisible()) await input.fill('');
   }
-};
+}
 
 /** Real Document PiP and extension scripts, with deterministic YouTube markup. */
 export const pictureInPictureScenario: BrowserScenario = async ({ page, context }) => {
@@ -133,7 +172,10 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
     const canvas = document.createElement('canvas');
     canvas.width = 640;
     canvas.height = 360;
-    canvas.getContext('2d')!.fillRect(0, 0, 640, 360);
+    const drawing = canvas.getContext('2d')!;
+    drawing.fillRect(0, 0, 640, 360);
+    // Keep producing frames so time-advance assertions verify real playback.
+    window.setInterval(() => drawing.fillRect(0, 0, 640, 360), 100);
     const video = document.querySelector('video')!;
     video.srcObject = canvas.captureStream(1);
     await video.play();
@@ -167,6 +209,9 @@ export const pictureInPictureScenario: BrowserScenario = async ({ page, context 
     await pip.locator('html').evaluate((element) => element.setAttribute('dark', ''));
     await expect(pip.locator('#chatframe')).toHaveCSS('border-top-color', 'rgba(255, 255, 255, 0.2)');
     await expect(pip.locator('video')).toHaveJSProperty('paused', false);
+    const time = await pip.locator('video').evaluate((video: HTMLVideoElement) => video.currentTime);
+    await expect.poll(() => pip.locator('video').evaluate((video: HTMLVideoElement) => video.currentTime))
+      .toBeGreaterThan(time);
     await expect(pip.locator('video')).toHaveJSProperty('controls', false);
     await expect(pip.locator('.ytp-chrome-bottom')).toHaveCSS('background-color', 'rgb(34, 34, 34)');
     await pip.getByRole('button', { name: 'Play / pause' }).click();

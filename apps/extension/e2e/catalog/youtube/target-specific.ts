@@ -15,7 +15,11 @@ import {
 } from '../../scenarios/safe-send';
 import { popupSettingsBehaviorScenario } from '../../scenarios/settings';
 import { tabAlertScenario } from '../../scenarios/tab-alert';
-import { pictureInPictureLiveScenario, pictureInPictureScenario } from '../../scenarios/picture-in-picture';
+import {
+  pictureInPictureLivePlaybackScenario,
+  pictureInPictureLiveScenario,
+  pictureInPictureScenario
+} from '../../scenarios/picture-in-picture';
 import { youtubeScenarioTargets as target, type YouTubeScenario } from './model';
 
 const popupReason =
@@ -25,10 +29,16 @@ const interceptedSendReason =
 
 export const targetSpecificScenarios: readonly YouTubeScenario[] = [
   {
-    title: 'video + chat PiP works with native YouTube chat and returns to the player',
+    title: 'video + chat PiP moves the paused native player and chat and returns them to the tab',
     run: pictureInPictureLiveScenario,
-    on: [target.liveLoggedOut, target.liveLoggedIn, target.replayLoggedIn],
-    reason: 'Checks real YouTube iframe reconnection in a Document PiP window without sending messages.'
+    on: [target.liveLoggedOut],
+    reason: 'Checks native player and iframe movement without requiring YouTube media delivery on public CI runners.'
+  },
+  {
+    title: 'video + chat PiP preserves native YouTube playback controls and returns to the player',
+    run: pictureInPictureLivePlaybackScenario,
+    on: [target.liveLoggedIn, target.replayLoggedIn],
+    reason: 'Requires working YouTube media playback in a prepared browser profile.'
   },
   {
     title: 'video + chat PiP preserves playback, drafts, and normal chat sizing',
