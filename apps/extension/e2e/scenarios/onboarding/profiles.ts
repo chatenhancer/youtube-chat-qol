@@ -23,7 +23,7 @@ export const onboardingProfilePreviewScenario: ExtensionScenario = async ({ cont
       await expect(card.locator('.ytcq-profile-card-title')).toHaveText(name);
       await expect(card.locator('.ytcq-profile-card-message')).toHaveCount(3);
       await expect(card.locator('.ytcq-profile-card-message-text').last()).toHaveText(text);
-      await card.getByRole('button', { name: 'Remember user', exact: true }).click();
+      await card.getByRole('button', { name: 'Bookmark user', exact: true }).click();
       await expect(avatar).toHaveClass(/ytcq-avatar-ring-active/u);
       await expect(message.locator('#author-name')).toHaveClass(/ytcq-remembered-author-active/u);
       const latest = card.locator('.ytcq-profile-card-message').last();
@@ -33,7 +33,7 @@ export const onboardingProfilePreviewScenario: ExtensionScenario = async ({ cont
       await card.getByRole('button', { name: 'Close', exact: true }).click();
       await expect(avatar).toBeFocused();
       await avatar.press('Enter');
-      await expect(card.getByRole('button', { name: 'Forget user', exact: true })).toHaveAttribute('aria-pressed', 'true');
+      await expect(card.getByRole('button', { name: 'Remove user bookmark', exact: true })).toHaveAttribute('aria-pressed', 'true');
       await expect(card.locator('.ytcq-bookmark-toggle').last()).toHaveAttribute('aria-pressed', 'true');
       await card.locator('.ytcq-profile-card-title').click();
       await expect(card).toHaveCount(0);

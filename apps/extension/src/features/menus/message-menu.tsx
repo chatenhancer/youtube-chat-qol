@@ -9,7 +9,7 @@ import { CHAT_MESSAGE_SELECTOR } from '../../youtube/selectors';
 import { t } from '../../shared/i18n';
 import {
   createSvgIcon,
-  MATERIAL_ICON_VIEW_BOX,
+  ICON_VIEW_BOX,
   MENTION_ICON_PATH,
   QUOTE_ICON_PATH
 } from '../../shared/icons';
@@ -217,15 +217,14 @@ function createReplyActionSplitItem(resolveMessage: ContextMessageResolver): HTM
     createReplyActionButton({
       action: 'mention',
       label: t('mention'),
-      iconPath: MENTION_ICON_PATH,
-      iconViewBox: MATERIAL_ICON_VIEW_BOX,
+      icon: createSvgIcon(ICON_VIEW_BOX, MENTION_ICON_PATH, 2),
       onClick: () => handleReplyAction(resolveMessage, false)
     }),
     createReplyActionDivider(),
     createReplyActionButton({
       action: 'quote',
       label: t('quote'),
-      iconPath: QUOTE_ICON_PATH,
+      icon: createSvgIcon(ICON_VIEW_BOX, QUOTE_ICON_PATH),
       onClick: () => handleReplyAction(resolveMessage, true)
     })
   );
@@ -248,14 +247,12 @@ function createReplyActionSplitItem(resolveMessage: ContextMessageResolver): HTM
 function createReplyActionButton({
   action,
   label,
-  iconPath,
-  iconViewBox,
+  icon,
   onClick
 }: {
   action: string;
   label: string;
-  iconPath: string;
-  iconViewBox?: string;
+  icon: SVGSVGElement;
   onClick: () => void;
 }): HTMLButtonElement {
   const handleActivation = (event: Event): void => {
@@ -276,7 +273,7 @@ function createReplyActionButton({
         handleActivation(event);
       }}
     >
-      <span class="ytcq-menu-icon">{createSvgIcon(iconViewBox || '0 0 24 24', iconPath)}</span>
+      <span class="ytcq-menu-icon">{icon}</span>
     </button>
   );
   return button;

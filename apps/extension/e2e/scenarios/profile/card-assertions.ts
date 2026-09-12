@@ -53,6 +53,10 @@ export async function expectProfileCardHasRecentMessages(
     const profileCard = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
     await expect(profileCard.locator('.ytcq-profile-card-title')).toContainText(source.authorName);
     await expect(await getProfileCardRecord(chat, source)).toBeVisible();
+    await profileCard.locator('.ytcq-profile-card-avatar-button').hover();
+    const openIcon = profileCard.locator('.ytcq-profile-card-avatar-open-icon');
+    await expect(openIcon).toHaveCSS('opacity', '1');
+    await expect(openIcon.locator('path')).toHaveCSS('stroke', 'rgb(255, 255, 255)');
   });
 }
 
@@ -77,7 +81,7 @@ export async function expectProfileAvatarRingToggle(
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    await expect(toggle).toHaveAttribute('title', /Forget user\nUser remembered .+/);
+    await expect(toggle).toHaveAttribute('title', /Remove user bookmark\nUser bookmarked .+/);
     await expect(sourceAvatar).toHaveClass(/ytcq-avatar-ring-active/);
     await expect(sourceAuthor).toHaveClass(/ytcq-remembered-author-active/);
     await expect(profileAuthor).toHaveClass(/ytcq-remembered-author-active/);

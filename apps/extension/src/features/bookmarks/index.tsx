@@ -1,11 +1,6 @@
 /** Browser-local chat message bookmarks. */
 import { registerFeature, type FeatureMessageContext } from '../../content/dispatcher';
-import {
-  BOOKMARK_FILLED_ICON_PATH,
-  BOOKMARK_ICON_PATH,
-  createSvgIcon,
-  MATERIAL_ICON_VIEW_BOX
-} from '../../shared/icons';
+import { createBookmarkIcon } from '../../shared/icons';
 import { getUiLocale, t } from '../../shared/i18n';
 import { jsx, el } from '../../shared/jsx-dom';
 import {
@@ -249,18 +244,14 @@ function formatBookmarkActionDate(timestamp: number): string {
   }).format(timestamp);
 }
 
-function createBookmarkIcon(iconPath = BOOKMARK_ICON_PATH): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, iconPath);
-}
-
 function updateBookmarkIcon(button: HTMLButtonElement, saved: boolean): void {
   const path = button.querySelector('svg path');
   if (path) {
-    path.setAttribute('d', saved ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH);
+    path.setAttribute('fill', saved ? 'currentColor' : 'none');
     return;
   }
 
-  button.prepend(createBookmarkIcon(saved ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH));
+  button.prepend(createBookmarkIcon(saved));
 }
 
 function ensureBookmarksLoaded(): Promise<void> {

@@ -174,8 +174,8 @@
 
 .ytcq-focus-close svg {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   pointer-events: none;
 }
 
@@ -204,11 +204,6 @@
 .ytcq-focus-header-actions .ytcq-profile-card-header-button {
   width: 24px;
   height: 24px;
-}
-
-.ytcq-focus-header-actions .ytcq-focus-ring-toggle svg {
-  width: 17px;
-  height: 17px;
 }
 
 .ytcq-focus-messages {

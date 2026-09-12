@@ -132,8 +132,8 @@ describe('onboarding settings', () => {
     });
     expect(
       document
-        .querySelector('.playground-joystick-icon')
-        ?.classList.contains('ytcq-playground-joystick-wiggle')
+        .querySelector('.playground-join-icon')
+        ?.classList.contains('ytcq-game-controller-hop')
     ).toBe(false);
     expect(
       document.querySelector('.game-invites-icon')?.classList.contains('ytcq-game-controller-hop')

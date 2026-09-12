@@ -1,11 +1,4 @@
-import {
-  BOOKMARK_FILLED_ICON_PATH,
-  BOOKMARK_ICON_PATH,
-  createAvatarRingIcon,
-  createOpenInNewIcon,
-  createSvgIcon,
-  MATERIAL_ICON_VIEW_BOX
-} from '../shared/icons';
+import { createBookmarkIcon, createAvatarRingIcon, createOpenInNewIcon } from '../shared/icons';
 import { jsx, el } from '../shared/jsx-dom';
 import {
   AVATAR_RINGS_STORAGE_KEY,
@@ -769,10 +762,7 @@ function createBookmarkRow(
         }
       }}
     >
-      {createSvgIcon(
-        MATERIAL_ICON_VIEW_BOX,
-        active ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH
-      )}
+      {createBookmarkIcon(active)}
     </button>
   );
 

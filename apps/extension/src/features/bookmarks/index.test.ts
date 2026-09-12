@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BOOKMARK_FILLED_ICON_PATH, BOOKMARK_ICON_PATH } from '../../shared/icons';
+import { BOOKMARK_ICON_PATH } from '../../shared/icons';
 import { BOOKMARKS_STORAGE_KEY, LEGACY_BOOKMARKS_STORAGE_KEY } from '../../shared/bookmarks';
 
 const chatFeedRecordMocks = vi.hoisted(() => ({
@@ -114,6 +114,7 @@ describe('bookmarks', () => {
     expect(first.classList.contains('ytcq-bookmark-toggle')).toBe(true);
     expect(first.title).toBe('Bookmark');
     expect(first.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_ICON_PATH);
+    expect(first.querySelector('path')?.getAttribute('fill')).toBe('none');
 
     await feature.toggleBookmark(bookmark('message-1'));
     expect(first.classList.contains('ytcq-bookmark-toggle-active')).toBe(true);
@@ -125,7 +126,7 @@ describe('bookmarks', () => {
       }).format(savedAt)}`
     );
     expect(first.getAttribute('aria-label')).toBe(first.title);
-    expect(first.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
+    expect(first.querySelector('path')?.getAttribute('fill')).toBe('currentColor');
     expect(second.classList.contains('ytcq-bookmark-toggle-active')).toBe(false);
   });
 
@@ -160,7 +161,7 @@ describe('bookmarks', () => {
     await flushAsyncWork();
     expect(openMenu).not.toHaveBeenCalled();
     expect(save.getAttribute('aria-pressed')).toBe('true');
-    expect(save.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_FILLED_ICON_PATH);
+    expect(save.querySelector('path')?.getAttribute('fill')).toBe('currentColor');
     expect(save.title).toMatch(/^Remove bookmark\nAdded /);
     expect(document.querySelector('.ytcq-toast')?.textContent).toBe('Saved to Bookmarks');
     expect(message.classList.contains('ytcq-bookmark-saved')).toBe(true);
@@ -174,6 +175,7 @@ describe('bookmarks', () => {
     await flushAsyncWork();
     expect(save.getAttribute('aria-pressed')).toBe('false');
     expect(save.querySelector('path')?.getAttribute('d')).toBe(BOOKMARK_ICON_PATH);
+    expect(save.querySelector('path')?.getAttribute('fill')).toBe('none');
     expect((await chrome.storage.local.get(BOOKMARKS_STORAGE_KEY))[BOOKMARKS_STORAGE_KEY]).toEqual({});
     dots.click();
     expect(openMenu).toHaveBeenCalledOnce();

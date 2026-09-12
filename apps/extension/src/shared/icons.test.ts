@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   createAddIcon,
   createAvatarRingIcon,
-  createBoltIcon,
+  AVATAR_RING_ACTIVE_BADGE_PATH,
+  AVATAR_RING_ADD_BADGE_PATH,
+  createLiteModeIcon,
   createChannelIcon,
   createInboxIcon,
   createLockIcon,
@@ -26,24 +28,13 @@ describe('shared SVG icon factories', () => {
   it('provides distinct drawings for different actions and Inbox states', () => {
     const icons = [
       createAddIcon(), createTranslateIcon(), createChannelIcon(),
-      createBoltIcon(), createLockIcon(), createInboxIcon(), createInboxIcon(true)
+      createLiteModeIcon(), createLockIcon(), createInboxIcon(), createInboxIcon(true)
     ];
     const drawings = icons.map((icon) => icon.querySelector('path')?.getAttribute('d'));
 
     expect(drawings.every(Boolean)).toBe(true);
     expect(new Set(drawings).size).toBe(icons.length);
     expect(icons.every((icon) => icon.hasAttribute('viewBox'))).toBe(true);
-  });
-
-  it('links the animated bolt to the supplied drawing mask', () => {
-    const icon = createBoltIcon({ drawMaskId: 'test-bolt-draw-mask' });
-    const mask = icon.querySelector('mask');
-
-    expect(mask?.id).toBe('test-bolt-draw-mask');
-    expect(mask?.children.length).toBeGreaterThan(0);
-    expect(icon.querySelector('.lite-mode-bolt-draw')?.getAttribute('mask')).toBe(
-      'url(#test-bolt-draw-mask)'
-    );
   });
 
   it('creates split translate icons with configurable classes', () => {
@@ -64,17 +55,14 @@ describe('shared SVG icon factories', () => {
     expect(createSoundBellIcon(true).querySelector('.ytcq-bell-ring')).not.toBeNull();
   });
 
-  it('keeps active avatar ring masks linked and unique across instances', () => {
+  it('distinguishes adding a marked user from an already marked user', () => {
     const addIcon = createAvatarRingIcon();
     const activeIcon = createAvatarRingIcon(true);
-    const activeMask = activeIcon.querySelector('mask');
-
-    expect(addIcon.querySelector('.ytcq-avatar-ring-icon-badge')?.getAttribute('fill')).toBe('none');
-    expect(activeMask?.id).toBeTruthy();
-    expect(activeMask?.children.length).toBeGreaterThan(0);
-    expect(activeIcon.querySelector('.ytcq-avatar-ring-icon-badge')?.getAttribute('mask')).toBe(
-      `url(#${activeMask?.id})`
+    expect(addIcon.querySelector('.ytcq-avatar-ring-icon-badge-symbol')?.getAttribute('d')).toBe(
+      AVATAR_RING_ADD_BADGE_PATH
     );
-    expect(createAvatarRingIcon(true).querySelector('mask')?.id).not.toBe(activeMask?.id);
+    expect(activeIcon.querySelector('.ytcq-avatar-ring-icon-badge-symbol')?.getAttribute('d')).toBe(
+      AVATAR_RING_ACTIVE_BADGE_PATH
+    );
   });
 });

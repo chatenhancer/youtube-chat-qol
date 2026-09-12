@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../../shared/options';
+import { SETTING_ICON_ANIMATIONS } from '../../shared/setting-icon-animations';
 import { setOptions } from '../../shared/state';
 import * as pictureInPicture from '../picture-in-picture/bridge';
 
@@ -104,7 +105,7 @@ describe('chat settings grid', () => {
     setOptions({ ...DEFAULT_OPTIONS, liteModeEnabled: true });
     refreshSettingsMenus();
     expect(item.getAttribute('aria-checked')).toBe('true');
-    vi.advanceTimersByTime(600);
+    vi.advanceTimersByTime(SETTING_ICON_ANIMATIONS.liteMode.durationMs);
     expect(icon.classList.contains('ytcq-bolt-redraw')).toBe(false);
     item.click();
     expect(saveOptions).toHaveBeenLastCalledWith({ liteModeEnabled: false });

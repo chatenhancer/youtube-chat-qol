@@ -7,77 +7,62 @@ export const ICON_VIEW_BOX = '0 0 24 24';
 export const MATERIAL_ICON_VIEW_BOX = '0 -960 960 960';
 
 export const ADD_ICON_PATH = 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2Z';
-export const AVATAR_RING_ADD_BADGE_PATH = 'M18 15.9v4.2M15.9 18h4.2';
-export const AVATAR_RING_ACTIVE_BADGE_PATH = 'm15.9 18 1.35 1.35 2.85-3.05';
-export const BOOKMARK_FILLED_ICON_PATH =
-  'M600-680v-80h280v80H600ZM200-120v-640q0-33 23.5-56.5T280-840h280q-20 30-30 57.5T520-720q0 72 45.5 127T680-524q23 3 40 3t40-3v404L480-240 200-120Z';
-export const BOOKMARK_ICON_PATH =
-  'M200-120v-640q0-33 23.5-56.5T280-840h240v80H280v518l200-86 200 86v-278h80v400L480-240 200-120Zm80-640h240-240Zm400 160v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80Z';
-export const BOLT_ICON_PATH =
-  'm422-232 207-248H469l29-227-185 267h139l-30 208Zm-62-128H236q-24 0-35.5-21.5T203-423l299-430q10-14 26-19.5t33 .5q17 6 25 21t6 32l-32 259h155q26 0 36.5 23t-6.5 43L416-100q-11 13-27 17t-31-3q-15-7-23.5-21.5T328-139l32-221Zm111-110Z';
-const BOLT_DRAW_MASK_MAIN_PATH = 'M515-790 258-432 406-400 404-156 687-487 515-520';
-const BOLT_DRAW_MASK_END_PATH = 'M515-520 515-790';
-const BOLT_DRAW_MASK_END_BLOCKER_PATH = 'M502-900H620V-560H560L469-480 498-707Z';
+export const AVATAR_RING_ADD_BADGE_PATH = 'M19 5v6 M16 8h6';
+export const AVATAR_RING_ACTIVE_BADGE_PATH = 'M16 8l2 2 4-5';
+export const BOOKMARK_ICON_PATH = 'M6 21V7a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v14l-6-4Z';
+export const LITE_MODE_ICON_PATH = 'M5 19V13A10 10 0 0 1 15 3h6v6a10 10 0 0 1-10 10Z M3 21 15 9';
 // Outline adaptation of the two chat bubbles and play mark in assets/icons/icon.svg.
 export const CHAT_ENHANCER_ICON_VIEW_BOX = '11 6 37 37';
 export const CHAT_ENHANCER_ICON_PATH =
   'M25.6 10.5c-4.7 0-8.3 1.2-9.8 3.1-2.8 3.2-2.8 11.7 0 15 .6.6 1.3 1.1 2.3 1.6l.6 3.2q.2 1.5 1.9.5l4-2.6q.5-.3 1.2-.3c4.4 0 8.1-1.2 9.5-2.8 2.8-3.2 2.8-11.4 0-14.6-1.6-1.9-5.2-3.1-9.7-3.1ZM41 20c1.4.6 2.5 1.3 3.2 2.2 2.2 2.7 2.2 9.1 0 11.8-.6.7-1.4 1.3-2.3 1.7l-.6 2.9q-.3 1.4-1.6.5l-3.2-2.1q-.3-.2-.8-.2c-3 0-5.7-.7-7.5-2';
-export const CHEVRON_BACKWARD_ICON_PATH =
-  'm432-480 156 156q11 11 11 28t-11 28q-11 11-28 11t-28-11L348-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 28-11t28 11q11 11 11 28t-11 28L432-480Z';
-export const CLOSE_ICON_PATH =
-  'M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4Z';
+export const CHEVRON_BACKWARD_ICON_PATH = 'M14.5 5 7.5 12l7 7';
+export const CLOSE_ICON_PATH = 'M6 6l12 12 M18 6 6 18';
 export const EXPAND_ICON_PATH =
-  'M5 5h6v2H8.41l3.3 3.29-1.42 1.42L7 8.41V11H5V5Zm8 0h6v6h-2V8.41l-3.29 3.3-1.42-1.42 3.3-3.29H13V5ZM5 13h2v2.59l3.29-3.3 1.42 1.42-3.3 3.29H11v2H5v-6Zm12 0h2v6h-6v-2h2.59l-3.3-3.29 1.42-1.42 3.29 3.3V13Z';
+  'M9 5H7a2 2 0 0 0-2 2v2 M15 5h2a2 2 0 0 1 2 2v2 M5 15v2a2 2 0 0 0 2 2h2 M19 15v2a2 2 0 0 1-2 2h-2';
 export const INBOX_ICON_PATH =
-  'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm0 12h-4a3 3 0 0 1-6 0H5V5h14v10Z';
+  'M8 6h8c1.3 0 2 .8 2.5 2L21 14v3a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-3l2.5-6C6 6.8 6.7 6 8 6Z M3 14h4c2 0 2 3 5 3s3-3 5-3h4';
 export const INBOX_TEXT_ICON_PATH =
-  'M5 21a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5Zm0-6h4a3 3 0 0 0 6 0h4V5H5v10Zm3-5h8V8H8v2Zm0 3h6v-2H8v2Z';
+  'M8 6h8c1.3 0 2 .8 2.5 2L21 14v3a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-3l2.5-6C6 6.8 6.7 6 8 6Z M3 14h4c2 0 2 3 5 3s3-3 5-3h4 M9 10h6 M10 13h4';
 export const GAMES_ICON_PATH =
-  'M189-160q-60 0-102.5-43T42-307q0-9 1-18t3-18l84-336q14-54 57-87.5t98-33.5h390q55 0 98 33.5t57 87.5l84 336q2 9 3.5 18.5T919-306q0 61-43.5 103.5T771-160q-42 0-78-22t-54-60l-28-58q-5-10-15-15t-21-5H385q-11 0-21 5t-15 15l-28 58q-18 38-54 60t-78 22Zm3-80q19 0 34.5-10t23.5-27l28-57q15-31 44-48.5t63-17.5h190q34 0 63 18t45 48l28 57q8 17 23.5 27t34.5 10q28 0 48-18.5t21-46.5q0 1-2-19l-84-335q-7-27-28-44t-49-17H285q-28 0-49.5 17T208-659l-84 335q-2 6-2 18 0 28 20.5 47t49.5 19Zm376.5-291.5Q580-543 580-560t-11.5-28.5Q557-600 540-600t-28.5 11.5Q500-577 500-560t11.5 28.5Q523-520 540-520t28.5-11.5Zm80-80Q660-623 660-640t-11.5-28.5Q637-680 620-680t-28.5 11.5Q580-657 580-640t11.5 28.5Q603-600 620-600t28.5-11.5Zm0 160Q660-463 660-480t-11.5-28.5Q637-520 620-520t-28.5 11.5Q580-497 580-480t11.5 28.5Q603-440 620-440t28.5-11.5Zm80-80Q740-543 740-560t-11.5-28.5Q717-600 700-600t-28.5 11.5Q660-577 660-560t11.5 28.5Q683-520 700-520t28.5-11.5Zm-367 63Q370-477 370-490v-40h40q13 0 21.5-8.5T440-560q0-13-8.5-21.5T410-590h-40v-40q0-13-8.5-21.5T340-660q-13 0-21.5 8.5T310-630v40h-40q-13 0-21.5 8.5T240-560q0 13 8.5 21.5T270-530h40v40q0 13 8.5 21.5T340-460q13 0 21.5-8.5ZM480-480Z';
+  'm11 6 1.2-2.7a2 2 0 0 1 2.6-1l6 2.7a2 2 0 0 1 1 2.6l-2.7 6a2 2 0 0 1-2.6 1l-.3-.1';
 export const JUMP_TO_MESSAGE_ICON_PATH =
-  'M440-42v-80q-125-14-214.5-103.5T122-440H42v-80h80q14-125 103.5-214.5T440-838v-80h80v80q125 14 214.5 103.5T838-520h80v80h-80q-14 125-103.5 214.5T520-122v80h-80Zm40-158q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Zm0-120q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-80q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400Zm0-80Z';
+  'M7 4h10a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-4l-5 3v-3H7a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z M7 11h9 m-3-3 3 3-3 3';
 export const LOCK_ICON_PATH =
-  'M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z';
+  'M8 10V7a4 4 0 0 1 8 0v3 M7 10h10a3 3 0 0 1 3 3v5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-5a3 3 0 0 1 3-3Z M12 14v3';
 export const MENTION_ICON_PATH =
-  'M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480v58q0 59-40.5 100.5T740-280q-35 0-66-15t-52-43q-29 29-65.5 43.5T480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480v58q0 26 17 44t43 18q26 0 43-18t17-44v-58q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93h200v80H480Zm85-315q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Z';
+  'M14 11a3 3 0 1 1-6 0a3 3 0 1 1 6 0Z M14 8v6a3 3 0 0 0 6 0v-3a8 8 0 1 0-8 8h2';
 export const MORE_VERTICAL_ICON_PATH =
   'M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z';
 export const OPEN_IN_NEW_ICON_PATH =
-  'M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3ZM5 5h6v2H5v12h12v-6h2v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2Z';
+  'M13 3h7v7 M20 3 10 13 M9 5H7a4 4 0 0 0-4 4v8a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4v-2';
 export const MINIMIZE_ICON_PATH =
-  'M11 11H5V9h2.59l-3.3-3.29 1.42-1.42L9 7.59V5h2v6Zm8 0h-6V5h2v2.59l3.29-3.3 1.42 1.42L16.41 9H19v2ZM11 19H9v-2.59l-3.29 3.3-1.42-1.42L7.59 15H5v-2h6v6Zm4 0h-2v-6h6v2h-2.59l3.3 3.29-1.42 1.42L15 16.41V19Z';
-export const PLAYGROUND_ICON_PATH =
-  'm272-440 208 120 208-120-168-97v137h-80v-137l-168 97Zm168-189v-17q-44-13-72-49.5T340-780q0-58 41-99t99-41q58 0 99 41t41 99q0 48-28 84.5T520-646v17l280 161q19 11 29.5 29.5T840-398v76q0 22-10.5 40.5T800-252L520-91q-19 11-40 11t-40-11L160-252q-19-11-29.5-29.5T120-322v-76q0-22 10.5-40.5T160-468l280-161Zm0 378L200-389v67l280 162 280-162v-67L520-251q-19 11-40 11t-40-11Zm82.5-486.5Q540-755 540-780t-17.5-42.5Q505-840 480-840t-42.5 17.5Q420-805 420-780t17.5 42.5Q455-720 480-720t42.5-17.5ZM480-160Z';
-export const PLAYGROUND_BASE_ICON_PATH =
-  'M520-629 800-468q19 11 29.5 29.5T840-398v76q0 22-10.5 40.5T800-252L520-91q-19 11-40 11t-40-11L160-252q-19-11-29.5-29.5T120-322v-76q0-22 10.5-40.5T160-468l280-161h80ZM272-440l208 120 208-120-208-120-208 120Zm168 189L200-389v67l280 162 280-162v-67L520-251q-19 11-40 11t-40-11Z';
-export const PLAYGROUND_STICK_ICON_PATH =
-  'M440-400v-246q-44-13-72-49.5T340-780q0-58 41-99t99-41q58 0 99 41t41 99q0 48-28 84.5T520-646v246h-80Zm82.5-337.5Q540-755 540-780t-17.5-42.5Q505-840 480-840t-42.5 17.5Q420-805 420-780t17.5 42.5Q455-720 480-720t42.5-17.5Z';
+  'M5 9h2a2 2 0 0 0 2-2V5 M15 5v2a2 2 0 0 0 2 2h2 M5 15h2a2 2 0 0 1 2 2v2 M15 19v-2a2 2 0 0 1 2-2h2';
 export const QUOTE_ICON_PATH =
-  'M7.2 6C5.45 7.45 4.5 9.34 4.5 11.55V18h6.4v-6.25H7.25c.08-1.33.62-2.42 1.63-3.28L7.2 6Zm9 0c-1.75 1.45-2.7 3.34-2.7 5.55V18h6.4v-6.25h-3.65c.08-1.33.62-2.42 1.63-3.28L16.2 6Z';
-export const SOUND_BELL_BODY_ICON_PATH =
-  'M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z';
-export const SOUND_BELL_CLAPPER_ICON_PATH =
-  'M480-80q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80Z';
-export const SOUND_BELL_RING_ICON_PATH =
-  'M80-560q0-100 44.5-183.5T244-882l47 64q-60 44-95.5 111T160-560H80Zm720 0q0-80-35.5-147T669-818l47-64q75 55 119.5 138.5T880-560h-80Z';
+  'M4.5 6.5h4A1.5 1.5 0 0 1 10 8v5c0 3.2-1.8 5.4-5 6.5l-1-2c2.1-.8 3.2-1.9 3.5-3.5h-3A1.5 1.5 0 0 1 3 12.5V8a1.5 1.5 0 0 1 1.5-1.5Z M15.5 6.5h4A1.5 1.5 0 0 1 21 8v5c0 3.2-1.8 5.4-5 6.5l-1-2c2.1-.8 3.2-1.9 3.5-3.5h-3a1.5 1.5 0 0 1-1.5-1.5V8a1.5 1.5 0 0 1 1.5-1.5Z';
+export const SOUND_BELL_BODY_ICON_PATH = 'M5 17h14l-2-4V8a5 5 0 0 0-10 0v5Z';
+export const SOUND_BELL_CLAPPER_ICON_PATH = 'M10 21h4';
+export const SOUND_BELL_RING_ICON_PATH = 'M3 9a9 9 0 0 1 2-5 M21 9a9 9 0 0 0-2-5';
 export const SOUND_BELL_ICON_PATH = `${SOUND_BELL_BODY_ICON_PATH}${SOUND_BELL_CLAPPER_ICON_PATH}`;
 export const SOUND_RINGING_BELL_ICON_PATH = `${SOUND_BELL_RING_ICON_PATH}${SOUND_BELL_ICON_PATH}`;
 export const TV_ICON_PATH =
-  'm429-379 181-116q14-8.79 14-24.89Q624-536 610-545L429-661q-15-10-30.5-1T383-635v230q0 18 15.5 27t30.5-1ZM140-200q-24 0-42-18t-18-42v-520q0-24 18-42t42-18h680q24 0 42 18t18 42v520q0 24-18 42t-42 18H630v50q0 12.75-8.62 21.37Q612.75-120 600-120H360q-12.75 0-21.37-8.63Q330-137.25 330-150v-50H140Zm0-60h680v-520H140v520Zm0 0v-520 520Z';
+  'M7 3h10a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Z M6 21h12 M10 7l5 3-5 3Z';
 export const TRANSLATE_SOURCE_ICON_PATH =
-  'M362-401 188-228q-11 11-27.5 11.5T132-228q-11-11-11-28t11-28l174-174q-35-35-63.5-80T190-640h84q20 39 40 68t48 58q33-33 68.5-92.5T484-720H80q-17 0-28.5-11.5T40-760q0-17 11.5-28.5T80-800h240v-40q0-17 11.5-28.5T360-880q17 0 28.5 11.5T400-840v40h240q17 0 28.5 11.5T680-760q0 17-11.5 28.5T640-720h-76q-21 72-63 148t-83 116l96 98-30 82-122-125Z';
-export const TRANSLATE_TARGET_ICON_PATH =
-  'm603-202-34 97q-4 11-14 18t-22 7q-20 0-32.5-16.5T496-133l152-402q5-11 15-18t22-7h30q12 0 22 7t15 18l152 403q8 19-4 35.5T868-80q-13 0-22.5-7T831-106l-34-96H603Zm25-70h144l-72-204-72 204Z';
+  'M3 6h10 M8 3v3 M11 6a15 15 0 0 1-8 10 M5 10a15 15 0 0 0 6 5';
+export const TRANSLATE_TARGET_ICON_PATH = 'M13 21l4-11 4 11 M15 17h4';
 export const TRANSLATE_ICON_PATH = `${TRANSLATE_TARGET_ICON_PATH}${TRANSLATE_SOURCE_ICON_PATH}`;
 export const VOLUME_OFF_ICON_PATH =
-  'M792-56 671-177q-25 16-53 27.5T560-131v-82q14-5 27.5-10t25.5-12L480-368v208L280-360H120v-240h128L56-792l56-56 736 736-56 56Zm-8-232-58-58q17-31 25.5-65t8.5-70q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 53-14.5 102T784-288ZM650-422l-90-90v-130q47 22 73.5 66t26.5 96q0 15-2.5 29.5T650-422ZM480-592 376-696l104-104v208Zm-80 238v-94l-72-72H200v80h114l86 86Zm-36-130Z';
+  'M4 9h3l5-4v14l-5-4H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z M17 10l4 4 M21 10l-4 4';
 export const VOLUME_UP_ICON_PATH =
-  'M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z';
+  'M4 9h3l5-4v14l-5-4H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1Z M16 9a5 5 0 0 1 0 6 M19 6a9 9 0 0 1 0 12';
 
-export function createSvgIcon(viewBox: string, pathData: string): SVGSVGElement {
+export function createSvgIcon(
+  viewBox: string,
+  pathData: string,
+  strokeWidth?: number
+): SVGSVGElement {
   return el<SVGSVGElement>(
     <svg viewBox={viewBox} focusable="false" aria-hidden="true">
-      {createSvgPath(pathData)}
+      {createSvgPath(pathData, '', strokeWidth)}
     </svg>
   );
 }
@@ -109,112 +94,67 @@ export function createSplitTranslateIcon({
 } = {}): SVGSVGElement {
   return el<SVGSVGElement>(
     <svg
-      viewBox={MATERIAL_ICON_VIEW_BOX}
+      viewBox={ICON_VIEW_BOX}
       focusable="false"
       aria-hidden="true"
       class={iconClassName || undefined}
     >
-      {createSvgPath(TRANSLATE_SOURCE_ICON_PATH, sourceClassName)}
-      {createSvgPath(TRANSLATE_TARGET_ICON_PATH, targetClassName)}
+      {createSvgPath(TRANSLATE_SOURCE_ICON_PATH, sourceClassName, 2)}
+      {createSvgPath(TRANSLATE_TARGET_ICON_PATH, targetClassName, 2)}
     </svg>
   );
 }
 
 export function createSoundBellIcon(ringing = false): SVGSVGElement {
   return el<SVGSVGElement>(
-    <svg viewBox={MATERIAL_ICON_VIEW_BOX} focusable="false" aria-hidden="true">
-      {ringing ? createSvgPath(SOUND_BELL_RING_ICON_PATH, 'ytcq-bell-ring') : null}
-      {createSvgPath(SOUND_BELL_BODY_ICON_PATH, 'ytcq-bell-body')}
-      {createSvgPath(SOUND_BELL_CLAPPER_ICON_PATH, 'ytcq-bell-clapper')}
+    <svg viewBox={ICON_VIEW_BOX} focusable="false" aria-hidden="true">
+      {ringing ? createSvgPath(SOUND_BELL_RING_ICON_PATH, 'ytcq-bell-ring', 2) : null}
+      {createSvgPath(SOUND_BELL_BODY_ICON_PATH, 'ytcq-bell-body', 2)}
+      {createSvgPath(SOUND_BELL_CLAPPER_ICON_PATH, 'ytcq-bell-clapper', 2)}
     </svg>
   );
 }
 
-let avatarRingIconBadgeMaskSequence = 0;
-
 export function createAvatarRingIcon(active = false): SVGSVGElement {
-  const badgeMaskId = active
-    ? `ytcq-avatar-ring-icon-badge-mask-${++avatarRingIconBadgeMaskSequence}`
-    : '';
-
   return el<SVGSVGElement>(
     <svg viewBox={ICON_VIEW_BOX} focusable="false" aria-hidden="true" class="ytcq-avatar-ring-icon">
-      {active ? (
-        <defs>
-          <mask
-            id={badgeMaskId}
-            x="0"
-            y="0"
-            width="24"
-            height="24"
-            maskUnits="userSpaceOnUse"
-            mask-type="luminance"
-          >
-            <rect x="0" y="0" width="24" height="24" fill="#fff" />
-            <path
-              class="ytcq-avatar-ring-icon-badge-symbol"
-              d={AVATAR_RING_ACTIVE_BADGE_PATH}
-              fill="none"
-              stroke="#000"
-              stroke-width="1.65"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </mask>
-        </defs>
-      ) : null}
-      <circle
-        class="ytcq-avatar-ring-icon-outline"
-        cx="10.5"
-        cy="10.5"
-        r="7.4"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.6"
-      />
-      <circle cx="10.5" cy="8.2" r="2.2" />
-      <path
-        d="M6.6 15.25c.72-2.02 2.02-3.03 3.9-3.03s3.18 1.01 3.9 3.03"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.6"
-        stroke-linecap="round"
-      />
-      <circle
-        class="ytcq-avatar-ring-icon-badge"
-        cx="18"
-        cy="18"
-        r="3.65"
-        fill={active ? 'currentColor' : 'none'}
-        mask={active ? `url(#${badgeMaskId})` : undefined}
-        stroke="currentColor"
-        stroke-width="1.5"
-      />
-      {active ? null : (
-        <path
-          class="ytcq-avatar-ring-icon-badge-symbol"
-          d={AVATAR_RING_ADD_BADGE_PATH}
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.65"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
+      <circle cx="9" cy="6" r="3" fill="none" stroke="currentColor" stroke-width="2" />
+      {createSvgPath('M3 21v-2a6 6 0 0 1 12 0v2', '', 2)}
+      {createSvgPath(
+        active ? AVATAR_RING_ACTIVE_BADGE_PATH : AVATAR_RING_ADD_BADGE_PATH,
+        'ytcq-avatar-ring-icon-badge-symbol',
+        2
       )}
     </svg>
   );
 }
 
-function createSvgPath(pathData: string, className = ''): SVGPathElement {
-  return el<SVGPathElement>(<path d={pathData} class={className || undefined} />);
+export function createBookmarkIcon(saved = false): SVGSVGElement {
+  const icon = createSvgIcon(ICON_VIEW_BOX, BOOKMARK_ICON_PATH, 2);
+  icon.firstElementChild?.setAttribute('fill', saved ? 'currentColor' : 'none');
+  return icon;
+}
+
+function createSvgPath(pathData: string, className = '', strokeWidth?: number): SVGPathElement {
+  return el<SVGPathElement>(
+    <path
+      d={pathData}
+      class={className || undefined}
+      fill={strokeWidth ? 'none' : undefined}
+      stroke={strokeWidth ? 'currentColor' : undefined}
+      stroke-width={strokeWidth}
+      stroke-linecap={strokeWidth ? 'round' : undefined}
+      stroke-linejoin={strokeWidth ? 'round' : undefined}
+    />
+  );
 }
 
 export function createCloseIcon(): SVGSVGElement {
-  return createSvgIcon(ICON_VIEW_BOX, CLOSE_ICON_PATH);
+  return createSvgIcon(ICON_VIEW_BOX, CLOSE_ICON_PATH, 2);
 }
 
 export function createExpandIcon(): SVGSVGElement {
-  return createSvgIcon(ICON_VIEW_BOX, EXPAND_ICON_PATH);
+  return createSvgIcon(ICON_VIEW_BOX, EXPAND_ICON_PATH, 2);
 }
 
 export function createAddIcon(): SVGSVGElement {
@@ -222,109 +162,101 @@ export function createAddIcon(): SVGSVGElement {
 }
 
 export function createChannelIcon(): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, TV_ICON_PATH);
+  return createSvgIcon(ICON_VIEW_BOX, TV_ICON_PATH, 2);
 }
 
-export function createBoltIcon({
-  drawMaskId = ''
-}: {
-  drawMaskId?: string;
-} = {}): SVGSVGElement {
-  if (!drawMaskId) return createSvgIcon(MATERIAL_ICON_VIEW_BOX, BOLT_ICON_PATH);
-
+export function createLiteModeIcon(): SVGSVGElement {
   return el<SVGSVGElement>(
-    <svg viewBox={MATERIAL_ICON_VIEW_BOX} focusable="false" aria-hidden="true">
-      <defs>
-        <mask
-          id={drawMaskId}
-          x="0"
-          y="-960"
-          width="960"
-          height="960"
-          maskUnits="userSpaceOnUse"
-          mask-type="luminance"
-        >
+    <svg viewBox={ICON_VIEW_BOX} focusable="false" aria-hidden="true">
+      <g class="lite-mode-wind">
+        {['M-11 7H1', 'M-5 15H1.5'].map((path) => (
           <path
-            class="lite-mode-bolt-draw-mask lite-mode-bolt-draw-mask-main"
-            d={BOLT_DRAW_MASK_MAIN_PATH}
+            d={path}
             fill="none"
-            pathLength="1"
-            stroke="#fff"
-            stroke-dasharray="1 2"
-            stroke-dashoffset="0"
-            stroke-linecap="butt"
-            stroke-linejoin="miter"
-            stroke-width="170"
-          />
-          <path
-            class="lite-mode-bolt-draw-mask-blocker"
-            d={BOLT_DRAW_MASK_END_BLOCKER_PATH}
-            fill="#000"
-          />
-          <path
-            class="lite-mode-bolt-draw-mask lite-mode-bolt-draw-mask-end"
-            d={BOLT_DRAW_MASK_END_PATH}
-            fill="none"
-            pathLength="1"
-            stroke="#fff"
-            stroke-dasharray="1 2"
-            stroke-dashoffset="0"
+            stroke="currentColor"
+            stroke-width="1.4"
             stroke-linecap="round"
-            stroke-width="230"
+            stroke-linejoin="round"
+            pathLength="1"
+            stroke-dasharray=".55 1"
+            stroke-dashoffset=".55"
+            opacity="0"
           />
-        </mask>
-      </defs>
-      {createSvgPath(BOLT_ICON_PATH, 'lite-mode-bolt-fill')}
-      <path class="lite-mode-bolt-draw" d={BOLT_ICON_PATH} mask={`url(#${drawMaskId})`} />
+        ))}
+        {['M26 6h2', 'M24 15h2.5'].map((path) => (
+          <path
+            d={path}
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            opacity="0"
+          />
+        ))}
+      </g>
+      <g class="lite-mode-leaf">{createSvgPath(LITE_MODE_ICON_PATH, '', 2)}</g>
     </svg>
   );
 }
 
 export function createChevronBackwardIcon(): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, CHEVRON_BACKWARD_ICON_PATH);
+  return createSvgIcon(ICON_VIEW_BOX, CHEVRON_BACKWARD_ICON_PATH, 2);
 }
 
 export function createInboxIcon(inboxText = false): SVGSVGElement {
-  return createSvgIcon(ICON_VIEW_BOX, inboxText ? INBOX_TEXT_ICON_PATH : INBOX_ICON_PATH);
+  return createSvgIcon(ICON_VIEW_BOX, inboxText ? INBOX_TEXT_ICON_PATH : INBOX_ICON_PATH, 1.8);
 }
 
 export function createGamesIcon(): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, GAMES_ICON_PATH);
-}
-
-export function createJumpToMessageIcon(): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, JUMP_TO_MESSAGE_ICON_PATH);
-}
-
-export function createLockIcon(): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, LOCK_ICON_PATH);
-}
-
-export function createOpenInNewIcon(): SVGSVGElement {
-  return createSvgIcon(ICON_VIEW_BOX, OPEN_IN_NEW_ICON_PATH);
-}
-
-export function createMinimizeIcon(): SVGSVGElement {
-  return createSvgIcon(ICON_VIEW_BOX, MINIMIZE_ICON_PATH);
-}
-
-export function createPlaygroundIcon(): SVGSVGElement {
   return el<SVGSVGElement>(
-    <svg viewBox={MATERIAL_ICON_VIEW_BOX} focusable="false" aria-hidden="true">
-      {createSvgPath(PLAYGROUND_STICK_ICON_PATH, 'playground-joystick-stick')}
-      {createSvgPath(PLAYGROUND_BASE_ICON_PATH, 'playground-joystick-base')}
+    <svg viewBox={ICON_VIEW_BOX} focusable="false" aria-hidden="true">
+      {createSvgPath(GAMES_ICON_PATH, '', 1.7)}
+      <g transform="rotate(-17 8.2 15.6)">
+        <rect
+          x="3.2"
+          y="10.6"
+          width="10"
+          height="10"
+          rx="2.3"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+        />
+        <g fill="currentColor" stroke="none">
+          <circle cx="6.3" cy="13.7" r=".85" />
+          <circle cx="10.1" cy="17.5" r=".85" />
+        </g>
+      </g>
+      <circle cx="16.5" cy="8.1" r="1" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
+export function createJumpToMessageIcon(): SVGSVGElement {
+  return createSvgIcon(ICON_VIEW_BOX, JUMP_TO_MESSAGE_ICON_PATH, 2);
+}
+
+export function createLockIcon(): SVGSVGElement {
+  return createSvgIcon(ICON_VIEW_BOX, LOCK_ICON_PATH, 2);
+}
+
+export function createOpenInNewIcon(): SVGSVGElement {
+  return createSvgIcon(ICON_VIEW_BOX, OPEN_IN_NEW_ICON_PATH, 2);
+}
+
+export function createMinimizeIcon(): SVGSVGElement {
+  return createSvgIcon(ICON_VIEW_BOX, MINIMIZE_ICON_PATH, 2);
+}
+
 export function createTranslateIcon(): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, TRANSLATE_ICON_PATH);
+  return createSvgIcon(ICON_VIEW_BOX, TRANSLATE_ICON_PATH, 2);
 }
 
 export function createVolumeOffIcon(): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, VOLUME_OFF_ICON_PATH);
+  return createSvgIcon(ICON_VIEW_BOX, VOLUME_OFF_ICON_PATH, 2);
 }
 
 export function createVolumeUpIcon(): SVGSVGElement {
-  return createSvgIcon(MATERIAL_ICON_VIEW_BOX, VOLUME_UP_ICON_PATH);
+  return createSvgIcon(ICON_VIEW_BOX, VOLUME_UP_ICON_PATH, 2);
 }

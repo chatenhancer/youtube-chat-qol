@@ -58,10 +58,10 @@
     "jumpToMessage": "پرش به پیام",
     "keywordOrPhrase": "کلیدواژه یا عبارت",
     "lessThanOneMinute": "کمتر از ۱ دقیقه",
-    "rememberUser": "به‌خاطر سپردن کاربر",
-    "forgetUser": "فراموش کردن کاربر",
+    "rememberUser": "نشانک‌گذاری کاربر",
+    "forgetUser": "حذف نشانک کاربر",
     "bookmarkAddedDate": "در {date} اضافه شد",
-    "userRememberedDate": "کاربر در {date} به‌خاطر سپرده شد",
+    "userRememberedDate": "کاربر در {date} نشانک‌گذاری شد",
     "mention": "منشن",
     "mentionUser": "منشن کاربر",
     "mentionUserTitle": "منشن کاربر. برای نقل‌قول Alt/Option-click کنید.",
@@ -637,7 +637,7 @@
       "message": "نشانک‌ها"
     },
     "popupResetItemRememberedUsers": {
-      "message": "کاربران به‌خاطر سپرده‌شده"
+      "message": "کاربران نشانک‌گذاری‌شده"
     },
     "noSavedItems": {
       "message": "هنوز مورد ذخیره‌شده‌ای نیست"
@@ -646,7 +646,7 @@
       "message": "{count} مورد ذخیره‌شده"
     },
     "savedItemsEmpty": {
-      "message": "پیام‌هایی که ذخیره می‌کنید و کاربرانی که به‌خاطر می‌سپارید اینجا نمایش داده می‌شوند."
+      "message": "پیام‌ها و کاربرانی که نشانک‌گذاری می‌کنید اینجا نمایش داده می‌شوند."
     },
     "filterBookmarks": {
       "message": "فیلتر کردن نشانک‌ها"
@@ -673,16 +673,16 @@
       "message": "هیچ مورد ذخیره‌شدهٔ منطبقی نیست."
     },
     "rememberedUser": {
-      "message": "کاربر به‌خاطر سپرده‌شده"
+      "message": "کاربر نشانک‌گذاری‌شده"
     },
     "userRememberedDate": {
-      "message": "کاربر در {date} به‌خاطر سپرده شد"
+      "message": "کاربر در {date} نشانک‌گذاری شد"
     },
     "forgetUser": {
-      "message": "فراموش کردن کاربر"
+      "message": "حذف نشانک کاربر"
     },
     "rememberUser": {
-      "message": "به‌خاطر سپردن کاربر"
+      "message": "نشانک‌گذاری کاربر"
     },
     "bookmarkMessagePostedDate": {
       "message": "پیام در {date} ارسال شد"

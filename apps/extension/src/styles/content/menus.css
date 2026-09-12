@@ -252,7 +252,7 @@ ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-paper-item {
   min-height: 40px;
   gap: 1px;
   padding: 2px;
-  border-radius: var(--ytcq-squircle-radius-control);
+  border-radius: calc(var(--ytcq-squircle-radius-control) + 3px);
   corner-shape: var(--ytcq-squircle-corner-shape);
   color: inherit;
   font-size: 12px;

@@ -58,10 +58,10 @@
     "jumpToMessage": "Przejdź do wiadomości",
     "keywordOrPhrase": "Słowo kluczowe lub fraza",
     "lessThanOneMinute": "mniej niż 1 min",
-    "rememberUser": "Zapamiętaj użytkownika",
-    "forgetUser": "Zapomnij użytkownika",
+    "rememberUser": "Dodaj użytkownika do zakładek",
+    "forgetUser": "Usuń użytkownika z zakładek",
     "bookmarkAddedDate": "Dodano {date}",
-    "userRememberedDate": "Użytkownik zapamiętany {date}",
+    "userRememberedDate": "Użytkownik dodany do zakładek {date}",
     "mention": "Wspomnij",
     "mentionUser": "Wspomnij użytkownika",
     "mentionUserTitle": "Wspomnij użytkownika. Alt/Option-klik, aby zacytować.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Gry",
     "gamesReplayOnly": "Tylko powtórka",
-    "gamesLivestreamOnly": "Tylko transmisja na żywo",
+    "gamesLivestreamOnly": "Tylko na żywo",
     "gamesUpdateRequired": "Wymagana aktualizacja",
     "gamesVersionMismatchHelper": "{game} jest tymczasowo niedostępna, ponieważ wersje Chat Enhancer i Playground nie są zgodne. Spróbuj ponownie, gdy wersje będą zgodne.",
     "gamesVersionMismatchActiveHelper": "Wymagana aktualizacja. Wersje Chat Enhancer i Playground nie są zgodne.",
@@ -637,7 +637,7 @@
       "message": "Zakładki"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Zapamiętani użytkownicy"
+      "message": "Użytkownicy w zakładkach"
     },
     "noSavedItems": {
       "message": "Brak zapisanych elementów"
@@ -646,7 +646,7 @@
       "message": "{count} zapisanych elementów"
     },
     "savedItemsEmpty": {
-      "message": "Zapisane wiadomości i zapamiętani użytkownicy pojawią się tutaj."
+      "message": "Wiadomości i użytkownicy dodani do zakładek pojawią się tutaj."
     },
     "filterBookmarks": {
       "message": "Filtruj zakładki"
@@ -673,16 +673,16 @@
       "message": "Brak pasujących zapisanych elementów."
     },
     "rememberedUser": {
-      "message": "Zapamiętany użytkownik"
+      "message": "Użytkownik w zakładkach"
     },
     "userRememberedDate": {
-      "message": "Użytkownik zapamiętany {date}"
+      "message": "Użytkownik dodany do zakładek {date}"
     },
     "forgetUser": {
-      "message": "Zapomnij użytkownika"
+      "message": "Usuń użytkownika z zakładek"
     },
     "rememberUser": {
-      "message": "Zapamiętaj użytkownika"
+      "message": "Dodaj użytkownika do zakładek"
     },
     "bookmarkMessagePostedDate": {
       "message": "Wiadomość wysłana {date}"

@@ -58,10 +58,10 @@
     "jumpToMessage": "ข้ามไปยังข้อความ",
     "keywordOrPhrase": "คำสำคัญหรือวลี",
     "lessThanOneMinute": "น้อยกว่า 1 นาที",
-    "rememberUser": "จดจำผู้ใช้",
-    "forgetUser": "ลืมผู้ใช้",
+    "rememberUser": "เพิ่มผู้ใช้ในบุ๊กมาร์ก",
+    "forgetUser": "ลบผู้ใช้ออกจากบุ๊กมาร์ก",
     "bookmarkAddedDate": "เพิ่มเมื่อ {date}",
-    "userRememberedDate": "จดจำผู้ใช้เมื่อ {date}",
+    "userRememberedDate": "เพิ่มผู้ใช้ในบุ๊กมาร์กเมื่อ {date}",
     "mention": "กล่าวถึง",
     "mentionUser": "กล่าวถึงผู้ใช้",
     "mentionUserTitle": "กล่าวถึงผู้ใช้ กด Alt/Option-click เพื่ออ้างอิง",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "เกม",
     "gamesReplayOnly": "เฉพาะรีเพลย์",
-    "gamesLivestreamOnly": "เฉพาะไลฟ์สด",
+    "gamesLivestreamOnly": "เฉพาะไลฟ์",
     "gamesUpdateRequired": "ต้องอัปเดต",
     "gamesVersionMismatchHelper": "{game} ไม่พร้อมใช้งานชั่วคราวเนื่องจากเวอร์ชันของ Chat Enhancer และ Playground ไม่ตรงกัน โปรดลองอีกครั้งเมื่อเวอร์ชันตรงกัน",
     "gamesVersionMismatchActiveHelper": "ต้องอัปเดต เวอร์ชันของ Chat Enhancer และ Playground ไม่ตรงกัน",
@@ -637,7 +637,7 @@
       "message": "บุ๊กมาร์ก"
     },
     "popupResetItemRememberedUsers": {
-      "message": "ผู้ใช้ที่จดจำ"
+      "message": "ผู้ใช้ที่เพิ่มในบุ๊กมาร์ก"
     },
     "noSavedItems": {
       "message": "ยังไม่มีรายการที่บันทึก"
@@ -646,7 +646,7 @@
       "message": "รายการที่บันทึก {count} รายการ"
     },
     "savedItemsEmpty": {
-      "message": "ข้อความที่คุณบันทึกและผู้ใช้ที่คุณจดจำจะปรากฏที่นี่"
+      "message": "ข้อความและผู้ใช้ที่คุณเพิ่มในบุ๊กมาร์กจะปรากฏที่นี่"
     },
     "filterBookmarks": {
       "message": "กรองบุ๊กมาร์ก"
@@ -673,16 +673,16 @@
       "message": "ไม่มีรายการที่บันทึกไว้ตรงกัน"
     },
     "rememberedUser": {
-      "message": "ผู้ใช้ที่จดจำ"
+      "message": "ผู้ใช้ที่เพิ่มในบุ๊กมาร์ก"
     },
     "userRememberedDate": {
-      "message": "จดจำผู้ใช้เมื่อ {date}"
+      "message": "เพิ่มผู้ใช้ในบุ๊กมาร์กเมื่อ {date}"
     },
     "forgetUser": {
-      "message": "ลืมผู้ใช้"
+      "message": "ลบผู้ใช้ออกจากบุ๊กมาร์ก"
     },
     "rememberUser": {
-      "message": "จดจำผู้ใช้"
+      "message": "เพิ่มผู้ใช้ในบุ๊กมาร์ก"
     },
     "bookmarkMessagePostedDate": {
       "message": "โพสต์ข้อความเมื่อ {date}"

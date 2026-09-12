@@ -14,7 +14,6 @@ interface MenuActionItemOptions {
   setting?: string;
   label: string;
   iconPath: string;
-  iconViewBox?: string;
   title?: string;
   disabled?: boolean;
   onClick: (event: Event) => void;
@@ -23,7 +22,6 @@ interface MenuActionItemOptions {
 interface PaperItemOptions {
   label: string;
   iconPath: string;
-  iconViewBox?: string;
   title?: string;
 }
 
@@ -33,7 +31,6 @@ export function createMenuActionItem({
   setting = '',
   label,
   iconPath,
-  iconViewBox,
   title,
   disabled = false,
   onClick
@@ -63,7 +60,7 @@ export function createMenuActionItem({
   if (setting) item.setAttribute('data-ytcq-setting', setting);
   if (title) item.title = title;
   if (disabled) item.setAttribute('aria-disabled', 'true');
-  item.appendChild(createPaperItem({ label, iconPath, iconViewBox, title }));
+  item.appendChild(createPaperItem({ label, iconPath, title }));
   return item;
 }
 
@@ -72,14 +69,12 @@ export function createMenuToggleItem({
   label,
   checked,
   iconPath,
-  iconViewBox,
   onClick
 }: {
   setting: string;
   label: string;
   checked: boolean;
   iconPath: string;
-  iconViewBox?: string;
   onClick: () => void;
 }): HTMLElement {
   const item = createMenuActionItem({
@@ -87,7 +82,6 @@ export function createMenuToggleItem({
     setting,
     label,
     iconPath,
-    iconViewBox,
     onClick
   });
   item.setAttribute('aria-checked', String(Boolean(checked)));
@@ -96,10 +90,10 @@ export function createMenuToggleItem({
   return item;
 }
 
-function createPaperItem({ label, iconPath, iconViewBox, title }: PaperItemOptions): HTMLElement {
+function createPaperItem({ label, iconPath, title }: PaperItemOptions): HTMLElement {
   const paperItem = el<HTMLDivElement>(
     <div class="ytcq-paper-item" role="option" tabIndex={0} aria-disabled="false">
-      <span class="ytcq-menu-icon">{createSvgIcon(iconViewBox || '0 0 24 24', iconPath)}</span>
+      <span class="ytcq-menu-icon">{createSvgIcon('0 0 24 24', iconPath, 2)}</span>
       <span class="ytcq-menu-label">{label}</span>
     </div>
   );

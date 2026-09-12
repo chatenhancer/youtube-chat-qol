@@ -41,7 +41,7 @@ export const playgroundReplayTriviaInviteScenario: BrowserScenario = async ({ ch
     await expect(stickAroundCard).toHaveAttribute('aria-disabled', 'true');
     for (const livestreamOnlyCard of [bountyCard, stickAroundCard]) {
       const contextBadge = livestreamOnlyCard.locator('.ytcq-games-context-badge');
-      await expect(contextBadge).toHaveText('Livestream only');
+      await expect(contextBadge).toHaveText('Live only');
       await expect(livestreamOnlyCard).toHaveAttribute(
         'title',
         'Can only be played during live chat.'

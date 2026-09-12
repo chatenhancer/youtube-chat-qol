@@ -58,10 +58,10 @@
     "jumpToMessage": "Naar bericht springen",
     "keywordOrPhrase": "Trefwoord of zin",
     "lessThanOneMinute": "minder dan 1 min",
-    "rememberUser": "Gebruiker onthouden",
-    "forgetUser": "Gebruiker vergeten",
+    "rememberUser": "Gebruiker aan bladwijzers toevoegen",
+    "forgetUser": "Gebruiker uit bladwijzers verwijderen",
     "bookmarkAddedDate": "Toegevoegd op {date}",
-    "userRememberedDate": "Gebruiker onthouden op {date}",
+    "userRememberedDate": "Gebruiker op {date} aan bladwijzers toegevoegd",
     "mention": "Vermelden",
     "mentionUser": "Gebruiker vermelden",
     "mentionUserTitle": "Gebruiker vermelden. Alt/Option-klik om te citeren.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Games",
     "gamesReplayOnly": "Alleen replay",
-    "gamesLivestreamOnly": "Alleen livestream",
+    "gamesLivestreamOnly": "Alleen live",
     "gamesUpdateRequired": "Update vereist",
     "gamesVersionMismatchHelper": "{game} is tijdelijk niet beschikbaar omdat de versies van Chat Enhancer en Playground niet overeenkomen. Probeer het opnieuw wanneer de versies overeenkomen.",
     "gamesVersionMismatchActiveHelper": "Update vereist. De versies van Chat Enhancer en Playground komen niet overeen.",
@@ -637,7 +637,7 @@
       "message": "Bladwijzers"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Onthouden gebruikers"
+      "message": "Gebruikers in bladwijzers"
     },
     "noSavedItems": {
       "message": "Nog geen opgeslagen items"
@@ -646,7 +646,7 @@
       "message": "{count} opgeslagen items"
     },
     "savedItemsEmpty": {
-      "message": "Berichten die je opslaat en gebruikers die je onthoudt, verschijnen hier."
+      "message": "Berichten en gebruikers die je aan bladwijzers toevoegt, verschijnen hier."
     },
     "filterBookmarks": {
       "message": "Bladwijzers filteren"
@@ -673,16 +673,16 @@
       "message": "Geen overeenkomende opgeslagen items."
     },
     "rememberedUser": {
-      "message": "Onthouden gebruiker"
+      "message": "Gebruiker in bladwijzers"
     },
     "userRememberedDate": {
-      "message": "Gebruiker onthouden op {date}"
+      "message": "Gebruiker op {date} aan bladwijzers toegevoegd"
     },
     "forgetUser": {
-      "message": "Gebruiker vergeten"
+      "message": "Gebruiker uit bladwijzers verwijderen"
     },
     "rememberUser": {
-      "message": "Gebruiker onthouden"
+      "message": "Gebruiker aan bladwijzers toevoegen"
     },
     "bookmarkMessagePostedDate": {
       "message": "Bericht geplaatst op {date}"

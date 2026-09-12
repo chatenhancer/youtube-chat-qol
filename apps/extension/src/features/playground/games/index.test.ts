@@ -750,7 +750,7 @@ describe('playground games header button', () => {
     expect(bountyCard.getAttribute('aria-disabled')).toBe('true');
     expect(bountyCard.title).toBe('Can only be played during live chat.');
     expect(bountyCard.querySelector('.ytcq-games-context-badge')?.textContent)
-      .toBe('Livestream only');
+      .toBe('Live only');
     expect(bountyCard.querySelector<HTMLElement>('.ytcq-games-context-badge')?.title).toBe('');
     expect(replayCard.getAttribute('aria-disabled')).toBe('false');
     expect(replayCard.title).toBe('');
@@ -758,7 +758,7 @@ describe('playground games header button', () => {
     expect(stickAroundCard.getAttribute('aria-disabled')).toBe('true');
     expect(stickAroundCard.title).toBe('Can only be played during live chat.');
     expect(stickAroundCard.querySelector('.ytcq-games-context-badge')?.textContent)
-      .toBe('Livestream only');
+      .toBe('Live only');
     expect(stickAroundCard.querySelector<HTMLElement>('.ytcq-games-context-badge')?.title).toBe('');
     expect(getGameCardHelpers()).toEqual([
       'Classic chess, three difficulty levels.',
@@ -784,7 +784,7 @@ describe('playground games header button', () => {
     const bountyCard = getGameCard('The Wild Wild Chat');
     expect(bountyCard.querySelectorAll('.ytcq-games-restriction-badge')).toHaveLength(1);
     expect(bountyCard.querySelector('.ytcq-games-context-badge')?.textContent)
-      .toBe('Livestream only');
+      .toBe('Live only');
     expect(bountyCard.querySelector('.ytcq-games-version-badge')).toBeNull();
     expect(bountyCard.getAttribute('aria-label')).toContain('Can only be played during live chat.');
     expect(bountyCard.getAttribute('aria-label')).not.toContain('temporarily unavailable');

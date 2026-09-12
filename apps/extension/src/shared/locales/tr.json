@@ -58,10 +58,10 @@
     "jumpToMessage": "Mesaja git",
     "keywordOrPhrase": "Anahtar kelime veya ifade",
     "lessThanOneMinute": "1 dakikadan az",
-    "rememberUser": "Kullanıcıyı hatırla",
-    "forgetUser": "Kullanıcıyı unut",
+    "rememberUser": "Kullanıcıyı yer imlerine ekle",
+    "forgetUser": "Kullanıcıyı yer imlerinden kaldır",
     "bookmarkAddedDate": "{date} tarihinde eklendi",
-    "userRememberedDate": "Kullanıcı {date} tarihinde hatırlandı",
+    "userRememberedDate": "Kullanıcı {date} tarihinde yer imlerine eklendi",
     "mention": "Bahset",
     "mentionUser": "Kullanıcıdan bahset",
     "mentionUserTitle": "Kullanıcıdan bahset. Alıntı yapmak için Alt/Option-tıkla.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Oyunlar",
     "gamesReplayOnly": "Yalnızca tekrar",
-    "gamesLivestreamOnly": "Yalnızca canlı yayın",
+    "gamesLivestreamOnly": "Yalnızca canlı",
     "gamesUpdateRequired": "Güncelleme gerekli",
     "gamesVersionMismatchHelper": "{game}, Chat Enhancer ve Playground sürümleri eşleşmediği için geçici olarak kullanılamıyor. Sürümler eşleştiğinde tekrar deneyin.",
     "gamesVersionMismatchActiveHelper": "Güncelleme gerekli. Chat Enhancer ve Playground sürümleri eşleşmiyor.",
@@ -640,7 +640,7 @@
       "message": "Yer imleri"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Hatırlanan kullanıcılar"
+      "message": "Yer imlerindeki kullanıcılar"
     },
     "noSavedItems": {
       "message": "Henüz kaydedilmiş öğe yok"
@@ -649,7 +649,7 @@
       "message": "{count} kayıtlı öğe"
     },
     "savedItemsEmpty": {
-      "message": "Kaydettiğiniz mesajlar ve hatırladığınız kullanıcılar burada görünür."
+      "message": "Yer imlerine eklediğiniz mesajlar ve kullanıcılar burada görünür."
     },
     "filterBookmarks": {
       "message": "Yer imlerini filtrele"
@@ -676,16 +676,16 @@
       "message": "Eşleşen kayıtlı öğe yok."
     },
     "rememberedUser": {
-      "message": "Hatırlanan kullanıcı"
+      "message": "Yer imlerindeki kullanıcı"
     },
     "userRememberedDate": {
-      "message": "Kullanıcı {date} tarihinde hatırlandı"
+      "message": "Kullanıcı {date} tarihinde yer imlerine eklendi"
     },
     "forgetUser": {
-      "message": "Kullanıcıyı unut"
+      "message": "Kullanıcıyı yer imlerinden kaldır"
     },
     "rememberUser": {
-      "message": "Kullanıcıyı hatırla"
+      "message": "Kullanıcıyı yer imlerine ekle"
     },
     "bookmarkMessagePostedDate": {
       "message": "Mesaj {date} tarihinde gönderildi"

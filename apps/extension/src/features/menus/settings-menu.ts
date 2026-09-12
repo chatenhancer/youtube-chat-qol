@@ -6,11 +6,10 @@ import { getTargetLanguageUpdate, getTranslationToggleTarget, type Options } fro
 import { getOptions } from '../../shared/state';
 import { t } from '../../shared/i18n';
 import {
-  BOLT_ICON_PATH,
-  MATERIAL_ICON_VIEW_BOX,
+  LITE_MODE_ICON_PATH,
   SOUND_BELL_ICON_PATH,
   TRANSLATE_ICON_PATH,
-  createBoltIcon,
+  createLiteModeIcon,
   createSoundBellIcon,
   createSplitTranslateIcon
 } from '../../shared/icons';
@@ -60,7 +59,6 @@ function createSettingsMenuItems(): HTMLElement[] {
     label: t('translateChat'),
     checked: Boolean(options.targetLanguage),
     iconPath: TRANSLATE_ICON_PATH,
-    iconViewBox: MATERIAL_ICON_VIEW_BOX,
     onClick: () => {
       const currentOptions = getOptions();
       const nextTargetLanguage = currentOptions.targetLanguage
@@ -79,7 +77,6 @@ function createSettingsMenuItems(): HTMLElement[] {
     label: t('alertSounds'),
     checked: options.sound,
     iconPath: SOUND_BELL_ICON_PATH,
-    iconViewBox: MATERIAL_ICON_VIEW_BOX,
     onClick: () => {
       const enabled = !getOptions().sound;
       if (enabled && soundItem) {
@@ -92,16 +89,13 @@ function createSettingsMenuItems(): HTMLElement[] {
   renderSoundMenuIcon(soundItem, options.sound);
   const items = [translateItem, soundItem];
   if (isSupportedLiteModePage()) {
-    const liteModeIcon = createBoltIcon({
-      drawMaskId: `ytcq-menu-lite-mode-draw-mask-${crypto.randomUUID()}`
-    });
+    const liteModeIcon = createLiteModeIcon();
     liteModeIcon.classList.add('lite-mode-icon');
     const liteModeItem = createMenuToggleItem({
       setting: 'liteModeEnabled',
       label: t('liteMode'),
       checked: options.liteModeEnabled,
-      iconPath: BOLT_ICON_PATH,
-      iconViewBox: MATERIAL_ICON_VIEW_BOX,
+      iconPath: LITE_MODE_ICON_PATH,
       onClick: () => {
         const enabled = !getOptions().liteModeEnabled;
         if (enabled) animateSettingIcon(liteModeIcon, SETTING_ICON_ANIMATIONS.liteMode);

@@ -270,7 +270,7 @@
   z-index: 1;
   width: 18px;
   height: 18px;
-  fill: #fff;
+  color: #fff;
   opacity: 0;
   pointer-events: none;
   transition: opacity 120ms ease;
@@ -348,14 +348,10 @@
   pointer-events: none;
 }
 
-.ytcq-profile-card-channel svg {
+.ytcq-profile-card-channel svg,
+.ytcq-avatar-ring-toggle svg {
   width: 16px;
   height: 16px;
-}
-
-.ytcq-avatar-ring-toggle svg {
-  width: 19px;
-  height: 19px;
 }
 
 .ytcq-profile-card-header-button:hover {

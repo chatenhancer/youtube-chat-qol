@@ -4,7 +4,7 @@ import { createSettingsGrid, handleSettingsGridBoundaryKeyDown, setSettingsToggl
 import { PIP_ICON_PATH } from '../features/picture-in-picture/ui';
 import { initUiLocaleFromDocument, t, type MessageKey } from '../shared/i18n';
 import { getExtensionMessage } from '../shared/extension-page-i18n';
-import { BOLT_ICON_PATH, MATERIAL_ICON_VIEW_BOX, SOUND_BELL_ICON_PATH, TRANSLATE_ICON_PATH, createSvgIcon } from '../shared/icons';
+import { LITE_MODE_ICON_PATH, SOUND_BELL_ICON_PATH, TRANSLATE_ICON_PATH, createSvgIcon } from '../shared/icons';
 import type { Options } from '../shared/options';
 
 export async function initMenuPreview(
@@ -19,11 +19,11 @@ export async function initMenuPreview(
   trigger.setAttribute('aria-label', getExtensionMessage('onboardingChatMenuTooltip'));
   const translate = createMenuToggleItem({
     setting: 'targetLanguage', label: t('translateChat'), checked: Boolean(controls.targetLanguage.value),
-    iconPath: TRANSLATE_ICON_PATH, iconViewBox: MATERIAL_ICON_VIEW_BOX, onClick: toggleTranslation
+    iconPath: TRANSLATE_ICON_PATH, onClick: toggleTranslation
   });
   const sound = createMenuToggleItem({
     setting: 'sound', label: t('alertSounds'), checked: true,
-    iconPath: SOUND_BELL_ICON_PATH, iconViewBox: MATERIAL_ICON_VIEW_BOX,
+    iconPath: SOUND_BELL_ICON_PATH,
     onClick: () => {
       const enabled = sound.getAttribute('aria-checked') !== 'true';
       setSettingsToggleChecked(sound, enabled);
@@ -35,7 +35,7 @@ export async function initMenuPreview(
   });
   const lite = createMenuToggleItem({
     setting: 'liteModeEnabled', label: t('liteMode'), checked: controls.liteModeEnabled.checked,
-    iconPath: BOLT_ICON_PATH, iconViewBox: MATERIAL_ICON_VIEW_BOX,
+    iconPath: LITE_MODE_ICON_PATH,
     onClick: () => {
       controls.liteModeEnabled.checked = !controls.liteModeEnabled.checked;
       controls.liteModeEnabled.dispatchEvent(new Event('change'));

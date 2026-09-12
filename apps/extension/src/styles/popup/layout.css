@@ -104,21 +104,6 @@ main {
   fill: currentColor;
 }
 
-.header-icon-button .support-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.header-icon-button .source-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.header-icon-button .reset-icon {
-  width: 15px;
-  height: 15px;
-}
-
 .header-icon-button:hover,
 .header-icon-button:focus {
   color: var(--ytcq-popup-text);

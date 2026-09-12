@@ -12,7 +12,7 @@ export const SETTING_ICON_ANIMATIONS = {
   },
   chatSkin: {
     className: 'ytcq-palette-pop',
-    durationMs: 900
+    durationMs: 1200
   },
   gameInvites: {
     className: 'ytcq-game-controller-hop',
@@ -20,15 +20,11 @@ export const SETTING_ICON_ANIMATIONS = {
   },
   liteMode: {
     className: 'ytcq-bolt-redraw',
-    durationMs: 550
+    durationMs: 1000
   },
   messageDensity: {
     className: 'ytcq-density-compress',
     durationMs: 700
-  },
-  playgroundJoystick: {
-    className: 'ytcq-playground-joystick-wiggle',
-    durationMs: 560
   },
   startupEffect: {
     className: 'ytcq-sparkle-burst',

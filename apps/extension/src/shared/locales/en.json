@@ -58,10 +58,10 @@
     "jumpToMessage": "Jump to message",
     "keywordOrPhrase": "Keyword or phrase",
     "lessThanOneMinute": "less than 1 min",
-    "rememberUser": "Remember user",
-    "forgetUser": "Forget user",
+    "rememberUser": "Bookmark user",
+    "forgetUser": "Remove user bookmark",
     "bookmarkAddedDate": "Added {date}",
-    "userRememberedDate": "User remembered {date}",
+    "userRememberedDate": "User bookmarked {date}",
     "mention": "Mention",
     "mentionUser": "Mention user",
     "mentionUserTitle": "Mention user. Alt/Option-click to quote.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Games",
     "gamesReplayOnly": "Replay only",
-    "gamesLivestreamOnly": "Livestream only",
+    "gamesLivestreamOnly": "Live only",
     "gamesUpdateRequired": "Update required",
     "gamesVersionMismatchHelper": "{game} is temporarily unavailable because Chat Enhancer and Playground versions do not match. Try again when the versions match.",
     "gamesVersionMismatchActiveHelper": "Update required. Chat Enhancer and Playground versions do not match.",
@@ -640,7 +640,7 @@
       "message": "Bookmarks"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Remembered users"
+      "message": "Bookmarked users"
     },
     "noSavedItems": {
       "message": "No saved items yet"
@@ -649,7 +649,7 @@
       "message": "{count} saved items"
     },
     "savedItemsEmpty": {
-      "message": "Messages you save and users you remember will appear here."
+      "message": "Messages and users you bookmark will appear here."
     },
     "filterBookmarks": {
       "message": "Filter bookmarks"
@@ -676,16 +676,16 @@
       "message": "No matching saved items."
     },
     "rememberedUser": {
-      "message": "Remembered user"
+      "message": "Bookmarked user"
     },
     "userRememberedDate": {
-      "message": "User remembered {date}"
+      "message": "User bookmarked {date}"
     },
     "forgetUser": {
-      "message": "Forget user"
+      "message": "Remove user bookmark"
     },
     "rememberUser": {
-      "message": "Remember user"
+      "message": "Bookmark user"
     },
     "bookmarkMessagePostedDate": {
       "message": "Message posted {date}"

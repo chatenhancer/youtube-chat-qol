@@ -722,7 +722,7 @@ pagefind-modal:has(.pf-input:placeholder-shown) .site-search-empty-state {
   padding: 5px 26px 5px 10px;
   color: var(--text);
   background-color: var(--surface);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='%2360646d' d='m7 10 5 5 5-5H7Z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%2360646d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 8px center;
   background-size: 14px 14px;
@@ -2728,14 +2728,6 @@ html[dir="rtl"] .back-link-icon {
   height: 18px;
   fill: currentColor;
   transform: translateX(2px) scaleX(-1);
-}
-
-.back-link-icon path,
-.forward-link-icon path {
-  stroke: currentColor;
-  stroke-width: 34px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 html[dir="rtl"] .forward-link-icon {

@@ -6,10 +6,9 @@
  */
 import { CHAT_SKIN_OPTIONS, DEFAULT_CHAT_SKIN, type ChatSkin } from '../shared/chat-skins';
 import {
-  createBoltIcon,
+  createLiteModeIcon,
   createGamesIcon,
   createInboxIcon,
-  createPlaygroundIcon,
   createSplitTranslateIcon,
   createTranslateIcon
 } from '../shared/icons';
@@ -130,8 +129,8 @@ export function initOnboarding(): void {
     preview.setPlaygroundEnabled(playgroundEnabled);
     if (playgroundEnabled) {
       animateSettingIcon(
-        document.querySelector('#onboardingPlaygroundIcon .playground-joystick-icon'),
-        SETTING_ICON_ANIMATIONS.playgroundJoystick
+        document.querySelector('#onboardingPlaygroundIcon .playground-join-icon'),
+        SETTING_ICON_ANIMATIONS.gameInvites
       );
       animateSettingIcon(
         document.querySelector('#previewGamesIcon .game-invites-icon'),
@@ -261,10 +260,10 @@ function installIcons(): void {
       targetClassName: 'translation-target-mark'
     })
   );
-  replaceIcon('onboardingPlaygroundIcon', createPlaygroundIcon(), 'playground-joystick-icon');
+  replaceIcon('onboardingPlaygroundIcon', createGamesIcon(), 'playground-join-icon');
   replaceIcon(
     'onboardingLiteIcon',
-    createBoltIcon({ drawMaskId: 'ytcq-onboarding-lite-mode-draw-mask' }),
+    createLiteModeIcon(),
     'lite-mode-icon'
   );
   replaceIcon('previewGamesIcon', createGamesIcon(), 'game-invites-icon');

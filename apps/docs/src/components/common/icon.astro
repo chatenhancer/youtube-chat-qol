@@ -1,21 +1,31 @@
 ---
-import { materialIcons } from '../../data/icons';
+import { iconPaths } from '../../data/icons';
 
-type IconName = keyof typeof materialIcons;
+type IconName = keyof typeof iconPaths;
 
 const {
   class: className,
   name,
-  viewBox = '0 -960 960 960'
+  viewBox
 } = Astro.props as {
   class?: string;
   name: IconName;
   viewBox?: string;
 };
-const iconPaths = materialIcons[name];
-const paths = Array.isArray(iconPaths) ? iconPaths : [iconPaths];
+const drawing = iconPaths[name];
+const paths = Array.isArray(drawing) ? drawing : [drawing];
+// Keep the native YouTube emoji and circled play icon filled.
+const strokeWidth = name === 'mood' || name === 'play_circle' ? undefined : name === 'inbox' ? 1.8 : 2;
+const iconViewBox = viewBox ?? '0 0 24 24';
 ---
 
-<svg class={className} viewBox={viewBox} focusable="false" aria-hidden="true">
-  {paths.map((path) => <path d={path}></path>)}
+<svg class={className} viewBox={iconViewBox} focusable="false" aria-hidden="true">
+  {paths.map((path) => <path
+    d={path}
+    fill={strokeWidth ? 'none' : undefined}
+    stroke={strokeWidth ? 'currentColor' : undefined}
+    stroke-width={strokeWidth}
+    stroke-linecap={strokeWidth ? 'round' : undefined}
+    stroke-linejoin={strokeWidth ? 'round' : undefined}
+  ></path>)}
 </svg>

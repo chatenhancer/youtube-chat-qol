@@ -139,7 +139,7 @@ describe('avatar rings', () => {
       avatarUrl: 'https://example.com/avatar.png'
     });
     document.body.append(button);
-    expect(button.title).toBe('Remember user');
+    expect(button.title).toBe('Bookmark user');
     expect(button.getAttribute('aria-pressed')).toBe('false');
     expect(button.querySelector('.ytcq-avatar-ring-icon-badge-symbol')?.getAttribute('d')).toBe(
       AVATAR_RING_ADD_BADGE_PATH
@@ -149,7 +149,7 @@ describe('avatar rings', () => {
     await flushAsyncWork();
 
     expect(button.title).toBe(
-      `Forget user\nUser remembered ${new Intl.DateTimeFormat('en', {
+      `Remove user bookmark\nUser bookmarked ${new Intl.DateTimeFormat('en', {
         dateStyle: 'medium',
         timeStyle: 'short'
       }).format(addedAt)}`

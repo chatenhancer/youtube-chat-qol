@@ -58,10 +58,10 @@
     "jumpToMessage": "קפיצה להודעה",
     "keywordOrPhrase": "מילת מפתח או ביטוי",
     "lessThanOneMinute": "פחות מדקה",
-    "rememberUser": "זכירת המשתמש",
-    "forgetUser": "שכחת המשתמש",
+    "rememberUser": "הוסף משתמש לסימניות",
+    "forgetUser": "הסר משתמש מסימניות",
     "bookmarkAddedDate": "נוספה ב-{date}",
-    "userRememberedDate": "המשתמש נשמר בזיכרון ב-{date}",
+    "userRememberedDate": "המשתמש נוסף לסימניות ב-{date}",
     "mention": "אזכור",
     "mentionUser": "אזכור משתמש",
     "mentionUserTitle": "אזכור משתמש. Alt/Option-קליק כדי לצטט.",
@@ -637,7 +637,7 @@
       "message": "סימניות"
     },
     "popupResetItemRememberedUsers": {
-      "message": "משתמשים שנשמרו בזיכרון"
+      "message": "משתמשים בסימניות"
     },
     "noSavedItems": {
       "message": "אין פריטים שמורים עדיין"
@@ -646,7 +646,7 @@
       "message": "{count} פריטים שמורים"
     },
     "savedItemsEmpty": {
-      "message": "הודעות שתשמרו ומשתמשים שתזכרו יופיעו כאן."
+      "message": "הודעות ומשתמשים שתוסיפו לסימניות יופיעו כאן."
     },
     "filterBookmarks": {
       "message": "סינון סימניות"
@@ -673,16 +673,16 @@
       "message": "אין פריטים שמורים תואמים."
     },
     "rememberedUser": {
-      "message": "משתמש שנשמר בזיכרון"
+      "message": "משתמש בסימניות"
     },
     "userRememberedDate": {
-      "message": "המשתמש נשמר בזיכרון ב-{date}"
+      "message": "המשתמש נוסף לסימניות ב-{date}"
     },
     "forgetUser": {
-      "message": "שכחת המשתמש"
+      "message": "הסר משתמש מסימניות"
     },
     "rememberUser": {
-      "message": "זכירת המשתמש"
+      "message": "הוסף משתמש לסימניות"
     },
     "bookmarkMessagePostedDate": {
       "message": "ההודעה פורסמה ב-{date}"

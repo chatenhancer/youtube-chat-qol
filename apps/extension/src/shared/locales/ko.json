@@ -58,10 +58,10 @@
     "jumpToMessage": "메시지로 이동",
     "keywordOrPhrase": "키워드 또는 문구",
     "lessThanOneMinute": "1분 미만",
-    "rememberUser": "사용자 기억",
-    "forgetUser": "사용자 잊기",
+    "rememberUser": "사용자 북마크",
+    "forgetUser": "사용자 북마크 삭제",
     "bookmarkAddedDate": "추가: {date}",
-    "userRememberedDate": "사용자 기억: {date}",
+    "userRememberedDate": "사용자 북마크: {date}",
     "mention": "멘션",
     "mentionUser": "사용자 멘션",
     "mentionUserTitle": "사용자 멘션. Alt/Option 클릭으로 인용.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "게임",
     "gamesReplayOnly": "다시보기 전용",
-    "gamesLivestreamOnly": "라이브 방송 전용",
+    "gamesLivestreamOnly": "라이브 전용",
     "gamesUpdateRequired": "업데이트 필요",
     "gamesVersionMismatchHelper": "{game}은(는) Chat Enhancer와 Playground 버전이 일치하지 않아 일시적으로 사용할 수 없습니다. 버전이 일치하면 다시 시도하세요.",
     "gamesVersionMismatchActiveHelper": "업데이트가 필요합니다. Chat Enhancer와 Playground 버전이 일치하지 않습니다.",
@@ -637,7 +637,7 @@
       "message": "북마크"
     },
     "popupResetItemRememberedUsers": {
-      "message": "기억된 사용자"
+      "message": "북마크한 사용자"
     },
     "noSavedItems": {
       "message": "아직 저장된 항목이 없습니다"
@@ -646,7 +646,7 @@
       "message": "저장된 항목 {count}개"
     },
     "savedItemsEmpty": {
-      "message": "저장한 메시지와 기억한 사용자가 여기에 표시됩니다."
+      "message": "북마크한 메시지와 사용자가 여기에 표시됩니다."
     },
     "filterBookmarks": {
       "message": "북마크 필터링"
@@ -673,16 +673,16 @@
       "message": "일치하는 저장된 항목이 없습니다."
     },
     "rememberedUser": {
-      "message": "기억된 사용자"
+      "message": "북마크한 사용자"
     },
     "userRememberedDate": {
-      "message": "사용자 기억: {date}"
+      "message": "사용자 북마크: {date}"
     },
     "forgetUser": {
-      "message": "사용자 잊기"
+      "message": "사용자 북마크 삭제"
     },
     "rememberUser": {
-      "message": "사용자 기억"
+      "message": "사용자 북마크"
     },
     "bookmarkMessagePostedDate": {
       "message": "메시지 게시: {date}"

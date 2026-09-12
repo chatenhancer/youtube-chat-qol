@@ -120,6 +120,20 @@ export const bookmarkPopupRenderingScenario: BrowserScenario = async ({ context 
         const message = popup.locator('.bookmark-message');
         await expect(message).toHaveText(LONG_BOOKMARK_MESSAGE);
         await expect(popup.locator('#bookmarksTab #bookmarksCount')).toHaveText('2');
+        await test.step('Keep avatar channel links white in both popup themes', async () => {
+          const avatars = popup.locator('.bookmark-avatar-button');
+          await expect(avatars).toHaveCount(2);
+          for (const theme of ['light', 'dark'] as const) {
+            await popup.emulateMedia({ colorScheme: theme });
+            for (const avatar of await avatars.all()) {
+              await avatar.hover();
+              const openIcon = avatar.locator('.bookmark-avatar-open-icon');
+              await expect(openIcon).toHaveCSS('opacity', '1');
+              await expect(openIcon.locator('path')).toHaveCSS('stroke', 'rgb(255, 255, 255)');
+            }
+          }
+          await popup.emulateMedia({ colorScheme: null });
+        });
         await test.step('Fit localized tab labels on one line without clipping', async () => {
           await popup.evaluate(() => {
             const settingsTab = document.querySelector('#settingsTab');

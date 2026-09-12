@@ -58,10 +58,10 @@
     "jumpToMessage": "跳到消息",
     "keywordOrPhrase": "关键词或短语",
     "lessThanOneMinute": "少于 1 分钟",
-    "rememberUser": "记住用户",
-    "forgetUser": "忘记用户",
+    "rememberUser": "将用户加入书签",
+    "forgetUser": "移除用户书签",
     "bookmarkAddedDate": "添加于 {date}",
-    "userRememberedDate": "已于 {date} 记住用户",
+    "userRememberedDate": "已于 {date} 将用户加入书签",
     "mention": "提及",
     "mentionUser": "提及用户",
     "mentionUserTitle": "提及用户。Alt/Option 点击可引用。",
@@ -640,7 +640,7 @@
       "message": "书签"
     },
     "popupResetItemRememberedUsers": {
-      "message": "已记住用户"
+      "message": "已加入书签的用户"
     },
     "noSavedItems": {
       "message": "还没有已保存的项目"
@@ -649,7 +649,7 @@
       "message": "{count} 个已保存项目"
     },
     "savedItemsEmpty": {
-      "message": "你保存的消息和记住的用户会显示在这里。"
+      "message": "你加入书签的消息和用户会显示在这里。"
     },
     "filterBookmarks": {
       "message": "筛选书签"
@@ -676,16 +676,16 @@
       "message": "没有匹配的已保存项目。"
     },
     "rememberedUser": {
-      "message": "已记住用户"
+      "message": "已加入书签的用户"
     },
     "userRememberedDate": {
-      "message": "已于 {date} 记住用户"
+      "message": "已于 {date} 将用户加入书签"
     },
     "forgetUser": {
-      "message": "忘记用户"
+      "message": "移除用户书签"
     },
     "rememberUser": {
-      "message": "记住用户"
+      "message": "将用户加入书签"
     },
     "bookmarkMessagePostedDate": {
       "message": "消息发布于 {date}"

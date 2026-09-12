@@ -58,10 +58,10 @@
     "jumpToMessage": "跳到訊息",
     "keywordOrPhrase": "關鍵字或片語",
     "lessThanOneMinute": "少於 1 分鐘",
-    "rememberUser": "記住使用者",
-    "forgetUser": "忘記使用者",
+    "rememberUser": "將使用者加入書籤",
+    "forgetUser": "移除使用者書籤",
     "bookmarkAddedDate": "新增於 {date}",
-    "userRememberedDate": "已於 {date} 記住使用者",
+    "userRememberedDate": "已於 {date} 將使用者加入書籤",
     "mention": "提及",
     "mentionUser": "提及使用者",
     "mentionUserTitle": "提及使用者。Alt/Option 點擊可引用。",
@@ -637,7 +637,7 @@
       "message": "書籤"
     },
     "popupResetItemRememberedUsers": {
-      "message": "已記住使用者"
+      "message": "已加入書籤的使用者"
     },
     "noSavedItems": {
       "message": "還沒有已儲存的項目"
@@ -646,7 +646,7 @@
       "message": "{count} 個已儲存項目"
     },
     "savedItemsEmpty": {
-      "message": "你儲存的訊息和記住的使用者會顯示在這裡。"
+      "message": "你加入書籤的訊息和使用者會顯示在這裡。"
     },
     "filterBookmarks": {
       "message": "篩選書籤"
@@ -673,16 +673,16 @@
       "message": "沒有相符的已儲存項目。"
     },
     "rememberedUser": {
-      "message": "已記住使用者"
+      "message": "已加入書籤的使用者"
     },
     "userRememberedDate": {
-      "message": "已於 {date} 記住使用者"
+      "message": "已於 {date} 將使用者加入書籤"
     },
     "forgetUser": {
-      "message": "忘記使用者"
+      "message": "移除使用者書籤"
     },
     "rememberUser": {
-      "message": "記住使用者"
+      "message": "將使用者加入書籤"
     },
     "bookmarkMessagePostedDate": {
       "message": "訊息發布於 {date}"

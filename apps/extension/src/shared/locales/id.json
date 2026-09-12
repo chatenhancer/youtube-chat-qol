@@ -58,10 +58,10 @@
     "jumpToMessage": "Lompat ke pesan",
     "keywordOrPhrase": "Kata kunci atau frasa",
     "lessThanOneMinute": "kurang dari 1 menit",
-    "rememberUser": "Ingat pengguna",
-    "forgetUser": "Lupakan pengguna",
+    "rememberUser": "Bookmark pengguna",
+    "forgetUser": "Hapus bookmark pengguna",
     "bookmarkAddedDate": "Ditambahkan {date}",
-    "userRememberedDate": "Pengguna diingat {date}",
+    "userRememberedDate": "Pengguna dibookmark pada {date}",
     "mention": "Sebut",
     "mentionUser": "Sebut pengguna",
     "mentionUserTitle": "Sebut pengguna. Alt/Option-klik untuk mengutip.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Game",
     "gamesReplayOnly": "Hanya tayangan ulang",
-    "gamesLivestreamOnly": "Hanya siaran langsung",
+    "gamesLivestreamOnly": "Hanya live",
     "gamesUpdateRequired": "Pembaruan diperlukan",
     "gamesVersionMismatchHelper": "{game} untuk sementara tidak tersedia karena versi Chat Enhancer dan Playground tidak cocok. Coba lagi saat versinya sudah cocok.",
     "gamesVersionMismatchActiveHelper": "Pembaruan diperlukan. Versi Chat Enhancer dan Playground tidak cocok.",
@@ -640,7 +640,7 @@
       "message": "Bookmark"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Pengguna yang diingat"
+      "message": "Pengguna yang dibookmark"
     },
     "noSavedItems": {
       "message": "Belum ada item tersimpan"
@@ -649,7 +649,7 @@
       "message": "{count} item tersimpan"
     },
     "savedItemsEmpty": {
-      "message": "Pesan yang Anda simpan dan pengguna yang Anda ingat akan muncul di sini."
+      "message": "Pesan dan pengguna yang Anda bookmark akan muncul di sini."
     },
     "filterBookmarks": {
       "message": "Filter bookmark"
@@ -676,16 +676,16 @@
       "message": "Tidak ada item tersimpan yang cocok."
     },
     "rememberedUser": {
-      "message": "Pengguna yang diingat"
+      "message": "Pengguna yang dibookmark"
     },
     "userRememberedDate": {
-      "message": "Pengguna diingat {date}"
+      "message": "Pengguna dibookmark pada {date}"
     },
     "forgetUser": {
-      "message": "Lupakan pengguna"
+      "message": "Hapus bookmark pengguna"
     },
     "rememberUser": {
-      "message": "Ingat pengguna"
+      "message": "Bookmark pengguna"
     },
     "bookmarkMessagePostedDate": {
       "message": "Pesan dikirim {date}"

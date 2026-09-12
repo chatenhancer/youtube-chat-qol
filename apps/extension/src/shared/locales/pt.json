@@ -58,10 +58,10 @@
     "jumpToMessage": "Ir para a mensagem",
     "keywordOrPhrase": "Palavra-chave ou frase",
     "lessThanOneMinute": "menos de 1 min",
-    "rememberUser": "Lembrar usuário",
-    "forgetUser": "Esquecer usuário",
+    "rememberUser": "Adicionar usuário aos marcadores",
+    "forgetUser": "Remover usuário dos marcadores",
     "bookmarkAddedDate": "Adicionado em {date}",
-    "userRememberedDate": "Usuário lembrado em {date}",
+    "userRememberedDate": "Usuário adicionado aos marcadores em {date}",
     "mention": "Mencionar",
     "mentionUser": "Mencionar usuário",
     "mentionUserTitle": "Mencionar usuário. Alt/Option-clique para citar.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Jogos",
     "gamesReplayOnly": "Só replay",
-    "gamesLivestreamOnly": "Só transmissão ao vivo",
+    "gamesLivestreamOnly": "Só ao vivo",
     "gamesUpdateRequired": "Atualização necessária",
     "gamesVersionMismatchHelper": "{game} está temporariamente indisponível porque as versões do Chat Enhancer e do Playground não correspondem. Tente novamente quando as versões corresponderem.",
     "gamesVersionMismatchActiveHelper": "Atualização necessária. As versões do Chat Enhancer e do Playground não correspondem.",
@@ -640,7 +640,7 @@
       "message": "Marcadores"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Usuários lembrados"
+      "message": "Usuários nos marcadores"
     },
     "noSavedItems": {
       "message": "Ainda não há itens salvos"
@@ -649,7 +649,7 @@
       "message": "{count} itens salvos"
     },
     "savedItemsEmpty": {
-      "message": "As mensagens que você salvar e os usuários que lembrar aparecerão aqui."
+      "message": "As mensagens e os usuários que você adicionar aos marcadores aparecerão aqui."
     },
     "filterBookmarks": {
       "message": "Filtrar marcadores"
@@ -676,16 +676,16 @@
       "message": "Nenhum item salvo correspondente."
     },
     "rememberedUser": {
-      "message": "Usuário lembrado"
+      "message": "Usuário nos marcadores"
     },
     "userRememberedDate": {
-      "message": "Usuário lembrado em {date}"
+      "message": "Usuário adicionado aos marcadores em {date}"
     },
     "forgetUser": {
-      "message": "Esquecer usuário"
+      "message": "Remover usuário dos marcadores"
     },
     "rememberUser": {
-      "message": "Lembrar usuário"
+      "message": "Adicionar usuário aos marcadores"
     },
     "bookmarkMessagePostedDate": {
       "message": "Mensagem publicada em {date}"

@@ -7,13 +7,11 @@ import { positionInboxCard } from '../features/inbox/positioning';
 import { clampFloatingPanelToViewport, wireFloatingPanelDrag } from '../shared/floating-panel-drag';
 import { getUiLocale, initUiLocaleFromDocument, t } from '../shared/i18n';
 import {
-  BOOKMARK_ICON_PATH,
-  MATERIAL_ICON_VIEW_BOX,
+  createBookmarkIcon,
   createAddIcon,
   createCloseIcon,
   createInboxIcon,
-  createJumpToMessageIcon,
-  createSvgIcon
+  createJumpToMessageIcon
 } from '../shared/icons';
 import { el, jsx } from '../shared/jsx-dom';
 import { wirePreviewInfo } from './info-tooltips';
@@ -149,7 +147,7 @@ export async function initInboxPreview(root: HTMLElement): Promise<void> {
                 aria-label={t('saveMessage')}
                 disabled
               >
-                {createSvgIcon(MATERIAL_ICON_VIEW_BOX, BOOKMARK_ICON_PATH)}
+                {createBookmarkIcon()}
               </button>
               <button
                 type="button"

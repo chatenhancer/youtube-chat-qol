@@ -58,10 +58,10 @@
     "jumpToMessage": "Nhảy đến tin nhắn",
     "keywordOrPhrase": "Từ khóa hoặc cụm từ",
     "lessThanOneMinute": "dưới 1 phút",
-    "rememberUser": "Ghi nhớ người dùng",
-    "forgetUser": "Quên người dùng",
+    "rememberUser": "Thêm người dùng vào dấu trang",
+    "forgetUser": "Xóa người dùng khỏi dấu trang",
     "bookmarkAddedDate": "Đã thêm {date}",
-    "userRememberedDate": "Đã ghi nhớ người dùng {date}",
+    "userRememberedDate": "Đã thêm người dùng vào dấu trang {date}",
     "mention": "Nhắc đến",
     "mentionUser": "Nhắc đến người dùng",
     "mentionUserTitle": "Nhắc đến người dùng. Alt/Option-click để trích dẫn.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Trò chơi",
     "gamesReplayOnly": "Chỉ phát lại",
-    "gamesLivestreamOnly": "Chỉ phát trực tiếp",
+    "gamesLivestreamOnly": "Chỉ trực tiếp",
     "gamesUpdateRequired": "Cần cập nhật",
     "gamesVersionMismatchHelper": "{game} tạm thời không khả dụng vì phiên bản Chat Enhancer và Playground không khớp. Hãy thử lại khi các phiên bản khớp nhau.",
     "gamesVersionMismatchActiveHelper": "Cần cập nhật. Phiên bản Chat Enhancer và Playground không khớp.",
@@ -637,7 +637,7 @@
       "message": "Dấu trang"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Người dùng đã ghi nhớ"
+      "message": "Người dùng trong dấu trang"
     },
     "noSavedItems": {
       "message": "Chưa có mục nào được lưu"
@@ -646,7 +646,7 @@
       "message": "{count} mục đã lưu"
     },
     "savedItemsEmpty": {
-      "message": "Tin nhắn bạn lưu và người dùng bạn ghi nhớ sẽ xuất hiện ở đây."
+      "message": "Tin nhắn và người dùng bạn thêm vào dấu trang sẽ xuất hiện ở đây."
     },
     "filterBookmarks": {
       "message": "Lọc dấu trang"
@@ -673,16 +673,16 @@
       "message": "Không có mục đã lưu phù hợp."
     },
     "rememberedUser": {
-      "message": "Người dùng đã ghi nhớ"
+      "message": "Người dùng trong dấu trang"
     },
     "userRememberedDate": {
-      "message": "Đã ghi nhớ người dùng {date}"
+      "message": "Đã thêm người dùng vào dấu trang {date}"
     },
     "forgetUser": {
-      "message": "Quên người dùng"
+      "message": "Xóa người dùng khỏi dấu trang"
     },
     "rememberUser": {
-      "message": "Ghi nhớ người dùng"
+      "message": "Thêm người dùng vào dấu trang"
     },
     "bookmarkMessagePostedDate": {
       "message": "Tin nhắn được đăng {date}"

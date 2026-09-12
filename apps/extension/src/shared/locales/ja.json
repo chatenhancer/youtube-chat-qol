@@ -58,10 +58,10 @@
     "jumpToMessage": "メッセージへ移動",
     "keywordOrPhrase": "キーワードまたはフレーズ",
     "lessThanOneMinute": "1分未満",
-    "rememberUser": "ユーザーを記憶",
-    "forgetUser": "ユーザーを忘れる",
+    "rememberUser": "ユーザーをブックマーク",
+    "forgetUser": "ユーザーのブックマークを解除",
     "bookmarkAddedDate": "{date} に追加",
-    "userRememberedDate": "{date} にユーザーを記憶",
+    "userRememberedDate": "{date} にユーザーをブックマーク",
     "mention": "メンション",
     "mentionUser": "ユーザーをメンション",
     "mentionUserTitle": "ユーザーをメンション。Alt/Option クリックで引用。",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "ゲーム",
     "gamesReplayOnly": "リプレイ限定",
-    "gamesLivestreamOnly": "ライブ配信限定",
+    "gamesLivestreamOnly": "ライブ限定",
     "gamesUpdateRequired": "アップデートが必要です",
     "gamesVersionMismatchHelper": "{game} は、Chat Enhancer と Playground のバージョンが一致していないため、一時的に利用できません。バージョンが一致したら、もう一度お試しください。",
     "gamesVersionMismatchActiveHelper": "アップデートが必要です。Chat Enhancer と Playground のバージョンが一致していません。",
@@ -640,7 +640,7 @@
       "message": "ブックマーク"
     },
     "popupResetItemRememberedUsers": {
-      "message": "記憶したユーザー"
+      "message": "ブックマークしたユーザー"
     },
     "noSavedItems": {
       "message": "保存済みアイテムはまだありません"
@@ -649,7 +649,7 @@
       "message": "保存済みアイテム {count} 件"
     },
     "savedItemsEmpty": {
-      "message": "保存したメッセージと記憶したユーザーがここに表示されます。"
+      "message": "ブックマークしたメッセージとユーザーがここに表示されます。"
     },
     "filterBookmarks": {
       "message": "ブックマークを絞り込む"
@@ -676,16 +676,16 @@
       "message": "一致する保存済みアイテムはありません。"
     },
     "rememberedUser": {
-      "message": "記憶したユーザー"
+      "message": "ブックマークしたユーザー"
     },
     "userRememberedDate": {
-      "message": "{date} にユーザーを記憶"
+      "message": "{date} にユーザーをブックマーク"
     },
     "forgetUser": {
-      "message": "ユーザーを忘れる"
+      "message": "ユーザーのブックマークを解除"
     },
     "rememberUser": {
-      "message": "ユーザーを記憶"
+      "message": "ユーザーをブックマーク"
     },
     "bookmarkMessagePostedDate": {
       "message": "{date} にメッセージを投稿"

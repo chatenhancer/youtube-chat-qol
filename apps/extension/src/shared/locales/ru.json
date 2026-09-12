@@ -58,10 +58,10 @@
     "jumpToMessage": "Перейти к сообщению",
     "keywordOrPhrase": "Ключевое слово или фраза",
     "lessThanOneMinute": "меньше 1 мин",
-    "rememberUser": "Запомнить пользователя",
-    "forgetUser": "Забыть пользователя",
+    "rememberUser": "Добавить пользователя в закладки",
+    "forgetUser": "Удалить пользователя из закладок",
     "bookmarkAddedDate": "Добавлено {date}",
-    "userRememberedDate": "Пользователь запомнен {date}",
+    "userRememberedDate": "Пользователь добавлен в закладки {date}",
     "mention": "Упомянуть",
     "mentionUser": "Упомянуть пользователя",
     "mentionUserTitle": "Упомянуть пользователя. Alt/Option-клик, чтобы процитировать.",
@@ -640,7 +640,7 @@
       "message": "Закладки"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Запомненные пользователи"
+      "message": "Пользователи в закладках"
     },
     "noSavedItems": {
       "message": "Сохранённых элементов пока нет"
@@ -649,7 +649,7 @@
       "message": "Сохранено элементов: {count}"
     },
     "savedItemsEmpty": {
-      "message": "Сохранённые сообщения и запомненные пользователи появятся здесь."
+      "message": "Сообщения и пользователи, добавленные в закладки, появятся здесь."
     },
     "filterBookmarks": {
       "message": "Фильтр закладок"
@@ -676,16 +676,16 @@
       "message": "Нет подходящих сохранённых элементов."
     },
     "rememberedUser": {
-      "message": "Запомненный пользователь"
+      "message": "Пользователь в закладках"
     },
     "userRememberedDate": {
-      "message": "Пользователь запомнен {date}"
+      "message": "Пользователь добавлен в закладки {date}"
     },
     "forgetUser": {
-      "message": "Забыть пользователя"
+      "message": "Удалить пользователя из закладок"
     },
     "rememberUser": {
-      "message": "Запомнить пользователя"
+      "message": "Добавить пользователя в закладки"
     },
     "bookmarkMessagePostedDate": {
       "message": "Сообщение отправлено {date}"

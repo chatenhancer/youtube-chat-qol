@@ -33,7 +33,7 @@ export function animatePopupMessageDensityIcon(): void {
 }
 
 export function animatePopupPlaygroundIcon(): void {
-  animatePopupIcon('.playground-joystick-icon', SETTING_ICON_ANIMATIONS.playgroundJoystick);
+  animatePopupIcon('.playground-join-icon', SETTING_ICON_ANIMATIONS.gameInvites);
 }
 
 export function animatePopupGameInvitesIcon(): void {

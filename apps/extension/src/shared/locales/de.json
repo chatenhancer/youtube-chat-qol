@@ -58,10 +58,10 @@
     "jumpToMessage": "Zur Nachricht springen",
     "keywordOrPhrase": "Schlüsselwort oder Phrase",
     "lessThanOneMinute": "weniger als 1 Min.",
-    "rememberUser": "Benutzer merken",
-    "forgetUser": "Benutzer vergessen",
+    "rememberUser": "Nutzer als Lesezeichen speichern",
+    "forgetUser": "Lesezeichen für Nutzer entfernen",
     "bookmarkAddedDate": "Hinzugefügt am {date}",
-    "userRememberedDate": "Benutzer gemerkt am {date}",
+    "userRememberedDate": "Nutzer am {date} als Lesezeichen gespeichert",
     "mention": "Erwähnen",
     "mentionUser": "Nutzer erwähnen",
     "mentionUserTitle": "Nutzer erwähnen. Alt/Option-Klick zum Zitieren.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Spiele",
     "gamesReplayOnly": "Nur Wiederholung",
-    "gamesLivestreamOnly": "Nur Livestream",
+    "gamesLivestreamOnly": "Nur live",
     "gamesUpdateRequired": "Update erforderlich",
     "gamesVersionMismatchHelper": "{game} ist vorübergehend nicht verfügbar, da die Versionen von Chat Enhancer und Playground nicht übereinstimmen. Versuche es erneut, wenn die Versionen übereinstimmen.",
     "gamesVersionMismatchActiveHelper": "Update erforderlich. Die Versionen von Chat Enhancer und Playground stimmen nicht überein.",
@@ -637,7 +637,7 @@
       "message": "Lesezeichen"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Gemerkte Nutzer"
+      "message": "Nutzer in den Lesezeichen"
     },
     "noSavedItems": {
       "message": "Noch keine gespeicherten Elemente"
@@ -646,7 +646,7 @@
       "message": "{count} gespeicherte Elemente"
     },
     "savedItemsEmpty": {
-      "message": "Nachrichten, die du speicherst, und Nutzer, die du dir merkst, werden hier angezeigt."
+      "message": "Nachrichten und Nutzer, die du als Lesezeichen speicherst, werden hier angezeigt."
     },
     "filterBookmarks": {
       "message": "Lesezeichen filtern"
@@ -673,16 +673,16 @@
       "message": "Keine passenden gespeicherten Elemente."
     },
     "rememberedUser": {
-      "message": "Gemerkter Nutzer"
+      "message": "Nutzer in den Lesezeichen"
     },
     "userRememberedDate": {
-      "message": "Benutzer gemerkt am {date}"
+      "message": "Nutzer am {date} als Lesezeichen gespeichert"
     },
     "forgetUser": {
-      "message": "Benutzer vergessen"
+      "message": "Lesezeichen für Nutzer entfernen"
     },
     "rememberUser": {
-      "message": "Benutzer merken"
+      "message": "Nutzer als Lesezeichen speichern"
     },
     "bookmarkMessagePostedDate": {
       "message": "Nachricht gesendet am {date}"

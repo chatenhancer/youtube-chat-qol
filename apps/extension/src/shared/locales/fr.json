@@ -58,10 +58,10 @@
     "jumpToMessage": "Aller au message",
     "keywordOrPhrase": "Mot-clé ou expression",
     "lessThanOneMinute": "moins de 1 min",
-    "rememberUser": "Mémoriser l’utilisateur",
-    "forgetUser": "Oublier l’utilisateur",
+    "rememberUser": "Ajouter l’utilisateur aux favoris",
+    "forgetUser": "Retirer l’utilisateur des favoris",
     "bookmarkAddedDate": "Ajouté le {date}",
-    "userRememberedDate": "Utilisateur mémorisé le {date}",
+    "userRememberedDate": "Utilisateur ajouté aux favoris le {date}",
     "mention": "Mentionner",
     "mentionUser": "Mentionner l'utilisateur",
     "mentionUserTitle": "Mentionner l'utilisateur. Alt/Option-clic pour citer.",
@@ -637,7 +637,7 @@
       "message": "Favoris"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Utilisateurs mémorisés"
+      "message": "Utilisateurs favoris"
     },
     "noSavedItems": {
       "message": "Aucun élément enregistré pour le moment"
@@ -646,7 +646,7 @@
       "message": "{count} éléments enregistrés"
     },
     "savedItemsEmpty": {
-      "message": "Les messages enregistrés et les utilisateurs mémorisés apparaîtront ici."
+      "message": "Les messages et les utilisateurs ajoutés aux favoris apparaîtront ici."
     },
     "filterBookmarks": {
       "message": "Filtrer les favoris"
@@ -673,16 +673,16 @@
       "message": "Aucun élément enregistré correspondant."
     },
     "rememberedUser": {
-      "message": "Utilisateur mémorisé"
+      "message": "Utilisateur favori"
     },
     "userRememberedDate": {
-      "message": "Utilisateur mémorisé le {date}"
+      "message": "Utilisateur ajouté aux favoris le {date}"
     },
     "forgetUser": {
-      "message": "Oublier l’utilisateur"
+      "message": "Retirer l’utilisateur des favoris"
     },
     "rememberUser": {
-      "message": "Mémoriser l’utilisateur"
+      "message": "Ajouter l’utilisateur aux favoris"
     },
     "bookmarkMessagePostedDate": {
       "message": "Message publié le {date}"

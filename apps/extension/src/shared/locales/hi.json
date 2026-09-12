@@ -58,10 +58,10 @@
     "jumpToMessage": "मैसेज पर जाएं",
     "keywordOrPhrase": "कीवर्ड या वाक्यांश",
     "lessThanOneMinute": "1 मिनट से कम",
-    "rememberUser": "उपयोगकर्ता याद रखें",
-    "forgetUser": "उपयोगकर्ता को भूलें",
+    "rememberUser": "उपयोगकर्ता को बुकमार्क करें",
+    "forgetUser": "उपयोगकर्ता का बुकमार्क हटाएं",
     "bookmarkAddedDate": "{date} को जोड़ा गया",
-    "userRememberedDate": "उपयोगकर्ता को {date} को याद रखा गया",
+    "userRememberedDate": "उपयोगकर्ता को {date} को बुकमार्क किया गया",
     "mention": "मेंशन",
     "mentionUser": "यूज़र को मेंशन करें",
     "mentionUserTitle": "यूज़र को मेंशन करें. कोट करने के लिए Alt/Option-क्लिक करें.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "गेम",
     "gamesReplayOnly": "सिर्फ़ रीप्ले",
-    "gamesLivestreamOnly": "सिर्फ़ लाइव स्ट्रीम",
+    "gamesLivestreamOnly": "सिर्फ़ लाइव",
     "gamesUpdateRequired": "अपडेट ज़रूरी है",
     "gamesVersionMismatchHelper": "{game} फ़िलहाल उपलब्ध नहीं है, क्योंकि Chat Enhancer और Playground के वर्शन मेल नहीं खाते। वर्शन मेल खाने पर फिर से कोशिश करें।",
     "gamesVersionMismatchActiveHelper": "अपडेट ज़रूरी है। Chat Enhancer और Playground के वर्शन मेल नहीं खाते।",
@@ -640,7 +640,7 @@
       "message": "बुकमार्क"
     },
     "popupResetItemRememberedUsers": {
-      "message": "याद रखे गए उपयोगकर्ता"
+      "message": "बुकमार्क किए गए उपयोगकर्ता"
     },
     "noSavedItems": {
       "message": "अभी कोई सहेजा गया आइटम नहीं"
@@ -649,7 +649,7 @@
       "message": "{count} सहेजे गए आइटम"
     },
     "savedItemsEmpty": {
-      "message": "आपके सहेजे गए संदेश और याद रखे गए उपयोगकर्ता यहाँ दिखाई देंगे।"
+      "message": "आपके बुकमार्क किए गए संदेश और उपयोगकर्ता यहाँ दिखाई देंगे।"
     },
     "filterBookmarks": {
       "message": "बुकमार्क फ़िल्टर करें"
@@ -676,16 +676,16 @@
       "message": "कोई मेल खाता सहेजा गया आइटम नहीं है।"
     },
     "rememberedUser": {
-      "message": "याद रखा गया उपयोगकर्ता"
+      "message": "बुकमार्क किया गया उपयोगकर्ता"
     },
     "userRememberedDate": {
-      "message": "उपयोगकर्ता को {date} को याद रखा गया"
+      "message": "उपयोगकर्ता को {date} को बुकमार्क किया गया"
     },
     "forgetUser": {
-      "message": "उपयोगकर्ता को भूलें"
+      "message": "उपयोगकर्ता का बुकमार्क हटाएं"
     },
     "rememberUser": {
-      "message": "उपयोगकर्ता याद रखें"
+      "message": "उपयोगकर्ता को बुकमार्क करें"
     },
     "bookmarkMessagePostedDate": {
       "message": "संदेश {date} को पोस्ट किया गया"

@@ -1679,7 +1679,7 @@ describe('popup', () => {
       <svg class="translation-target-icon"></svg>
       <svg class="lite-mode-icon"></svg>
       <svg class="message-density-icon"></svg>
-      <svg class="playground-joystick-icon"></svg>
+      <svg class="playground-join-icon"></svg>
       <svg class="game-invites-icon"></svg>
     `;
     await chrome.storage.sync.set({
@@ -1733,8 +1733,8 @@ describe('popup', () => {
     );
     expect(
       document
-        .querySelector('.playground-joystick-icon')
-        ?.classList.contains('ytcq-playground-joystick-wiggle')
+        .querySelector('.playground-join-icon')
+        ?.classList.contains('ytcq-game-controller-hop')
     ).toBe(false);
     expect(
       document.querySelector('.game-invites-icon')?.classList.contains('ytcq-game-controller-hop')

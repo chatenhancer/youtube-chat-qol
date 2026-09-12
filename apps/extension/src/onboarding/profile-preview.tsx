@@ -9,14 +9,11 @@ import { wireFloatingPanelDrag } from '../shared/floating-panel-drag';
 import { wireFloatingPanelResize } from '../shared/floating-panel-resize';
 import { getUiLocale, initUiLocaleFromDocument, t } from '../shared/i18n';
 import {
-  BOOKMARK_FILLED_ICON_PATH,
-  BOOKMARK_ICON_PATH,
-  MATERIAL_ICON_VIEW_BOX,
+  createBookmarkIcon,
   createAvatarRingIcon,
   createChannelIcon,
   createCloseIcon,
-  createJumpToMessageIcon,
-  createSvgIcon
+  createJumpToMessageIcon
 } from '../shared/icons';
 import { el, jsx } from '../shared/jsx-dom';
 import { wirePreviewInfo } from './info-tooltips';
@@ -170,7 +167,7 @@ export async function initProfilePreview(root: HTMLElement): Promise<void> {
         const save = actionButton(
           'ytcq-message-row-action ytcq-bookmark-toggle',
           t('saveMessage'),
-          createSvgIcon(MATERIAL_ICON_VIEW_BOX, BOOKMARK_ICON_PATH),
+          createBookmarkIcon(),
           () => {
             if (savedMessages.has(messageIndex)) savedMessages.delete(messageIndex);
             else savedMessages.add(messageIndex);
@@ -218,12 +215,7 @@ export async function initProfilePreview(root: HTMLElement): Promise<void> {
           save.setAttribute('aria-label', label);
           save.setAttribute('aria-pressed', String(saved));
           save.classList.toggle('ytcq-bookmark-toggle-active', saved);
-          save.replaceChildren(
-            createSvgIcon(
-              MATERIAL_ICON_VIEW_BOX,
-              saved ? BOOKMARK_FILLED_ICON_PATH : BOOKMARK_ICON_PATH
-            )
-          );
+          save.replaceChildren(createBookmarkIcon(saved));
         }
       });
       document.body.append(card);

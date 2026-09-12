@@ -2743,6 +2743,11 @@
   }
 }
 
+:root[data-ytcq-chat-skin="aero"] .ytcq-settings-grid {
+  /* Aero removes the listbox padding; match the grid's side inset below it. */
+  margin-bottom: 8px;
+}
+
 :root[data-ytcq-chat-skin="aero"] .ytcq-settings-grid .ytcq-paper-item,
 :root[data-ytcq-chat-skin="aero"] .ytcq-settings-grid .ytcq-menu-label {
   font-family: Tahoma, "Segoe UI", Arial, sans-serif;

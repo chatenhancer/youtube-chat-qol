@@ -58,10 +58,10 @@
     "jumpToMessage": "Перейти до повідомлення",
     "keywordOrPhrase": "Ключове слово або фраза",
     "lessThanOneMinute": "менше ніж 1 хв",
-    "rememberUser": "Запам’ятати користувача",
-    "forgetUser": "Забути користувача",
+    "rememberUser": "Додати користувача до закладок",
+    "forgetUser": "Видалити користувача із закладок",
     "bookmarkAddedDate": "Додано {date}",
-    "userRememberedDate": "Користувача запам’ятовано {date}",
+    "userRememberedDate": "Користувача додано до закладок {date}",
     "mention": "Згадати",
     "mentionUser": "Згадати користувача",
     "mentionUserTitle": "Згадати користувача. Alt/Option-клік, щоб процитувати.",
@@ -167,7 +167,7 @@
     "playground": "Playground",
     "games": "Ігри",
     "gamesReplayOnly": "Лише повтор",
-    "gamesLivestreamOnly": "Лише пряма трансляція",
+    "gamesLivestreamOnly": "Лише наживо",
     "gamesUpdateRequired": "Потрібне оновлення",
     "gamesVersionMismatchHelper": "Гра {game} тимчасово недоступна, оскільки версії Chat Enhancer і Playground не збігаються. Спробуйте ще раз, коли версії збігатимуться.",
     "gamesVersionMismatchActiveHelper": "Потрібне оновлення. Версії Chat Enhancer і Playground не збігаються.",
@@ -637,7 +637,7 @@
       "message": "Закладки"
     },
     "popupResetItemRememberedUsers": {
-      "message": "Запам’ятовані користувачі"
+      "message": "Користувачі в закладках"
     },
     "noSavedItems": {
       "message": "Збережених елементів поки немає"
@@ -646,7 +646,7 @@
       "message": "Збережено елементів: {count}"
     },
     "savedItemsEmpty": {
-      "message": "Збережені повідомлення й запам’ятовані користувачі з’являться тут."
+      "message": "Повідомлення й користувачі, додані до закладок, з’являться тут."
     },
     "filterBookmarks": {
       "message": "Фільтрувати закладки"
@@ -673,16 +673,16 @@
       "message": "Немає відповідних збережених елементів."
     },
     "rememberedUser": {
-      "message": "Запам’ятований користувач"
+      "message": "Користувач у закладках"
     },
     "userRememberedDate": {
-      "message": "Користувача запам’ятовано {date}"
+      "message": "Користувача додано до закладок {date}"
     },
     "forgetUser": {
-      "message": "Забути користувача"
+      "message": "Видалити користувача із закладок"
     },
     "rememberUser": {
-      "message": "Запам’ятати користувача"
+      "message": "Додати користувача до закладок"
     },
     "bookmarkMessagePostedDate": {
       "message": "Повідомлення надіслано {date}"
