@@ -111,22 +111,22 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     await expect(onboarding.locator('html')).toHaveAttribute('data-ytcq-chat-skin-theme', 'dark');
     await expect(onboarding.locator('#chatPreview')).toHaveCSS(
       'background-color',
-      'rgb(8, 19, 31)'
+      'rgb(8, 28, 45)'
     );
     await expect(onboarding.locator('#chatPreview')).toHaveCSS(
       'border-top-color',
-      'rgb(46, 97, 128)'
+      'rgb(64, 137, 180)'
     );
     await expect(onboarding.locator('.preview-chat-header')).toHaveCSS(
       'border-bottom-color',
-      'rgb(46, 97, 128)'
+      'rgb(6, 43, 73)'
     );
     await expect(onboarding.locator('.preview-chat-header')).not.toHaveCSS('box-shadow', 'none');
     await expect(onboarding.locator('.preview-chat-header')).toHaveCSS('z-index', '4');
     await expect(onboarding.locator('.preview-chat-feed')).toHaveCSS('z-index', '1');
     await expect(onboarding.locator('.preview-composer')).toHaveCSS(
       'border-top-color',
-      'rgb(46, 97, 128)'
+      'rgb(64, 137, 180)'
     );
     await onboarding.locator('.preview-composer-field').hover();
     await expect
@@ -135,7 +135,7 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
           .locator('.preview-composer-field')
           .evaluate((field) => getComputedStyle(field, '::before').borderTopColor)
       )
-      .toBe('rgb(85, 169, 207)');
+      .toBe('rgb(35, 72, 97)');
     await expect
       .poll(() =>
         onboarding
@@ -153,7 +153,7 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     await expect(onboarding.locator('.preview-send button')).toHaveCSS('border-top-width', '0px');
     await expect(onboarding.locator('.preview-send button')).toHaveCSS(
       'color',
-      'rgb(185, 234, 246)'
+      'rgb(181, 236, 255)'
     );
     await expectStoredOnboardingOptions(context);
   });
