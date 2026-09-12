@@ -222,8 +222,8 @@ describe('docs walkthrough clips', () => {
         type="button"
         data-walkthrough-clip-open
         data-walkthrough-clip-chapter="translate-what-you-type"
-        data-walkthrough-clip-start="28"
-        data-walkthrough-clip-end="45"
+        data-walkthrough-clip-start="27.416666666666668"
+        data-walkthrough-clip-end="44.36666666666667"
         data-walkthrough-clip-title="Draft translator"
       >Drafts</button>
       <button
@@ -311,7 +311,7 @@ describe('docs walkthrough clips', () => {
     expect(modal.open).toBe(true);
     expect(window.location.hash).toBe('#clip-translate-what-you-type');
     expect(requireElement<HTMLElement>('[data-walkthrough-clip-title]', modal).textContent).toBe('Draft translator');
-    expect(video.currentTime).toBe(28);
+    expect(video.currentTime).toBe(27.416666666666668);
     expect(video.play).toHaveBeenCalledOnce();
     expect(video.preload).toBe('auto');
     expect(video.src).toBe(new URL('../videos/walkthrough.mp4', window.location.href).href);
@@ -342,7 +342,10 @@ describe('docs walkthrough clips', () => {
     expect(window.location.hash).toBe('#clip-translate-what-you-type');
     expect(draftsTrigger.textContent).toBe('Drafts');
     expect(requireElement<HTMLElement>('[data-walkthrough-clip-title]', modal).textContent).toBe('Draft translator');
-    expect(video.currentTime).toBe(28);
+    expect(video.currentTime).toBe(27.416666666666668);
+    video.currentTime = 44.32;
+    video.dispatchEvent(new Event('timeupdate'));
+    expect(video.currentTime).toBe(27.416666666666668);
 
     commandsTrigger.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }));
     expect(window.location.hash).toBe('#clip-use-tab-commands');

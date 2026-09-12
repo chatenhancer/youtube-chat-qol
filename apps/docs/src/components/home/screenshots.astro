@@ -30,6 +30,7 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
           <article class="showcase-panel" data-screenshot-panel="translation">
             <div class="showcase-copy showcase-copy-balanced walkthrough-clip-tag-host">
               <WalkthroughClipTag
+                locale={locale}
                 chapter="translate-live-chat"
                 label={m.features.walkthroughClipCta}
                 title={m.features.walkthroughKeyPointTranslation}
@@ -84,6 +85,7 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
             </div>
             <div class="showcase-copy walkthrough-clip-tag-host">
               <WalkthroughClipTag
+                locale={locale}
                 chapter="mention-and-quote"
                 label={m.features.walkthroughClipCta}
                 title={m.features.walkthroughKeyPointMentions}
@@ -111,6 +113,7 @@ const { locale, messages: m, rootPrefix } = Astro.props as {
           <article class="showcase-panel" data-screenshot-panel="extras">
             <div class="showcase-copy showcase-copy-balanced walkthrough-clip-tag-host">
               <WalkthroughClipTag
+                locale={locale}
                 chapter="review-user-profiles"
                 label={m.features.walkthroughClipCta}
                 title={m.features.walkthroughKeyPointUserCards}

@@ -2,8 +2,9 @@
 import Icon from '../common/icon.astro';
 import WalkthroughClipTag from '../common/walkthrough-clip-tag.astro';
 import type { Messages } from '../../data/site';
+import type { Locale } from '../../data/locales';
 
-const { messages: m } = Astro.props as { messages: Messages };
+const { locale, messages: m } = Astro.props as { locale: Locale; messages: Messages };
 const features = [
   {
     body: m.features.translationBody,
@@ -64,6 +65,7 @@ const features = [
       {features.map(({ body, chapter, clipTitle, icon, title }) => (
         <article class="feature walkthrough-clip-tag-host">
           <WalkthroughClipTag
+            locale={locale}
             chapter={chapter}
             label={m.features.walkthroughClipCta}
             title={clipTitle}

@@ -2,8 +2,9 @@
 import Icon from '../common/icon.astro';
 import WalkthroughClipTag from '../common/walkthrough-clip-tag.astro';
 import type { Messages } from '../../data/site';
+import type { Locale } from '../../data/locales';
 
-const { messages: m } = Astro.props as { messages: Messages };
+const { locale, messages: m } = Astro.props as { locale: Locale; messages: Messages };
 
 const timezoneAliases = ['utc', 'tokyo', 'jst', 'seoul', 'kst', 'london', 'paris', 'madrid', 'newyork', 'nyc', 'et', 'eastern', 'losangeles', 'la', 'pt', 'pacific'];
 const inlineLabel = m.commands.inlineTitle.replace(/:$/, '');
@@ -57,6 +58,7 @@ const commandCopyParagraphs = [m.commands.copy, m.commands.actionCopy].filter(Bo
     <div class="commands-layout">
       <div class="commands-copy walkthrough-clip-tag-host">
         <WalkthroughClipTag
+          locale={locale}
           chapter="use-tab-commands"
           label={m.features.walkthroughClipCta}
           title={m.features.walkthroughKeyPointCommands}

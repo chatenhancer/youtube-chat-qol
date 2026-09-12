@@ -2,13 +2,15 @@
 import Icon from './icon.astro';
 import { getWalkthroughClip, getWalkthroughClipHash } from '../../data/walkthrough';
 import type { WalkthroughChapterName } from '../../data/walkthrough';
+import type { Locale } from '../../data/locales';
 
-const { chapter, label, title } = Astro.props as {
+const { chapter, label, locale, title } = Astro.props as {
   chapter: WalkthroughChapterName;
+  locale: Locale;
   label: string;
   title: string;
 };
-const clip = getWalkthroughClip(chapter);
+const clip = getWalkthroughClip(chapter, locale);
 const clipHash = getWalkthroughClipHash(chapter);
 ---
 

@@ -23,6 +23,6 @@ const { clientConfig = {}, locale, messages, rootPrefix } = Astro.props as {
   <main id="top" data-pagefind-body>
     <slot />
   </main>
-  <WalkthroughModal messages={messages} />
+  <WalkthroughModal locale={locale} messages={messages} />
   <Footer locale={locale} messages={messages} />
 </BaseLayout>

@@ -21,7 +21,7 @@ const clientConfig = {
   ...(walkthroughUrl ? { walkthrough: walkthroughUrl } : {})
 };
 const gamesWalkthroughClip = {
-  ...getWalkthroughClip('games'),
+  ...getWalkthroughClip('games', locale),
   title: messages.features.walkthroughKeyPointGames
 };
 
