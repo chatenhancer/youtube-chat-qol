@@ -1309,6 +1309,11 @@ ytd-menu-popup-renderer.preview-settings-menu {
     inset 0 0 0 1px rgba(255, 255, 255, 0.72);
 }
 
+:root[data-ytcq-chat-skin="aero"] .preview-composer-field yt-live-chat-text-input-field-renderer {
+  display: flex;
+  align-items: center;
+}
+
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="light"] .chat-preview {
   --preview-subtle: color-mix(in srgb, var(--ytcq-aero-border) 34%, white);
   --preview-skeleton-author: color-mix(in srgb, var(--ytcq-aero-accent-strong) 28%, white);
