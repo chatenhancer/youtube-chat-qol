@@ -1322,18 +1322,16 @@ ytd-menu-popup-renderer.preview-settings-menu {
 }
 
 :root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .chat-preview {
-  --preview-border: #2e6180;
-  box-shadow:
-    0 18px 38px rgba(0, 10, 18, 0.42),
-    inset 0 0 0 1px rgba(220, 247, 252, 0.14);
+  box-shadow: var(--ytcq-aero-card-shadow);
 }
 
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .chat-preview .preview-chat-header {
-  border-bottom-color: var(--preview-border) !important;
-}
-
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .chat-preview .preview-composer {
-  border-top-color: var(--preview-border) !important;
+:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .chat-preview :where(
+  .preview-chat-feed,
+  .preview-chat-header,
+  .preview-composer
+) {
+  /* Change the artwork and its tint together when switching from light. */
+  transition: none;
 }
 
 @keyframes preview-pulse {
