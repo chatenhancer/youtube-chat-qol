@@ -75,6 +75,7 @@ export function initChatCommands(saveOptions: SaveOptions): void {
   document.addEventListener('selectionchange', commandAutocomplete.scheduleUpdate, options);
   document.addEventListener('mousedown', commandAutocomplete.handlePointerDown, options);
   document.addEventListener('click', handleChatCommandSendClick, options);
+  window.addEventListener('blur', commandAutocomplete.close, { signal: commandListeners.signal });
   window.addEventListener('resize', commandAutocomplete.scheduleUpdate, options);
 }
 

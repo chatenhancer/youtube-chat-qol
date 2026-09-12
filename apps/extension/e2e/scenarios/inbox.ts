@@ -64,7 +64,7 @@ export const inboxGripDragScenario: BrowserScenario = async ({ chat, page }) => 
   await closeInboxPanel(chat);
 };
 
-export const inboxStaysOpenOnWatchPageClickScenario: BrowserScenario = async ({ chat, page }) => {
+export const inboxClosesOnWatchPageClickScenario: BrowserScenario = async ({ chat, page }) => {
   await openInboxPanel(chat);
 
   const outsideTargetId = 'ytcq-e2e-watch-page-focus-target';
@@ -86,8 +86,7 @@ export const inboxStaysOpenOnWatchPageClickScenario: BrowserScenario = async ({ 
 
   try {
     await page.locator(`#${outsideTargetId}`).click();
-    await expect(chat.locator('.ytcq-inbox-card')).toBeVisible();
-    await closeInboxPanel(chat);
+    await expect(chat.locator('.ytcq-inbox-card')).toBeHidden();
   } finally {
     await page.evaluate((id) => document.getElementById(id)?.remove(), outsideTargetId);
   }

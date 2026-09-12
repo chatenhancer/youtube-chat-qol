@@ -315,7 +315,7 @@ describe('composer translation', () => {
     expect(chrome.runtime.sendMessage).toHaveBeenCalledTimes(disabled ? 1 : 2);
   });
 
-  it('opens draft translation and closes it outside or with Escape', async () => {
+  it('opens draft translation and closes it outside, on frame blur, or with Escape', async () => {
     vi.useFakeTimers();
     document.body.replaceChildren();
     const saveOptions = vi.fn();
@@ -346,6 +346,13 @@ describe('composer translation', () => {
 
     document.querySelector<HTMLButtonElement>('.ytcq-composer-translate-button')?.click();
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(panel.hidden).toBe(true);
+
+    document.querySelector<HTMLButtonElement>('.ytcq-composer-translate-button')?.click();
+    select.focus();
+    document.querySelector<HTMLButtonElement>('.ytcq-composer-translate-button')!.focus();
+    expect(panel.hidden).toBe(false);
+    window.dispatchEvent(new Event('blur'));
     expect(panel.hidden).toBe(true);
   });
 

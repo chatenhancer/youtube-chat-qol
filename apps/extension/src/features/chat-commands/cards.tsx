@@ -56,6 +56,7 @@ export function createCommandCards(): CommandCards {
       const options = { capture: true, signal: cardListeners.signal };
       document.addEventListener('click', handleOutsideClick, options);
       document.addEventListener('keydown', handleKeydown, options);
+      window.addEventListener('blur', close, { signal: cardListeners.signal });
       window.addEventListener('resize', handleResize, options);
     }, 0);
   };

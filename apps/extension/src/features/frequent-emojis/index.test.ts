@@ -142,6 +142,23 @@ describe('frequent emoji feature entry points', () => {
     );
   });
 
+  it('closes the quick popover and cancels delayed opening when the frame loses focus', async () => {
+    chrome.storage.local.set({ ytcqEmojiUsage: [emoji({ text: '🙂' })] });
+    const toggle = createEmojiToggle();
+    initFrequentEmojis();
+
+    toggle.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+    window.dispatchEvent(new Event('blur'));
+    await vi.advanceTimersByTimeAsync(150);
+    expect(document.querySelector('.ytcq-quick-emoji-popover')).toBeNull();
+
+    toggle.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+    await vi.advanceTimersByTimeAsync(150);
+    expect(document.querySelector('.ytcq-quick-emoji-popover')).not.toBeNull();
+    window.dispatchEvent(new Event('blur'));
+    expect(document.querySelector('.ytcq-quick-emoji-popover')).toBeNull();
+  });
+
   it('keeps the quick popover fixed when usage refreshes after an insertion', async () => {
     chrome.storage.local.set({
       ytcqEmojiUsage: [emoji({ count: 3, text: '🙂' })]

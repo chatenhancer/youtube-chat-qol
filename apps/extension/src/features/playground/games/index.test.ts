@@ -1801,7 +1801,7 @@ describe('playground games header button', () => {
     expect(button.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('installs card listeners for outside click, escape, resize, and cleanup', async () => {
+  it('installs card listeners for outside click, frame blur, escape, resize, and cleanup', async () => {
     const onClose = vi.fn();
     const { card } = createGamesCard(onClose);
     const anchor = document.createElement('button');
@@ -1823,10 +1823,16 @@ describe('playground games header button', () => {
     panel.className = 'ytcq-game-panel';
     document.body.append(panel);
     panel.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    card.querySelector<HTMLButtonElement>('.ytcq-profile-card-close')!.focus();
+    anchor.focus();
     expect(onClose).not.toHaveBeenCalled();
 
     window.dispatchEvent(new Event('resize'));
     expect(card.style.left).not.toBe('');
+
+    window.dispatchEvent(new Event('blur'));
+    expect(onClose).toHaveBeenCalledOnce();
+    onClose.mockClear();
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(onClose).toHaveBeenCalledOnce();
@@ -1834,6 +1840,7 @@ describe('playground games header button', () => {
     onClose.mockClear();
     cleanup();
     document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    window.dispatchEvent(new Event('blur'));
     expect(onClose).not.toHaveBeenCalled();
   });
 
@@ -1872,6 +1879,7 @@ describe('playground games header button', () => {
     expect(card.style.top).toBe('70px');
     expect(card.querySelector('.ytcq-panel-resize-handle')).toBeNull();
     document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    window.dispatchEvent(new Event('blur'));
     expect(onClose).not.toHaveBeenCalled();
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));

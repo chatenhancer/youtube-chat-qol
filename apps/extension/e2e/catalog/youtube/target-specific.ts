@@ -10,7 +10,8 @@ import {
   reconnectEnabledExtensionScenario,
   reconnectEnabledExtensionLiteScenario
 } from '../../scenarios/extension-attachment';
-import { inboxStaysOpenOnWatchPageClickScenario } from '../../scenarios/inbox';
+import { inboxClosesOnWatchPageClickScenario } from '../../scenarios/inbox';
+import { panelsCloseOnWatchPageClickScenario } from '../../scenarios/panel-dismissal';
 import { nativeContinuationRendererScenario } from '../../scenarios/native-renderer';
 import { popupResetScenario } from '../../scenarios/popup-reset';
 import {
@@ -125,10 +126,16 @@ export const targetSpecificScenarios: readonly YouTubeScenario[] = [
     reason: 'Verifies YouTube consumes the intercepted continuation protocol itself.'
   },
   {
-    title: 'Inbox stays open when the watch page is clicked',
-    run: inboxStaysOpenOnWatchPageClickScenario,
+    title: 'Inbox closes when the watch page is clicked',
+    run: inboxClosesOnWatchPageClickScenario,
     on: [target.liveLoggedOut],
     reason: 'Requires the real top-level watch page around YouTube\'s chat iframe.'
+  },
+  {
+    title: 'panels close when focus leaves the chat iframe and preserve internal interactions',
+    run: panelsCloseOnWatchPageClickScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Uses a deterministic watch page around a real chat iframe to exercise browser focus changes.'
   },
   {
     title: 'composer send is intercepted and handled without posting',

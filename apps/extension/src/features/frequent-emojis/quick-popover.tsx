@@ -52,6 +52,9 @@ export function initQuickEmojiPopover(
   document.addEventListener('focusin', handleFocusIn, options);
   document.addEventListener('focusout', handleFocusOut, options);
   document.addEventListener('keydown', handleKeydown, options);
+  window.addEventListener('blur', () => closeQuickEmojiPopover(false), {
+    signal: listeners.signal
+  });
 }
 
 export function resetQuickEmojiPopover(): void {

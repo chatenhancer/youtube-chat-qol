@@ -54,13 +54,17 @@ describe('chat command cards', () => {
     expect(document.querySelector('.ytcq-command-help-card')).toBeNull();
   });
 
-  it('closes on outside clicks after listener wiring', async () => {
+  it.each(['click', 'blur'])('closes on outside %s after listener wiring', async (eventType) => {
     vi.useFakeTimers();
     const cards = createCommandCards();
     cards.showWatchedKeywords(['launch']);
     await vi.runAllTimersAsync();
 
-    document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    if (eventType === 'click') {
+      document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    } else {
+      window.dispatchEvent(new Event('blur'));
+    }
 
     expect(document.querySelector('.ytcq-command-help-card')).toBeNull();
   });

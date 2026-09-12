@@ -90,6 +90,7 @@ export function initComposerTranslation(callback: SaveOptions): void {
   document.addEventListener('click', handleDocumentClick, options);
   document.addEventListener('keydown', handleDocumentKeydown, options);
   document.addEventListener('scroll', positionPanel, options);
+  window.addEventListener('blur', closePanel, { signal: composerTranslationListeners.signal });
   window.addEventListener('resize', positionPanel, options);
 }
 

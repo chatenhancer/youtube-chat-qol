@@ -68,6 +68,9 @@ export function installGamesCardListeners({
   const handleKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') onClose();
   };
+  const handleWindowBlur = (): void => {
+    if (!persistent) onClose();
+  };
   const handleResize = (): void => {
     const card = getCard();
     if (!card) return;
@@ -96,6 +99,7 @@ export function installGamesCardListeners({
     const options = { capture: true, signal: cardListeners.signal };
     document.addEventListener('click', handleOutsideClick, options);
     document.addEventListener('keydown', handleKeydown, options);
+    window.addEventListener('blur', handleWindowBlur, { signal: cardListeners.signal });
     window.addEventListener('resize', handleResize, options);
   }, 0);
 

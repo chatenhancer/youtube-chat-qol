@@ -311,7 +311,7 @@ describe('inbox card view', () => {
     expect(document.querySelector('.ytcq-profile-card-jump')).toBeNull();
   });
 
-  it('closes from outside click or Escape while ignoring the inbox button', async () => {
+  it('closes from outside click, frame blur, or Escape while allowing panel interactions', async () => {
     vi.useFakeTimers();
     openInboxCardView(undefined, callbacksForCard());
     await vi.runOnlyPendingTimersAsync();
@@ -335,6 +335,14 @@ describe('inbox card view', () => {
     openInboxCardView(undefined, callbacksForCard());
     await vi.runOnlyPendingTimersAsync();
     document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(isInboxCardOpen()).toBe(false);
+
+    openInboxCardView(undefined, callbacksForCard());
+    await vi.runOnlyPendingTimersAsync();
+    document.querySelector<HTMLButtonElement>('.ytcq-profile-card-close')!.focus();
+    document.querySelector<HTMLButtonElement>('.ytcq-inbox-keyword-toggle')!.focus();
+    expect(isInboxCardOpen()).toBe(true);
+    window.dispatchEvent(new Event('blur'));
     expect(isInboxCardOpen()).toBe(false);
   });
 
@@ -368,6 +376,7 @@ describe('inbox card view', () => {
     expect(card.style.top).toBe('70px');
     expect(card.querySelectorAll('.ytcq-panel-resize-handle')).toHaveLength(8);
     document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    window.dispatchEvent(new Event('blur'));
     expect(isInboxCardOpen()).toBe(true);
 
     document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));

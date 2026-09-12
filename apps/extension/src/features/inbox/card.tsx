@@ -154,6 +154,9 @@ export function openInboxCardView(
   const handleKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') closeInboxCard();
   };
+  const handleWindowBlur = (): void => {
+    if (!persistent) closeInboxCard();
+  };
   const handleResize = (): void => {
     if (!activeInboxCard) return;
     if (persistent) {
@@ -171,6 +174,7 @@ export function openInboxCardView(
     const options = { capture: true, signal: cardListeners.signal };
     document.addEventListener('click', handleOutsideClick, options);
     document.addEventListener('keydown', handleKeydown, options);
+    window.addEventListener('blur', handleWindowBlur, { signal: cardListeners.signal });
     window.addEventListener('resize', handleResize, options);
   }, 0);
 }
