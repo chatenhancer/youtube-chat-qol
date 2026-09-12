@@ -169,7 +169,13 @@ async function buildTarget(target) {
       entryPoints: [path.join(extensionRoot, 'src', 'onboarding', 'index.ts')],
       outfile: path.join(extensionDir, 'onboarding.js'),
       format: 'iife'
-    })
+    }),
+    ...(target === 'safari' ? [build({
+      ...getBuildOptions(target),
+      entryPoints: [path.join(extensionRoot, 'src', 'youtube', 'chat-feed', 'loader-entry.ts')],
+      outfile: path.join(extensionDir, 'chat-feed-loader.js'),
+      format: 'iife'
+    })] : [])
   ]);
 
   await Promise.all([
@@ -326,7 +332,7 @@ function createManifest(target) {
         'wss://playground.chatenhancer.com/*'
       ])
     ];
-    removeMainWorldContentScripts(manifest);
+    useSafariChatFeedLoader(manifest);
     addSafariChatFeedPageResource(manifest);
     useSafariPersistentBackground(manifest);
   }
@@ -367,11 +373,12 @@ function stripBuildPrefix(value) {
   return String(value).replace(/^dist\/extension(?:-chrome)?\//, '');
 }
 
-function removeMainWorldContentScripts(manifest) {
-  manifest.content_scripts = (manifest.content_scripts || []).filter((script) => {
-    if (script.world !== 'MAIN') return true;
-    return false;
-  });
+function useSafariChatFeedLoader(manifest) {
+  for (const script of manifest.content_scripts) {
+    if (!script.js.includes('chat-feed-page.js')) continue;
+    script.js = ['chat-feed-loader.js'];
+    delete script.world;
+  }
 }
 
 function addSafariChatFeedPageResource(manifest) {

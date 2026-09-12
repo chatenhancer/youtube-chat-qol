@@ -3,9 +3,9 @@
  *
  * The normal content script starts at document idle. This tiny entrypoint reads
  * the opt-in setting early, prevents the native list from flashing before the
- * Lite controller mounts, and starts the page-world transport early enough to
- * observe YouTube's first chat responses. It never activates on YouTube Studio
- * during the initial beta.
+ * Lite controller mounts, and signals the shared chat feed to prepare for Lite
+ * mode. The chat feed bridge starts through its own document-start entrypoint.
+ * Lite mode never activates on YouTube Studio during the initial beta.
  */
 import { YOUTUBE_CHAT_FEED_BOOTSTRAP_INTENT_ATTRIBUTE } from '../../youtube/chat-feed/protocol';
 import { jsx, el } from '../../shared/jsx-dom';

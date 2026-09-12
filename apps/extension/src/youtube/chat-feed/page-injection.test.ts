@@ -7,6 +7,7 @@ describe('YouTube chat feed page injection', () => {
     vi.resetModules();
     document.head.replaceChildren();
     document.body.replaceChildren();
+    chrome.storage.sync.clear();
     delete (globalThis as { YTCQ_INJECT_CHAT_FEED_PAGE?: boolean }).YTCQ_INJECT_CHAT_FEED_PAGE;
     fetchMock = vi.fn(() => Promise.resolve({
       ok: true,
@@ -30,11 +31,12 @@ describe('YouTube chat feed page injection', () => {
     expect(document.querySelector('#ytcq-chat-feed-page-transport')).toBeNull();
   });
 
-  it('injects the page-world chat feed transport source once when enabled', async () => {
+  it('shares one bridge between the Safari loader and idle fallback while Lite mode is off', async () => {
     (globalThis as { YTCQ_INJECT_CHAT_FEED_PAGE?: boolean }).YTCQ_INJECT_CHAT_FEED_PAGE = true;
+    await chrome.storage.sync.set({ liteModeEnabled: false });
+    await import('./loader-entry');
     const { injectYouTubeChatFeedPage } = await import('./page-injection');
 
-    injectYouTubeChatFeedPage();
     injectYouTubeChatFeedPage();
     await flushInjection();
 
