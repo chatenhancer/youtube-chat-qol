@@ -40,6 +40,7 @@
     "walkthroughCta": "See the extension in action"
   },
   "features": {
+    "blogLink": "Discover more features on our blog",
     "eyebrow": "Built for live streams",
     "title": "Changes where <span class=\"title-emphasis\">chat</span><br>already happens",
     "translationTitle": "Translate as you chat",

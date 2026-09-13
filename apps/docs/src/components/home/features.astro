@@ -1,6 +1,7 @@
 ---
 import Icon from '../common/icon.astro';
 import WalkthroughClipTag from '../common/walkthrough-clip-tag.astro';
+import { getBlogIndexPath } from '../../data/blog';
 import type { Messages } from '../../data/site';
 import type { Locale } from '../../data/locales';
 
@@ -97,5 +98,11 @@ const features = [
         </span>
       </button>
     </div>
+    <p class="feature-blog">
+      <a class="feature-link blog-forward-link" href={getBlogIndexPath(locale)}>
+        <span>{m.features.blogLink}</span>
+        <Icon class="forward-link-icon" name="chevron_backward" />
+      </a>
+    </p>
   </div>
 </section>
