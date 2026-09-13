@@ -47,14 +47,13 @@ interface TranslationRequest {
 }
 
 interface ActiveTranslationPriorityScope {
-  keys: Set<string>;
-  messages: Set<HTMLElement>;
+  messages: WeakSet<HTMLElement>;
 }
 
 export interface TranslationPriorityScope {
-  /** Releases all priority keys retained by this panel/surface. */
+  /** Stops prioritizing this panel/surface's messages. */
   close: () => void;
-  /** Marks live message renderers as important while this scope is open. */
+  /** Replaces the live message renderers currently shown by this panel/surface. */
   prioritize: (messages: Iterable<HTMLElement | null | undefined>) => void;
 }
 
@@ -77,7 +76,6 @@ let pendingTranslationSequence = 0;
 
 const translationCache = new Map<string, TranslationResult>();
 const pendingTranslations = new Map<string, Set<PendingTranslationEntry>>();
-const priorityTranslationKeys = new Map<string, number>();
 const activePriorityScopes = new Set<ActiveTranslationPriorityScope>();
 
 export function queueMessageTranslation(
@@ -87,7 +85,6 @@ export function queueMessageTranslation(
   const request = getTranslationRequest(message, originalText);
   if (!request) return;
 
-  retainPriorityTranslationKeyForMessage(message, request.key);
   if (message.dataset.ytcqTranslationKey === request.key) return;
 
   message.dataset.ytcqTranslationKey = request.key;
@@ -141,8 +138,7 @@ export function queueMessageTranslation(
 
 export function createTranslationPriorityScope(): TranslationPriorityScope {
   const scope = {
-    keys: new Set<string>(),
-    messages: new Set<HTMLElement>()
+    messages: new WeakSet<HTMLElement>()
   };
   activePriorityScopes.add(scope);
   let closed = false;
@@ -151,26 +147,30 @@ export function createTranslationPriorityScope(): TranslationPriorityScope {
     close: () => {
       if (closed) return;
       closed = true;
-      scope.keys.forEach(releasePriorityTranslationKey);
-      scope.keys.clear();
-      scope.messages.clear();
+      scope.messages = new WeakSet();
       activePriorityScopes.delete(scope);
     },
     prioritize: (messages) => {
       if (closed) return;
 
+      const nextMessages = new WeakSet<HTMLElement>();
+      const toQueue: HTMLElement[] = [];
       for (const message of messages) {
-        if (!message?.isConnected) continue;
-        scope.messages.add(message);
-        const request = getTranslationRequest(message);
-        if (!request) continue;
-        retainPriorityTranslationKey(scope, request.key);
-        if (message.dataset.ytcqTranslationKey !== request.key) {
-          queueMessageTranslation(message, { backfill: true });
-        }
+        if (!message?.isConnected || nextMessages.has(message)) continue;
+        nextMessages.add(message);
+        toQueue.push(message);
+      }
+      if (closed) return;
+
+      // Publish the complete weak membership before cached translations can
+      // synchronously refresh or close this panel through their listeners.
+      scope.messages = nextMessages;
+      for (const message of toQueue) {
+        if (closed || scope.messages !== nextMessages) return;
+        if (message.isConnected) queueMessageTranslation(message, { backfill: true });
       }
 
-      pumpTranslationQueue();
+      if (!closed && scope.messages === nextMessages) pumpTranslationQueue();
     }
   };
 }
@@ -271,28 +271,6 @@ function promoteBackfillTranslation(key: string): void {
     translationDelayTimer = 0;
   }
   scheduleTranslationPump();
-}
-
-function retainPriorityTranslationKey(scope: ActiveTranslationPriorityScope, key: string): void {
-  if (scope.keys.has(key)) return;
-  scope.keys.add(key);
-  priorityTranslationKeys.set(key, (priorityTranslationKeys.get(key) || 0) + 1);
-}
-
-function retainPriorityTranslationKeyForMessage(message: HTMLElement, key: string): void {
-  activePriorityScopes.forEach((scope) => {
-    if (scope.messages.has(message)) retainPriorityTranslationKey(scope, key);
-  });
-}
-
-function releasePriorityTranslationKey(key: string): void {
-  const count = priorityTranslationKeys.get(key) || 0;
-  if (count <= 1) {
-    priorityTranslationKeys.delete(key);
-    return;
-  }
-
-  priorityTranslationKeys.set(key, count - 1);
 }
 
 function enforcePendingTranslationLimit(): void {
@@ -500,32 +478,57 @@ function scheduleTranslationPump(): void {
 }
 
 function takeNextTranslationBatch(): TranslationJob[] {
-  const first = takeNextTranslationJob();
+  const priorityKeys = getPriorityTranslationKeys();
+  const first = takeNextTranslationJob(priorityKeys);
   if (!first) return [];
 
   const batch = [first];
   while (batch.length < MAX_TRANSLATION_BATCH_SIZE) {
-    const next = takeNextTranslationJob(first.targetLanguage, first.backfill);
+    const next = takeNextTranslationJob(priorityKeys, first.targetLanguage, first.backfill);
     if (!next) break;
     batch.push(next);
   }
   return batch;
 }
 
-function takeNextTranslationJob(targetLanguage?: string, backfill?: boolean): TranslationJob | undefined {
-  return takePriorityTranslationJob(liveTranslationQueue, targetLanguage, backfill) ||
-    takePriorityTranslationJob(backfillTranslationQueue, targetLanguage, backfill) ||
+function getPriorityTranslationKeys(): Set<string> {
+  const keys = new Set<string>();
+  const scopes = Array.from(activePriorityScopes);
+  if (!scopes.length) return keys;
+
+  // Derive priorities from the bounded queue instead of retaining every key a
+  // panel has ever shown, including completed or disconnected messages.
+  for (const [key, entries] of pendingTranslations) {
+    for (const entry of entries) {
+      const message = entry.messageRef.deref();
+      if (!message?.isConnected || message.dataset.ytcqTranslationKey !== key) continue;
+      if (!scopes.some((scope) => scope.messages.has(message))) continue;
+      keys.add(key);
+      break;
+    }
+  }
+  return keys;
+}
+
+function takeNextTranslationJob(
+  priorityKeys: ReadonlySet<string>,
+  targetLanguage?: string,
+  backfill?: boolean
+): TranslationJob | undefined {
+  return takePriorityTranslationJob(liveTranslationQueue, priorityKeys, targetLanguage, backfill) ||
+    takePriorityTranslationJob(backfillTranslationQueue, priorityKeys, targetLanguage, backfill) ||
     takeQueuedTranslationJob(liveTranslationQueue, targetLanguage, backfill) ||
     takeQueuedTranslationJob(backfillTranslationQueue, targetLanguage, backfill);
 }
 
 function takePriorityTranslationJob(
   queue: TranslationJob[],
+  priorityKeys: ReadonlySet<string>,
   targetLanguage?: string,
   backfill?: boolean
 ): TranslationJob | undefined {
   const index = queue.findIndex((job) =>
-    priorityTranslationKeys.has(job.key) &&
+    priorityKeys.has(job.key) &&
     (!targetLanguage || job.targetLanguage === targetLanguage) &&
     (backfill === undefined || job.backfill === backfill)
   );

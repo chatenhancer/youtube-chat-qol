@@ -340,27 +340,169 @@ describe('translation queue', () => {
     await resolveAllRuntimeRequests(requests);
   });
 
-  it('stops prioritizing queued messages after their priority scope closes', async () => {
-    const requests = mockDeferredRuntimeSendMessages();
-    const firstLiveMessage = createTextMessage('Otro mensaje vivo uno');
-    const secondLiveMessage = createTextMessage('Otro mensaje vivo dos');
-    const thirdLiveMessage = createTextMessage('Otro mensaje vivo tres');
-    const panelMessage = createTextMessage('Otro mensaje del panel');
-
-    queueMessageTranslation(firstLiveMessage);
-    queueMessageTranslation(secondLiveMessage);
-    queueMessageTranslation(thirdLiveMessage);
-    queueMessageTranslation(panelMessage, { backfill: true });
-
+  it.each(['close', 'empty update'] as const)('stops prioritizing queued messages after a scope %s', async (action) => {
+    const requests = await startBusyTranslationQueue();
+    const panelMessage = createTextMessage(`Otro mensaje del panel ${action}`);
+    const liveText = `Otro mensaje vivo antes del historial ${action}`;
     const scope = createTranslationPriorityScope();
-    scope.prioritize([panelMessage]);
-    scope.close();
 
-    await waitForRuntimeRequestCount(requests, 2);
+    try {
+      scope.prioritize([panelMessage]);
+      if (action === 'close') scope.close();
+      else scope.prioritize([]);
+      queueMessageTranslation(createTextMessage(liveText));
+      requests[0].resolve();
+      await waitForRuntimeRequestCount(requests, 3);
 
-    expect(getRequestTexts(requests[0])).toEqual(['Otro mensaje del panel']);
+      expect(getRequestTexts(requests[2])).toEqual([liveText]);
+    } finally {
+      scope.close();
+      await resolveAllRuntimeRequests(requests);
+    }
+  });
 
-    await resolveAllRuntimeRequests(requests);
+  it.each(['en', ''])('replaces current panel membership with initial translation language %j', async (targetLanguage) => {
+    const requests = await startBusyTranslationQueue();
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage });
+    const previousMessage = createTextMessage(`Mensaje anterior del panel ${targetLanguage}`);
+    const currentMessage = createTextMessage(`Mensaje actual del panel ${targetLanguage}`);
+    const scope = createTranslationPriorityScope();
+
+    try {
+      scope.prioritize([previousMessage, previousMessage]);
+      scope.prioritize([currentMessage]);
+      setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
+      queueMessageTranslation(previousMessage, { backfill: true });
+      queueMessageTranslation(currentMessage, { backfill: true });
+      queueMessageTranslation(createTextMessage(`Mensaje vivo durante el cambio ${targetLanguage}`));
+      requests[0].resolve();
+      await waitForRuntimeRequestCount(requests, 3);
+
+      expect(getRequestTexts(requests[2])).toEqual([
+        `Mensaje actual del panel ${targetLanguage}`.trim(),
+        `Mensaje anterior del panel ${targetLanguage}`.trim()
+      ]);
+    } finally {
+      scope.close();
+      await resolveAllRuntimeRequests(requests);
+    }
+  });
+
+  it.each(['close', 'refresh'] as const)('stops an obsolete snapshot when a cached translation triggers a scope %s', async (action) => {
+    const cachedMessage = await createCachedTextMessage(`Mensaje en cache antes de ${action}`);
+    const requests = mockDeferredRuntimeSendMessages();
+    const staleMessage = createTextMessage(`Mensaje del panel anterior ${action}`);
+    const currentText = `Mensaje del panel actualizado ${action}`;
+    const currentMessage = createTextMessage(currentText);
+    const scope = createTranslationPriorityScope();
+    const unsubscribe = onMessageTranslationRendered(({ message }) => {
+      if (message !== cachedMessage) return;
+      if (action === 'close') scope.close();
+      else scope.prioritize([currentMessage]);
+    });
+
+    try {
+      scope.prioritize([cachedMessage, staleMessage]);
+      await flushPromises();
+
+      expect(requests.flatMap(getRequestTexts)).toEqual(action === 'close' ? [] : [currentText]);
+    } finally {
+      unsubscribe();
+      scope.close();
+      await resolveAllRuntimeRequests(requests);
+    }
+  });
+
+  it('publishes the complete snapshot before a cached translation callback dispatches pending work', async () => {
+    const cachedMessage = await createCachedTextMessage('Mensaje en cache antes de publicar el panel');
+    const requests = mockDeferredRuntimeSendMessages();
+    const panelText = 'Mensaje pendiente del panel completo';
+    const panelMessage = createTextMessage(panelText);
+    const liveMessage = createTextMessage('Mensaje vivo durante la publicacion del panel');
+    const scope = createTranslationPriorityScope();
+    const otherScope = createTranslationPriorityScope();
+    const unsubscribe = onMessageTranslationRendered(({ message }) => {
+      if (message !== cachedMessage) return;
+      queueMessageTranslation(panelMessage, { backfill: true });
+      queueMessageTranslation(liveMessage);
+      otherScope.prioritize([]);
+    });
+
+    try {
+      scope.prioritize([cachedMessage, panelMessage]);
+      await waitForRuntimeRequestCount(requests, 2);
+
+      expect(getRequestTexts(requests[0])).toEqual([panelText]);
+    } finally {
+      unsubscribe();
+      scope.close();
+      otherScope.close();
+      await resolveAllRuntimeRequests(requests);
+    }
+  });
+
+  it('drops detached panel priorities without another panel update when unrelated messages share their text', async () => {
+    const requests = await startBusyTranslationQueue();
+    const panelMessage = createTextMessage('Mensaje del panel retirado por YouTube');
+    const scope = createTranslationPriorityScope();
+
+    try {
+      scope.prioritize([panelMessage]);
+      panelMessage.remove();
+      queueMessageTranslation(createTextMessage('Mensaje del panel retirado por YouTube'), { backfill: true });
+      queueMessageTranslation(createTextMessage('Mensaje vivo delante del duplicado'));
+      requests[0].resolve();
+      await waitForRuntimeRequestCount(requests, 3);
+
+      expect(getRequestTexts(requests[2])).toEqual(['Mensaje vivo delante del duplicado']);
+    } finally {
+      scope.close();
+      await resolveAllRuntimeRequests(requests);
+    }
+  });
+
+  it.each(['', 'es'])('keeps current panel priority when changing translation language from %j', async (targetLanguage) => {
+    const requests = await startBusyTranslationQueue();
+    setOptions({ ...DEFAULT_OPTIONS, targetLanguage });
+    const text = `Mensaje del panel tras cambiar idioma ${targetLanguage}`.trim();
+    const panelMessage = createTextMessage(text);
+    const scope = createTranslationPriorityScope();
+
+    try {
+      scope.prioritize([panelMessage]);
+      setOptions({ ...DEFAULT_OPTIONS, targetLanguage: 'en' });
+      clearTranslations();
+      queueMessageTranslation(panelMessage, { backfill: true });
+      queueMessageTranslation(createTextMessage(`Mensaje vivo tras cambiar idioma ${targetLanguage}`));
+      requests[0].resolve();
+      await waitForRuntimeRequestCount(requests, 3);
+
+      expect(getRequestTexts(requests[2])).toEqual([text]);
+    } finally {
+      scope.close();
+      await resolveAllRuntimeRequests(requests);
+    }
+  });
+
+  it.each(['', 'Texto anterior'])('prioritizes current text when YouTube fills or replaces %j in a panel message', async (initialText) => {
+    const requests = await startBusyTranslationQueue();
+    const panelMessage = createTextMessage(initialText);
+    const text = `Texto actualizado del panel ${initialText}`.trim();
+    const scope = createTranslationPriorityScope();
+
+    try {
+      scope.prioritize([panelMessage]);
+      panelMessage.querySelector('[id="message"]')!.textContent = text;
+      queueMessageTranslation(panelMessage, { backfill: true });
+      queueMessageTranslation(createTextMessage(`Mensaje vivo junto a texto actualizado ${initialText}`));
+      requests[0].resolve();
+      await waitForRuntimeRequestCount(requests, 3);
+
+      expect(getRequestTexts(requests[2])[0]).toBe(text);
+    } finally {
+      scope.close();
+      await resolveAllRuntimeRequests(requests);
+    }
   });
 
   it('ignores invalid priority messages and allows priority scopes to close idempotently', async () => {
@@ -418,30 +560,30 @@ describe('translation queue', () => {
     await resolveAllRuntimeRequests(requests);
   });
 
-  it('keeps a priority key retained only once per scope and releases shared priority counts gradually', async () => {
-    const requests = mockDeferredRuntimeSendMessages();
-    const firstLiveMessage = createTextMessage('Mensaje con prioridad compartida uno');
-    const secondLiveMessage = createTextMessage('Mensaje con prioridad compartida dos');
-    const thirdLiveMessage = createTextMessage('Mensaje con prioridad compartida tres');
-    const priorityMessage = createTextMessage('Mensaje con prioridad compartida panel');
-
-    queueMessageTranslation(firstLiveMessage);
-    queueMessageTranslation(secondLiveMessage);
-    queueMessageTranslation(thirdLiveMessage);
-    queueMessageTranslation(priorityMessage, { backfill: true });
-
+  it.each(['close', 'empty update'] as const)('preserves another panel\'s shared priority after a scope %s', async (action) => {
+    const requests = await startBusyTranslationQueue();
+    const text = `Mensaje con prioridad compartida panel ${action}`;
+    const priorityMessage = createTextMessage(text);
+    const otherPanelMessage = createTextMessage(text);
     const firstScope = createTranslationPriorityScope();
     const secondScope = createTranslationPriorityScope();
-    firstScope.prioritize([priorityMessage, priorityMessage]);
-    secondScope.prioritize([priorityMessage]);
-    firstScope.close();
 
-    await waitForRuntimeRequestCount(requests, 2);
+    try {
+      firstScope.prioritize([priorityMessage, priorityMessage]);
+      secondScope.prioritize([otherPanelMessage]);
+      if (action === 'close') firstScope.close();
+      else firstScope.prioritize([]);
+      priorityMessage.remove();
+      queueMessageTranslation(createTextMessage(`Mensaje vivo junto a paneles compartidos ${action}`));
+      requests[0].resolve();
+      await waitForRuntimeRequestCount(requests, 3);
 
-    expect(getRequestTexts(requests[0])).toEqual(['Mensaje con prioridad compartida panel']);
-
-    secondScope.close();
-    await resolveAllRuntimeRequests(requests);
+      expect(getRequestTexts(requests[2])).toEqual([text]);
+    } finally {
+      firstScope.close();
+      secondScope.close();
+      await resolveAllRuntimeRequests(requests);
+    }
   });
 
   it('promotes a queued backfill translation when a matching live message appears', async () => {
@@ -734,6 +876,22 @@ function mockDeferredRuntimeSendMessages(): DeferredRuntimeRequest[] {
     return Promise.resolve();
   }) as never);
   return requests;
+}
+
+async function startBusyTranslationQueue(): Promise<DeferredRuntimeRequest[]> {
+  const requests = mockDeferredRuntimeSendMessages();
+  for (let index = 0; index < 2; index += 1) {
+    queueMessageTranslation(createTextMessage(`Mensaje en curso ${testMessageId}`));
+    await waitForRuntimeRequestCount(requests, index + 1);
+  }
+  return requests;
+}
+
+async function createCachedTextMessage(text: string): Promise<HTMLElement> {
+  queueMessageTranslation(createTextMessage(text));
+  await flushPromises();
+  clearTranslations();
+  return createTextMessage(text);
 }
 
 async function resolveAllRuntimeRequests(requests: DeferredRuntimeRequest[]): Promise<void> {
