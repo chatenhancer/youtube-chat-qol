@@ -144,6 +144,27 @@ describe('tab alert', () => {
     expect(topDocument.documentElement.dataset.ytcqTabAlertActive).toBeUndefined();
   });
 
+  it('creates favicon links in the watch document realm so Firefox accepts them', async () => {
+    const watchFrame = document.createElement('iframe');
+    document.body.append(watchFrame);
+    const topDocument = watchFrame.contentDocument!;
+    Object.defineProperty(window, 'top', {
+      configurable: true,
+      value: watchFrame.contentWindow
+    });
+    setDocumentVisibilityState(topDocument, 'hidden');
+    const { showInboxTabAlert } = await import('./tab-alert');
+
+    showInboxTabAlert(3);
+
+    const links = topDocument.querySelectorAll('.ytcq-tab-alert-favicon');
+    expect(links).toHaveLength(4);
+    const topLinkConstructor = topDocument.createElement('link').constructor;
+    for (const link of links) {
+      expect(link).toBeInstanceOf(topLinkConstructor);
+    }
+  });
+
   it('treats the tab as active when the top watch document is visible', async () => {
     const topDocument = document.implementation.createHTMLDocument('Top Stream');
     Object.defineProperty(window, 'top', {

@@ -121,7 +121,9 @@ function setAlertFavicon(topDocument: Document): void {
 
   const href = createAlertFaviconHref();
   ALERT_FAVICON_SIZES.forEach((size) => {
-    const link = topDocument.adoptNode(
+    // Firefox ignores favicon links created in a subframe, even after adoption.
+    // Importing creates the link in the watch document's realm.
+    const link = topDocument.importNode(
       el<HTMLLinkElement>(
         <link
           class={ALERT_FAVICON_CLASS}
