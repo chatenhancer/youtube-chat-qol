@@ -47,7 +47,7 @@
     "translationBody": "Leia mensagens recebidas no seu idioma ou traduza o que você está digitando antes de enviar.",
     "mentionTitle": "Menções, citações e rascunhos",
     "mentionBody": "Mencione ou cite pessoas rapidamente, mantenha uma conversa visível e recupere rascunhos não enviados depois de atualizar a mesma transmissão.",
-    "contextTitle": "Veja o histórico de alguém",
+    "contextTitle": "Perfis e marcadores",
     "contextBody": "Clique em um avatar para revisar mensagens recentes, salvar as que quiser manter e abrir o canal quando precisar.",
     "inboxTitle": "Não perca mensagens importantes",
     "inboxBody": "Menções e mensagens com as palavras-chave que você escolher vão direto para sua caixa de entrada, com alertas sonoros opcionais.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Marcadores"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Um chat mais leve quando o movimento aumenta",
+    "liteModeBody": "Ative o modo Lite opcional no popup. Ele ainda está em beta.",
+    "liteModeToolsTitle": "Suas ferramentas de chat continuam por perto",
+    "liteModeToolsBody": "Acompanhe novas mensagens e abra perfis no chat leve.",
+    "floatingPlayerTitle": "Mantenha vídeo e chat juntos",
+    "floatingPlayerBody": "Abra o vídeo e o chat juntos pelo menu do chat.",
+    "floatingPlayerDraftTitle": "Seu rascunho vai com você",
+    "floatingPlayerDraftBody": "Redimensione a janela, continue digitando e volte à aba com seu rascunho intacto.",
     "introTitle": "O Chat Enhancer funciona dentro do chat ao vivo do YouTube",
     "introBody": "Pequenas ferramentas aparecem onde o chat já acontece, sem substituir o chat do YouTube.",
     "outroTitle": "Demonstração do Chat Enhancer",

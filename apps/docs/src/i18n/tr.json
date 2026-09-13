@@ -47,7 +47,7 @@
     "translationBody": "Gelen mesajları kendi dilinizde okuyun veya göndermeden önce yazdığınız metni çevirin.",
     "mentionTitle": "Bahsetmeler, alıntılar ve taslaklar",
     "mentionBody": "Kişilerden hızla bahsedin veya onları alıntılayın, bir konuşmayı görünür tutun ve aynı yayını yeniledikten sonra gönderilmemiş taslakları geri getirin.",
-    "contextTitle": "Birinin yazdıklarını hızlıca görün",
+    "contextTitle": "Profiller ve yer imleri",
     "contextBody": "Son mesajları görmek, istediklerinizi kaydetmek ve gerektiğinde kanalı açmak için avatara tıklayın.",
     "inboxTitle": "Önemli mesajları kaçırmayın",
     "inboxBody": "Bahsetmeler ve seçtiğiniz özel anahtar kelimeleri içeren mesajlar doğrudan gelen kutunuza düşer; isterseniz sesli uyarı da açabilirsiniz.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Yer işaretleri"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Yoğun sohbetler için daha hafif bir akış",
+    "liteModeBody": "Açılır pencereden isteğe bağlı Lite modunu açın. Hâlâ beta aşamasındadır.",
+    "liteModeToolsTitle": "Sohbet araçlarınız elinizin altında",
+    "liteModeToolsBody": "Hafif akışta yeni mesajları takip edin ve profilleri açın.",
+    "floatingPlayerTitle": "Video ve sohbeti bir arada tutun",
+    "floatingPlayerBody": "Sohbet menüsünden video ve sohbeti birlikte açın.",
+    "floatingPlayerDraftTitle": "Taslağınız sizinle gelir",
+    "floatingPlayerDraftBody": "Pencereyi yeniden boyutlandırın, yazmaya devam edin ve taslağınızı koruyarak sekmeye dönün.",
     "introTitle": "Chat Enhancer, YouTube canlı sohbetinin içinde çalışır",
     "introBody": "Küçük araçlar, YouTube sohbetinin yerini almadan sohbetin zaten gerçekleştiği yerde görünür.",
     "outroTitle": "Chat Enhancer demosu",

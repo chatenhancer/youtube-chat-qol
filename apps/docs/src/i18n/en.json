@@ -47,7 +47,7 @@
     "translationBody": "Read incoming messages in your language, or translate what you're typing before you send it.",
     "mentionTitle": "Mentions, quotes, and drafts",
     "mentionBody": "Mention or quote people quickly, keep one conversation visible, and recover unsent drafts after refreshing the same stream.",
-    "contextTitle": "Catch up on someone",
+    "contextTitle": "Profiles and bookmarks",
     "contextBody": "Click an avatar to review recent messages, save the ones you want to keep, and open their channel when needed.",
     "inboxTitle": "Never miss key messages",
     "inboxBody": "Mentions and messages with custom keywords you choose go straight to your inbox, with optional sound alerts.",
@@ -81,6 +81,14 @@
     "walkthroughKeyPointPopup": "Advanced settings"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "A lighter feed for busy chats",
+    "liteModeBody": "Turn on optional Lite mode in the popup. It is still in beta.",
+    "liteModeToolsTitle": "Your chat tools stay close",
+    "liteModeToolsBody": "Follow new messages and open profiles in the lightweight feed.",
+    "floatingPlayerTitle": "Keep video and chat together",
+    "floatingPlayerBody": "Open video and chat together from the chat menu.",
+    "floatingPlayerDraftTitle": "Your draft comes with you",
+    "floatingPlayerDraftBody": "Resize the window, keep typing, and return to the tab with your draft intact.",
     "introTitle": "Chat Enhancer works inside YouTube live chat",
     "introBody": "Small tools appear where chat already happens, without replacing YouTube chat.",
     "outroTitle": "Chat Enhancer Demo",

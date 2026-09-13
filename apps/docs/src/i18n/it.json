@@ -47,7 +47,7 @@
     "translationBody": "Leggi i messaggi in arrivo nella tua lingua, oppure traduci ciò che stai scrivendo prima di inviarlo.",
     "mentionTitle": "Menzioni, citazioni e bozze",
     "mentionBody": "Menziona o cita le persone rapidamente, tieni una conversazione in vista e recupera le bozze non inviate dopo aver aggiornato la stessa live.",
-    "contextTitle": "Recupera i messaggi di qualcuno",
+    "contextTitle": "Profili e segnalibri",
     "contextBody": "Fai clic su un avatar per rivedere i messaggi recenti, salvare quelli che vuoi conservare e aprire il canale quando serve.",
     "inboxTitle": "Non perdere i messaggi importanti",
     "inboxBody": "Le menzioni e i messaggi con le parole chiave che scegli finiscono direttamente nella tua posta in arrivo, con avvisi sonori opzionali.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Segnalibri"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Un flusso più leggero per le chat affollate",
+    "liteModeBody": "Attiva la modalità Lite facoltativa nel popup. È ancora in beta.",
+    "liteModeToolsTitle": "Gli strumenti della chat restano a portata di mano",
+    "liteModeToolsBody": "Segui i nuovi messaggi e apri i profili nel flusso leggero.",
+    "floatingPlayerTitle": "Tieni insieme video e chat",
+    "floatingPlayerBody": "Apri video e chat insieme dal menu della chat.",
+    "floatingPlayerDraftTitle": "La bozza viene con te",
+    "floatingPlayerDraftBody": "Ridimensiona la finestra, continua a scrivere e torna alla scheda con la bozza intatta.",
     "introTitle": "Chat Enhancer funziona nella chat dal vivo di YouTube",
     "introBody": "Piccoli strumenti compaiono dove la chat è già attiva, senza sostituire la chat di YouTube.",
     "outroTitle": "Demo di Chat Enhancer",

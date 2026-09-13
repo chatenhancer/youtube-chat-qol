@@ -47,7 +47,7 @@
     "translationBody": "Lies eingehende Nachrichten in deiner Sprache oder übersetze deinen eigenen Text, bevor du ihn sendest.",
     "mentionTitle": "Erwähnungen, Zitate und Entwürfe",
     "mentionBody": "Erwähne oder zitiere andere schnell, halte eine Unterhaltung im Blick und stelle ungesendete Entwürfe nach dem Aktualisieren desselben Streams wieder her.",
-    "contextTitle": "Bei einzelnen Personen nachlesen",
+    "contextTitle": "Profile und Lesezeichen",
     "contextBody": "Klicke auf einen Avatar, um die letzten Nachrichten zu sehen, gewünschte Nachrichten zu speichern und bei Bedarf den Kanal zu öffnen.",
     "inboxTitle": "Wichtige Nachrichten nicht verpassen",
     "inboxBody": "Erwähnungen und Nachrichten mit selbst gewählten Schlüsselwörtern landen direkt in deinem Posteingang, auf Wunsch mit Tonhinweis.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Lesezeichen"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Ein leichterer Feed für volle Chats",
+    "liteModeBody": "Aktiviere den optionalen Lite-Modus im Popup. Er ist noch in der Beta-Phase.",
+    "liteModeToolsTitle": "Deine Chat-Werkzeuge bleiben griffbereit",
+    "liteModeToolsBody": "Verfolge neue Nachrichten und öffne Profile im schlanken Chat-Feed.",
+    "floatingPlayerTitle": "Video und Chat zusammenhalten",
+    "floatingPlayerBody": "Öffne Video und Chat zusammen über das Chat-Menü.",
+    "floatingPlayerDraftTitle": "Dein Entwurf kommt mit",
+    "floatingPlayerDraftBody": "Ändere die Fenstergröße, schreibe weiter und kehre mit deinem Entwurf zum Tab zurück.",
     "introTitle": "Chat Enhancer funktioniert direkt im YouTube-Livechat",
     "introBody": "Kleine Werkzeuge erscheinen dort, wo der Chat bereits stattfindet, ohne den YouTube-Chat zu ersetzen.",
     "outroTitle": "Chat-Enhancer-Demo",

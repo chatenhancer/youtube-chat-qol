@@ -47,7 +47,7 @@
     "translationBody": "Lisez les messages entrants dans votre langue, ou traduisez ce que vous êtes en train d’écrire avant de l’envoyer.",
     "mentionTitle": "Mentions, citations et brouillons",
     "mentionBody": "Mentionnez ou citez quelqu’un rapidement, gardez une conversation visible et retrouvez vos brouillons non envoyés après l’actualisation du même live.",
-    "contextTitle": "Rattrapez les messages d’une personne",
+    "contextTitle": "Profils et favoris",
     "contextBody": "Cliquez sur un avatar pour revoir les messages récents, enregistrer ceux que vous souhaitez conserver et ouvrir la chaîne si besoin.",
     "inboxTitle": "Ne manquez pas les messages clés",
     "inboxBody": "Les mentions et les messages contenant les mots-clés que vous choisissez arrivent directement dans votre boîte de réception, avec des alertes sonores facultatives.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Favoris"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Un fil plus léger pour les chats animés",
+    "liteModeBody": "Activez le mode Lite facultatif dans la fenêtre de l’extension. Il est encore en bêta.",
+    "liteModeToolsTitle": "Vos outils de chat restent à portée de main",
+    "liteModeToolsBody": "Suivez les nouveaux messages et ouvrez les profils dans le fil allégé.",
+    "floatingPlayerTitle": "Gardez la vidéo et le chat ensemble",
+    "floatingPlayerBody": "Ouvrez la vidéo et le chat ensemble depuis le menu du chat.",
+    "floatingPlayerDraftTitle": "Votre brouillon vous accompagne",
+    "floatingPlayerDraftBody": "Redimensionnez la fenêtre, continuez à écrire et revenez à l’onglet avec votre brouillon intact.",
     "introTitle": "Chat Enhancer fonctionne dans le chat en direct YouTube",
     "introBody": "De petits outils apparaissent là où le chat se déroule déjà, sans remplacer le chat YouTube.",
     "outroTitle": "Démo de Chat Enhancer",

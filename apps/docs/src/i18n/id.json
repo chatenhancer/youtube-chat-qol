@@ -47,7 +47,7 @@
     "translationBody": "Baca pesan masuk dalam bahasa Anda, atau terjemahkan teks yang sedang Anda ketik sebelum mengirimnya.",
     "mentionTitle": "Mention, kutipan, dan draf",
     "mentionBody": "Mention atau kutip orang lain dengan cepat, jaga satu percakapan tetap terlihat, dan pulihkan draf yang belum terkirim setelah memuat ulang siaran yang sama.",
-    "contextTitle": "Lihat konteks seseorang",
+    "contextTitle": "Profil dan bookmark",
     "contextBody": "Klik avatar untuk meninjau pesan terbaru, menyimpan pesan yang ingin dipertahankan, dan membuka channel bila diperlukan.",
     "inboxTitle": "Jangan lewatkan pesan penting",
     "inboxBody": "Mention dan pesan berisi kata kunci pilihan Anda masuk langsung ke Inbox, dengan suara notifikasi opsional.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Bookmark"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Feed lebih ringan untuk chat yang ramai",
+    "liteModeBody": "Aktifkan mode Lite opsional di popup. Fitur ini masih beta.",
+    "liteModeToolsTitle": "Alat chat tetap mudah dijangkau",
+    "liteModeToolsBody": "Ikuti pesan baru dan buka profil dalam feed yang ringan.",
+    "floatingPlayerTitle": "Satukan video dan chat",
+    "floatingPlayerBody": "Buka video dan chat bersama dari menu chat.",
+    "floatingPlayerDraftTitle": "Draf ikut bersama Anda",
+    "floatingPlayerDraftBody": "Ubah ukuran jendela, terus mengetik, lalu kembali ke tab dengan draf tetap utuh.",
     "introTitle": "Chat Enhancer bekerja di dalam live chat YouTube",
     "introBody": "Alat-alat kecil muncul di tempat chat berlangsung tanpa menggantikan chat YouTube.",
     "outroTitle": "Demo Chat Enhancer",

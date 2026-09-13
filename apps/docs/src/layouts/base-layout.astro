@@ -149,15 +149,19 @@ const structuredDataJson = resolvedStructuredData
     {structuredDataJson && <script is:inline type="application/ld+json" set:html={structuredDataJson}></script>}
   </head>
   <body>
-    <p
-      class="site-announcement site-alert-info"
-      data-site-announcement
-      data-announcement-url={site.announcementUrl}
-      data-announcement-locale={locale}
-      data-pagefind-ignore
-      role="status"
-      hidden
-    ></p>
+    <div class="site-announcement-reveal">
+      <div class="site-announcement-content">
+        <p
+          class="site-announcement site-alert-info"
+          data-site-announcement
+          data-announcement-url={site.announcementUrl}
+          data-announcement-locale={locale}
+          data-pagefind-ignore
+          role="status"
+          hidden
+        ></p>
+      </div>
+    </div>
     <slot />
     <WalkthroughClipModal messages={messages} />
     <pagefind-config excerpt-length="24"></pagefind-config>

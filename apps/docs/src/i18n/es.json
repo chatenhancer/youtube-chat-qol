@@ -47,7 +47,7 @@
     "translationBody": "Lee los mensajes entrantes en tu idioma, o traduce lo que estás escribiendo antes de enviarlo.",
     "mentionTitle": "Menciones, citas y borradores",
     "mentionBody": "Menciona o cita a otras personas rápidamente, deja una conversación a la vista y recupera borradores sin enviar tras actualizar el mismo directo.",
-    "contextTitle": "Ponte al día con alguien",
+    "contextTitle": "Perfiles y marcadores",
     "contextBody": "Haz clic en un avatar para revisar mensajes recientes, guardar los que quieras conservar y abrir su canal cuando lo necesites.",
     "inboxTitle": "No te pierdas mensajes clave",
     "inboxBody": "Las menciones y los mensajes con las palabras clave que elijas van directamente a tu bandeja de entrada, con avisos sonoros opcionales.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Marcadores"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Un chat más ligero cuando hay mucha actividad",
+    "liteModeBody": "Activa el modo Lite opcional en la ventana emergente. Sigue en beta.",
+    "liteModeToolsTitle": "Tus herramientas de chat siguen a mano",
+    "liteModeToolsBody": "Sigue los mensajes nuevos y abre perfiles en el chat ligero.",
+    "floatingPlayerTitle": "Mantén el vídeo y el chat juntos",
+    "floatingPlayerBody": "Abre el vídeo y el chat juntos desde el menú del chat.",
+    "floatingPlayerDraftTitle": "Tu borrador va contigo",
+    "floatingPlayerDraftBody": "Cambia el tamaño de la ventana, sigue escribiendo y vuelve a la pestaña con tu borrador intacto.",
     "introTitle": "Chat Enhancer funciona dentro del chat en directo de YouTube",
     "introBody": "Pequeñas herramientas aparecen donde ya sucede el chat, sin sustituir el chat de YouTube.",
     "outroTitle": "Demostración de Chat Enhancer",

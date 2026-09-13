@@ -47,7 +47,7 @@
     "translationBody": "Czytaj przychodzące wiadomości w swoim języku albo przetłumacz to, co piszesz, zanim wyślesz wiadomość.",
     "mentionTitle": "Wzmianki, cytaty i wersje robocze",
     "mentionBody": "Szybko wspominaj lub cytuj innych, utrzymuj jedną rozmowę w widoku i odzyskuj niewysłane wersje robocze po odświeżeniu tej samej transmisji.",
-    "contextTitle": "Sprawdź, co pisała dana osoba",
+    "contextTitle": "Profile i zakładki",
     "contextBody": "Kliknij awatar, aby przejrzeć ostatnie wiadomości, zapisać wybrane i w razie potrzeby otworzyć kanał.",
     "inboxTitle": "Nie przegap ważnych wiadomości",
     "inboxBody": "Wzmianki oraz wiadomości z wybranymi przez ciebie słowami kluczowymi trafiają prosto do skrzynki, opcjonalnie z alertem dźwiękowym.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Zakładki"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Lżejszy widok aktywnych czatów",
+    "liteModeBody": "Włącz opcjonalny tryb Lite w oknie rozszerzenia. Nadal jest w wersji beta.",
+    "liteModeToolsTitle": "Narzędzia czatu pozostają pod ręką",
+    "liteModeToolsBody": "Śledź nowe wiadomości i otwieraj profile w lekkim widoku czatu.",
+    "floatingPlayerTitle": "Trzymaj wideo i czat razem",
+    "floatingPlayerBody": "Otwórz wideo i czat razem z menu czatu.",
+    "floatingPlayerDraftTitle": "Szkic wiadomości zostaje z Tobą",
+    "floatingPlayerDraftBody": "Zmień rozmiar okna, pisz dalej i wróć do karty z zachowanym szkicem wiadomości.",
     "introTitle": "Chat Enhancer działa wewnątrz czatu na żywo YouTube",
     "introBody": "Małe narzędzia pojawiają się tam, gdzie już działa czat, bez zastępowania czatu YouTube.",
     "outroTitle": "Prezentacja Chat Enhancer",

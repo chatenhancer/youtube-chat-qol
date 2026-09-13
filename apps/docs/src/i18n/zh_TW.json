@@ -47,7 +47,7 @@
     "translationBody": "用你的語言閱讀收到的訊息，或在送出前翻譯正在輸入的內容。",
     "mentionTitle": "提及、引用與草稿",
     "mentionBody": "快速提及或引用他人，讓某段對話保持可見，並在重新整理同一場直播後復原未送出的草稿。",
-    "contextTitle": "快速了解某個人",
+    "contextTitle": "個人資料與書籤",
     "contextBody": "點擊頭像即可查看近期訊息、儲存想保留的訊息，並在需要時開啟對方頻道。",
     "inboxTitle": "重要訊息不再錯過",
     "inboxBody": "提及你的訊息，以及包含你自訂關鍵字的訊息，會直接進入收件匣；需要時也可以開啟聲音提醒。",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "書籤"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "讓熱鬧的聊天室更輕盈",
+    "liteModeBody": "在彈出視窗中啟用選用的 Lite 模式。目前仍為測試版。",
+    "liteModeToolsTitle": "聊天工具依然觸手可及",
+    "liteModeToolsBody": "在輕量聊天室中閱讀新訊息並開啟個人資料。",
+    "floatingPlayerTitle": "讓影片與聊天相伴",
+    "floatingPlayerBody": "從聊天選單中同時開啟影片和聊天室。",
+    "floatingPlayerDraftTitle": "草稿隨你一起移動",
+    "floatingPlayerDraftBody": "調整視窗大小、繼續輸入，再返回分頁，草稿依然保留。",
     "introTitle": "Chat Enhancer 直接在 YouTube 直播聊天室中運作",
     "introBody": "小工具會出現在聊天原本進行的位置，不會取代 YouTube 聊天室。",
     "outroTitle": "Chat Enhancer 示範",

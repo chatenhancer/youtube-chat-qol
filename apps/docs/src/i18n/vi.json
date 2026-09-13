@@ -47,7 +47,7 @@
     "translationBody": "Đọc tin nhắn đến bằng ngôn ngữ của bạn, hoặc dịch nội dung bạn đang gõ trước khi gửi.",
     "mentionTitle": "Nhắc tên, trích dẫn và bản nháp",
     "mentionBody": "Nhanh chóng nhắc tên hoặc trích dẫn người khác, giữ một cuộc trò chuyện luôn trong tầm nhìn và khôi phục bản nháp chưa gửi sau khi tải lại cùng một buổi phát.",
-    "contextTitle": "Xem nhanh ngữ cảnh của một người",
+    "contextTitle": "Hồ sơ và dấu trang",
     "contextBody": "Nhấp vào ảnh đại diện để xem lại tin nhắn gần đây, lưu những tin muốn giữ và mở kênh khi cần.",
     "inboxTitle": "Không bỏ lỡ tin nhắn quan trọng",
     "inboxBody": "Lượt nhắc tên và tin nhắn chứa từ khóa bạn chọn sẽ đi thẳng vào Inbox, kèm âm thanh cảnh báo nếu bạn bật.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Dấu trang"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Luồng tin nhẹ hơn cho cuộc trò chuyện sôi động",
+    "liteModeBody": "Bật chế độ Lite tùy chọn trong cửa sổ tiện ích. Tính năng này vẫn đang ở bản beta.",
+    "liteModeToolsTitle": "Công cụ trò chuyện vẫn trong tầm tay",
+    "liteModeToolsBody": "Theo dõi tin nhắn mới và mở hồ sơ trong luồng tin nhẹ.",
+    "floatingPlayerTitle": "Giữ video và trò chuyện cùng nhau",
+    "floatingPlayerBody": "Mở video và trò chuyện cùng nhau từ menu trò chuyện.",
+    "floatingPlayerDraftTitle": "Bản nháp luôn đi cùng bạn",
+    "floatingPlayerDraftBody": "Đổi kích thước cửa sổ, tiếp tục nhập rồi quay lại thẻ với bản nháp còn nguyên.",
     "introTitle": "Chat Enhancer hoạt động ngay trong live chat YouTube",
     "introBody": "Các công cụ nhỏ xuất hiện ngay nơi cuộc trò chuyện diễn ra mà không thay thế chat YouTube.",
     "outroTitle": "Bản trình diễn Chat Enhancer",

@@ -47,7 +47,7 @@
     "translationBody": "届いたメッセージを自分の言語で読み、送信前に入力中の文章も翻訳できます。",
     "mentionTitle": "メンション、引用、下書き",
     "mentionBody": "相手をすばやくメンションしたり引用したりできます。ひとつの会話を見える場所に保ち、同じ配信を再読み込みしても未送信の下書きを復元できます。",
-    "contextTitle": "相手の最近の発言を確認",
+    "contextTitle": "プロフィールとブックマーク",
     "contextBody": "アバターをクリックすると、最近のメッセージを確認し、残したいものを保存し、必要なときにチャンネルを開けます。",
     "inboxTitle": "大事なメッセージを見逃さない",
     "inboxBody": "メンションや指定したキーワードを含むメッセージを受信トレイに集め、必要に応じて音で通知します。",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "ブックマーク"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "賑やかなチャットをもっと軽快に",
+    "liteModeBody": "ポップアップで任意のLiteモードを有効にできます。現在はベータ版です。",
+    "liteModeToolsTitle": "チャットツールはそのまま使えます",
+    "liteModeToolsBody": "軽量なチャットで新しいメッセージを読み、プロフィールを開けます。",
+    "floatingPlayerTitle": "動画とチャットをひとつに",
+    "floatingPlayerBody": "チャットメニューから動画とチャットを一緒に開きます。",
+    "floatingPlayerDraftTitle": "下書きも一緒に移動",
+    "floatingPlayerDraftBody": "ウィンドウのサイズを変えて入力を続け、下書きを保ったままタブに戻れます。",
     "introTitle": "Chat Enhancer は YouTube ライブチャット内で動作します",
     "introBody": "YouTube チャットを置き換えず、チャットが行われる場所に小さなツールを追加します。",
     "outroTitle": "Chat Enhancer のデモ",

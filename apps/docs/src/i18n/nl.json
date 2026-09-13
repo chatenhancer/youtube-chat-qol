@@ -47,7 +47,7 @@
     "translationBody": "Lees binnenkomende berichten in je eigen taal of vertaal wat je typt voordat je het verstuurt.",
     "mentionTitle": "Vermeldingen, citaten en concepten",
     "mentionBody": "Vermeld of citeer mensen snel, houd één gesprek in beeld en herstel niet-verzonden concepten nadat je dezelfde stream hebt vernieuwd.",
-    "contextTitle": "Teruglezen wat iemand schreef",
+    "contextTitle": "Profielen en bladwijzers",
     "contextBody": "Klik op een avatar om recente berichten te bekijken, gewenste berichten op te slaan en zo nodig het kanaal te openen.",
     "inboxTitle": "Geen belangrijke berichten missen",
     "inboxBody": "Vermeldingen en berichten met door jou gekozen trefwoorden gaan rechtstreeks naar je inbox, eventueel met een geluidsmelding.",
@@ -81,6 +81,14 @@
     "walkthroughBookmarks": "Bladwijzers"
   },
   "walkthroughVideo": {
+    "liteModeTitle": "Een lichtere feed voor drukke chats",
+    "liteModeBody": "Schakel de optionele Lite-modus in de pop-up in. Deze is nog in bèta.",
+    "liteModeToolsTitle": "Je chatgereedschap blijft binnen handbereik",
+    "liteModeToolsBody": "Volg nieuwe berichten en open profielen in de lichte feed.",
+    "floatingPlayerTitle": "Houd video en chat bij elkaar",
+    "floatingPlayerBody": "Open video en chat samen via het chatmenu.",
+    "floatingPlayerDraftTitle": "Je concept gaat mee",
+    "floatingPlayerDraftBody": "Pas het vensterformaat aan, blijf typen en keer terug naar het tabblad met je concept intact.",
     "introTitle": "Chat Enhancer werkt in de YouTube-livechat",
     "introBody": "Kleine hulpmiddelen verschijnen waar de chat al plaatsvindt, zonder de YouTube-chat te vervangen.",
     "outroTitle": "Chat Enhancer-demo",
