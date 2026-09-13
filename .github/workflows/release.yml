@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
-          cache: npm
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
       - name: Validate release tag
@@ -32,9 +32,13 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
-          cache: npm
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
+      - name: Cache npm downloads
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Check extension
@@ -59,9 +63,13 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
-          cache: npm
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
+      - name: Cache npm downloads
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Test extension and scripts with coverage
@@ -85,9 +93,13 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
-          cache: npm
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
+      - name: Cache npm downloads
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Build extensions
@@ -110,9 +122,13 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
-          cache: npm
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
+      - name: Cache npm downloads
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Cache Playwright browsers
@@ -163,6 +179,7 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
       - name: Download unit test report
@@ -243,6 +260,7 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
       - name: Download release archives
@@ -270,6 +288,7 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
       - name: Download release archives
@@ -300,9 +319,13 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: 22.23.2
-          cache: npm
+          package-manager-cache: false
       - name: Install pinned npm
         run: npm install --global "npm@$(node -p 'require("./package.json").devEngines.packageManager.version')"
+      - name: Cache npm downloads
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Configure App Store Connect API key
