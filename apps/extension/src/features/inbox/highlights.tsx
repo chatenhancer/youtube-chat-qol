@@ -7,7 +7,7 @@
 import { getAuthorNameElement, getMessageTextElement } from '../../youtube/messages';
 import { jsx, el } from '../../shared/jsx-dom';
 import { findMentionTokens, PRESERVED_MENTION_TOKEN_CLASS } from '../../shared/mention-tokens';
-import { normalizeComparableText } from '../../shared/text';
+import { normalizeComparableText, normalizeComparableTextWithRanges } from '../../shared/text';
 import type { InboxRecord, InlineHighlightMatch, InlineHighlightTerm } from './types';
 
 export const CHAT_KEYWORD_HIGHLIGHT_CLASS = 'ytcq-chat-keyword-highlight';
@@ -145,12 +145,20 @@ function highlightTextNode(
 }
 
 function getHighlightMatches(text: string, terms: InlineHighlightTerm[]): InlineHighlightMatch[] {
+  const { normalizedText, sourceRanges } = normalizeComparableTextWithRanges(text);
   const matches: InlineHighlightMatch[] = [];
   let cursor = 0;
-  while (cursor < text.length) {
-    const match = findNextHighlightMatch(text, cursor, terms);
+  while (cursor < normalizedText.length) {
+    const match = findNextHighlightMatch(normalizedText, cursor, terms);
     if (!match) break;
-    matches.push(match);
+    const start = sourceRanges[match.index].start;
+    const end = sourceRanges[match.index + match.length - 1].end;
+    const previous = matches.at(-1);
+    if (previous && start < previous.index + previous.length) {
+      previous.length = Math.max(previous.index + previous.length, end) - previous.index;
+    } else {
+      matches.push({ ...match, index: start, length: end - start });
+    }
     cursor = match.index + match.length;
   }
   return matches;
@@ -184,30 +192,29 @@ function appendHighlightedText(
 }
 
 function findNextHighlightMatch(
-  text: string,
+  normalizedText: string,
   start: number,
   terms: InlineHighlightTerm[]
 ): InlineHighlightMatch | null {
-  const lowerText = normalizeHighlightText(text);
   let best: InlineHighlightMatch | null = null;
 
   terms.forEach((term) => {
     const lowerTerm = term.normalizedText || normalizeHighlightText(term.text);
     if (!lowerTerm) return;
 
-    const index = lowerText.indexOf(lowerTerm, start);
+    const index = normalizedText.indexOf(lowerTerm, start);
     if (index < 0) return;
 
     if (
       !best ||
       index < best.index ||
       (index === best.index && term.priority > best.priority) ||
-      (index === best.index && term.priority === best.priority && term.text.length > best.length)
+      (index === best.index && term.priority === best.priority && lowerTerm.length > best.length)
     ) {
       best = {
         className: term.className,
         index,
-        length: term.text.length,
+        length: lowerTerm.length,
         priority: term.priority
       };
     }

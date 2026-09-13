@@ -41,6 +41,70 @@ describe('inbox highlight helpers', () => {
     expect(root.querySelector('.ytcq-inbox-keyword-highlight')).toBeNull();
   });
 
+  it('keeps Inbox keyword highlights aligned after a clickable profile mention', () => {
+    const root = document.createElement('span');
+    const text = '@SampleViewer anything to be made at home';
+    root.textContent = text;
+    decorateProfileMentions(root, (identity) => identity);
+    const mention = root.querySelector('.ytcq-profile-mention');
+
+    highlightInboxMatches(root, record({ matchedKeywords: ['a'] }));
+
+    expect(Array.from(root.querySelectorAll('.ytcq-inbox-keyword-highlight'), (node) => node.textContent))
+      .toEqual(['a', 'a', 'a', 'a']);
+    expect(root.textContent).toBe(text);
+    expect(root.querySelector('.ytcq-profile-mention')).toBe(mention);
+    expect(mention?.textContent).toBe('@SampleViewer');
+  });
+
+  it.each([
+    ['  a  a\t a  ', 'a', ['a', 'a', 'a']],
+    ['ready\t  for launch next', 'for launch', ['for launch']],
+    ['ready for\t  launch next', 'for launch', ['for\t  launch']],
+    ['\u200Bready a\u2060lpha\uFEFF next', 'alpha', ['a\u2060lpha']],
+    ['\uFB03rst a', 'a', ['a']],
+    ['Before… a calm day', 'a', ['a', 'a', 'a']],
+    ['\uFB03rst next', 'ffi', ['\uFB03']],
+    ['\uFB03rst next', 'f', ['\uFB03']],
+    ['office next', 'o\uFB03ce', ['office']],
+    ['Ｆｕｌｌ × Х х', 'full x', ['Ｆｕｌｌ ×']],
+    ['cafe\u0301 next', 'café', ['cafe\u0301']],
+    ['cafe\u200B\u0301 next', 'café', ['cafe\u200B\u0301']],
+    ['ΟΣ next', 'ος', ['ΟΣ']],
+    ['\u0130 a 🚀 A', 'a', ['a', 'A']],
+    ['\u1100\u1161 a', '가', ['\u1100\u1161']]
+  ])('highlights original text in %j using the normalized keyword %j', (text, keyword, expected) => {
+    const root = document.createElement('span');
+    root.textContent = text;
+
+    highlightInboxMatches(root, record({ matchedKeywords: [keyword] }));
+
+    expect(Array.from(root.querySelectorAll('.ytcq-inbox-keyword-highlight'), (node) => node.textContent))
+      .toEqual(expected);
+    expect(root.textContent).toBe(text);
+  });
+
+  it('keeps live keyword highlights aligned after a decorated mention and when reapplied', () => {
+    const text = '@SampleViewer anything to be made at home';
+    const message = createMessage('@Host', text);
+    const messageText = message.querySelector<HTMLElement>('#message')!;
+    decorateProfileMentions(messageText, (identity) => identity);
+    const mention = messageText.querySelector('.ytcq-profile-mention');
+
+    applyChatKeywordHighlights(message, ['a'], 'first-key');
+    applyChatKeywordHighlights(message, ['a'], 'second-key');
+
+    expect(Array.from(messageText.querySelectorAll('.ytcq-chat-keyword-highlight'), (node) => node.textContent))
+      .toEqual(['a', 'a', 'a', 'a']);
+    expect(messageText.textContent).toBe(text);
+    expect(messageText.querySelector('.ytcq-profile-mention')).toBe(mention);
+
+    clearChatKeywordHighlights(message);
+    expect(messageText.textContent).toBe(text);
+    expect(messageText.querySelector('.ytcq-chat-keyword-highlight')).toBeNull();
+    expect(messageText.querySelector('.ytcq-profile-mention')).toBe(mention);
+  });
+
   it('highlights matching keywords in live chat author names and message text', async () => {
     vi.useFakeTimers();
     const message = createMessage('@LaunchHost', 'ready for launch');
