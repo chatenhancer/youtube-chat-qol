@@ -693,6 +693,10 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
   align-items: flex-start;
 }
 
+yt-live-chat-paid-message-renderer #menu:has(> .ytcq-chat-bookmark-toggle) {
+  align-items: center;
+}
+
 #menu > .ytcq-chat-bookmark-toggle {
   flex: 0 0 28px;
   color: inherit;
@@ -715,6 +719,24 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
 
 #menu > .ytcq-chat-bookmark-toggle.ytcq-bookmark-toggle-active {
   color: var(--yt-spec-call-to-action, #3ea6ff);
+}
+
+/* Paid cards supply their own contrasting foreground, including in Aero and when saved. */
+:is(
+  yt-live-chat-paid-message-renderer,
+  .ytcq-lite-message-paid,
+  .ytcq-lite-message-sticker
+) #menu > :is(.ytcq-chat-bookmark-toggle, .ytcq-lite-message-menu-button) {
+  color: inherit !important;
+}
+
+:root[data-ytcq-chat-skin="aero"] :is(
+  yt-live-chat-paid-message-renderer,
+  .ytcq-lite-message-paid,
+  .ytcq-lite-message-sticker
+) #menu > :is(.ytcq-chat-bookmark-toggle, .ytcq-lite-message-menu-button):is(:hover, :focus) {
+  background: color-mix(in srgb, currentColor 12%, transparent) !important;
+  box-shadow: none;
 }
 
 #menu > .ytcq-chat-bookmark-toggle svg {
