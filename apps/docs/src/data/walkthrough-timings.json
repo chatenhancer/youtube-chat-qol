@@ -2,92 +2,92 @@
   "frameRate": 60,
   "videos": {
     "ar": {
-      "fileName": "chat-enhancer-walkthrough-ar-efc1faac.mp4",
-      "boundaries": [345, 1605, 2625, 4248, 5022, 5815, 7273, 9160, 9952, 10842, 11785, 12564]
+      "fileName": "chat-enhancer-walkthrough-ar-c7d7365b.mp4",
+      "boundaries": [345, 1605, 2625, 4248, 5022, 5815, 7273, 9160, 9952, 10842, 11789, 12568]
     },
     "de": {
-      "fileName": "chat-enhancer-walkthrough-de-3654765d.mp4",
-      "boundaries": [345, 1645, 2662, 4286, 5060, 5853, 7311, 9198, 9988, 10878, 11821, 12599]
+      "fileName": "chat-enhancer-walkthrough-de-587729e3.mp4",
+      "boundaries": [345, 1645, 2662, 4286, 5060, 5853, 7311, 9198, 9988, 10878, 11826, 12604]
     },
     "en": {
-      "fileName": "chat-enhancer-walkthrough-en-1f9ce087.mp4",
-      "boundaries": [345, 1644, 2663, 4287, 5061, 5854, 7312, 9198, 9988, 10878, 11830, 12608]
+      "fileName": "chat-enhancer-walkthrough-en-804bb8ba.mp4",
+      "boundaries": [345, 1644, 2663, 4287, 5061, 5854, 7312, 9198, 9988, 10878, 11825, 12603]
     },
     "es": {
-      "fileName": "chat-enhancer-walkthrough-es-758940ed.mp4",
-      "boundaries": [345, 1644, 2660, 4284, 5058, 5851, 7309, 9196, 9986, 10876, 11819, 12597]
+      "fileName": "chat-enhancer-walkthrough-es-deaa3a37.mp4",
+      "boundaries": [345, 1644, 2660, 4284, 5058, 5851, 7309, 9196, 9986, 10876, 11824, 12602]
     },
     "fa": {
-      "fileName": "chat-enhancer-walkthrough-fa-ccee22e9.mp4",
-      "boundaries": [345, 1605, 2622, 4245, 5019, 5812, 7270, 9157, 9949, 10839, 11781, 12560]
+      "fileName": "chat-enhancer-walkthrough-fa-a3c6824e.mp4",
+      "boundaries": [345, 1605, 2622, 4245, 5019, 5812, 7270, 9157, 9949, 10839, 11787, 12566]
     },
     "fr": {
-      "fileName": "chat-enhancer-walkthrough-fr-900fdf10.mp4",
-      "boundaries": [345, 1647, 2664, 4288, 5062, 5855, 7313, 9201, 9991, 10881, 11823, 12601]
+      "fileName": "chat-enhancer-walkthrough-fr-788f38b1.mp4",
+      "boundaries": [345, 1647, 2664, 4288, 5062, 5855, 7313, 9201, 9991, 10881, 11829, 12607]
     },
     "he": {
-      "fileName": "chat-enhancer-walkthrough-he-c58bff0e.mp4",
-      "boundaries": [345, 1605, 2620, 4243, 5017, 5810, 7268, 9155, 9947, 10837, 11779, 12558]
+      "fileName": "chat-enhancer-walkthrough-he-f72f9add.mp4",
+      "boundaries": [345, 1605, 2620, 4243, 5017, 5810, 7268, 9155, 9947, 10837, 11785, 12564]
     },
     "hi": {
-      "fileName": "chat-enhancer-walkthrough-hi-f4fbcb21.mp4",
-      "boundaries": [345, 1643, 2657, 4281, 5055, 5848, 7306, 9192, 9982, 10872, 11819, 12598]
+      "fileName": "chat-enhancer-walkthrough-hi-78b70cef.mp4",
+      "boundaries": [345, 1643, 2657, 4281, 5055, 5848, 7306, 9192, 9982, 10872, 11820, 12599]
     },
     "id": {
-      "fileName": "chat-enhancer-walkthrough-id-da0a8d0d.mp4",
-      "boundaries": [345, 1644, 2668, 4292, 5066, 5859, 7317, 9203, 9993, 10883, 11830, 12608]
+      "fileName": "chat-enhancer-walkthrough-id-e19ce33b.mp4",
+      "boundaries": [345, 1644, 2668, 4292, 5066, 5859, 7317, 9203, 9993, 10883, 11829, 12607]
     },
     "it": {
-      "fileName": "chat-enhancer-walkthrough-it-d7d959c0.mp4",
-      "boundaries": [345, 1646, 2665, 4289, 5063, 5856, 7314, 9200, 9990, 10880, 11827, 12605]
+      "fileName": "chat-enhancer-walkthrough-it-56205ec9.mp4",
+      "boundaries": [345, 1646, 2665, 4289, 5063, 5856, 7314, 9200, 9990, 10880, 11826, 12604]
     },
     "ja": {
-      "fileName": "chat-enhancer-walkthrough-ja-d9480096.mp4",
+      "fileName": "chat-enhancer-walkthrough-ja-9c87d5e2.mp4",
       "boundaries": [345, 1645, 2660, 4284, 5058, 5851, 7309, 9196, 9986, 10876, 11823, 12602]
     },
     "ko": {
-      "fileName": "chat-enhancer-walkthrough-ko-b65bb50d.mp4",
+      "fileName": "chat-enhancer-walkthrough-ko-0a537c26.mp4",
       "boundaries": [345, 1644, 2660, 4284, 5058, 5852, 7310, 9196, 9986, 10876, 11823, 12602]
     },
     "nl": {
-      "fileName": "chat-enhancer-walkthrough-nl-9901f5c9.mp4",
+      "fileName": "chat-enhancer-walkthrough-nl-495724be.mp4",
       "boundaries": [345, 1647, 2669, 4293, 5067, 5860, 7318, 9205, 9995, 10885, 11832, 12610]
     },
     "pl": {
-      "fileName": "chat-enhancer-walkthrough-pl-593d9205.mp4",
+      "fileName": "chat-enhancer-walkthrough-pl-80332a26.mp4",
       "boundaries": [345, 1645, 2663, 4287, 5061, 5854, 7312, 9199, 9989, 10879, 11826, 12604]
     },
     "pt": {
-      "fileName": "chat-enhancer-walkthrough-pt-1e47923d.mp4",
+      "fileName": "chat-enhancer-walkthrough-pt-5e175645.mp4",
       "boundaries": [345, 1645, 2664, 4288, 5062, 5855, 7313, 9199, 9989, 10879, 11826, 12604]
     },
     "ru": {
-      "fileName": "chat-enhancer-walkthrough-ru-cf715d41.mp4",
+      "fileName": "chat-enhancer-walkthrough-ru-fe8a430b.mp4",
       "boundaries": [345, 1645, 2663, 4286, 5060, 5853, 7311, 9198, 9988, 10878, 11825, 12603]
     },
     "th": {
-      "fileName": "chat-enhancer-walkthrough-th-79313d4d.mp4",
+      "fileName": "chat-enhancer-walkthrough-th-0f0c008d.mp4",
       "boundaries": [345, 1644, 2661, 4285, 5059, 5852, 7310, 9196, 9986, 10876, 11823, 12601]
     },
     "tr": {
-      "fileName": "chat-enhancer-walkthrough-tr-c8612aae.mp4",
+      "fileName": "chat-enhancer-walkthrough-tr-c65caa22.mp4",
       "boundaries": [345, 1645, 2665, 4289, 5063, 5856, 7314, 9200, 9990, 10880, 11827, 12605]
     },
     "uk": {
-      "fileName": "chat-enhancer-walkthrough-uk-08807d55.mp4",
+      "fileName": "chat-enhancer-walkthrough-uk-287e28c4.mp4",
       "boundaries": [345, 1644, 2659, 4282, 5056, 5849, 7307, 9194, 9984, 10874, 11821, 12599]
     },
     "vi": {
-      "fileName": "chat-enhancer-walkthrough-vi-2d1d6d71.mp4",
-      "boundaries": [345, 1645, 2663, 4287, 5061, 5854, 7312, 9199, 9989, 10879, 11822, 12600]
+      "fileName": "chat-enhancer-walkthrough-vi-2c626aab.mp4",
+      "boundaries": [345, 1645, 2663, 4287, 5061, 5854, 7312, 9199, 9989, 10879, 11826, 12604]
     },
     "zh_CN": {
-      "fileName": "chat-enhancer-walkthrough-zh_CN-40ed7fed.mp4",
-      "boundaries": [345, 1643, 2659, 4283, 5057, 5850, 7308, 9194, 9984, 10874, 11817, 12596]
+      "fileName": "chat-enhancer-walkthrough-zh_CN-d26e17ab.mp4",
+      "boundaries": [345, 1643, 2659, 4283, 5057, 5850, 7308, 9194, 9984, 10874, 11822, 12601]
     },
     "zh_TW": {
-      "fileName": "chat-enhancer-walkthrough-zh_TW-688b3334.mp4",
-      "boundaries": [345, 1645, 2662, 4286, 5060, 5853, 7311, 9197, 9987, 10877, 11820, 12599]
+      "fileName": "chat-enhancer-walkthrough-zh_TW-c15abf9d.mp4",
+      "boundaries": [345, 1645, 2662, 4286, 5060, 5853, 7311, 9197, 9987, 10877, 11825, 12604]
     }
   }
 }

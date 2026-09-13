@@ -11,10 +11,10 @@ export const AVATAR_RING_ADD_BADGE_PATH = 'M19 5v6 M16 8h6';
 export const AVATAR_RING_ACTIVE_BADGE_PATH = 'M16 8l2 2 4-5';
 export const BOOKMARK_ICON_PATH = 'M6 21V7a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v14l-6-4Z';
 export const LITE_MODE_ICON_PATH = 'M5 19V13A10 10 0 0 1 15 3h6v6a10 10 0 0 1-10 10Z M3 21 15 9';
-// Outline adaptation of the two chat bubbles and play mark in assets/icons/icon.svg.
+// Monochrome version of the two chat bubbles and play cutout in assets/icons/icon.svg.
 export const CHAT_ENHANCER_ICON_VIEW_BOX = '11 6 37 37';
 export const CHAT_ENHANCER_ICON_PATH =
-  'M25.6 10.5c-4.7 0-8.3 1.2-9.8 3.1-2.8 3.2-2.8 11.7 0 15 .6.6 1.3 1.1 2.3 1.6l.6 3.2q.2 1.5 1.9.5l4-2.6q.5-.3 1.2-.3c4.4 0 8.1-1.2 9.5-2.8 2.8-3.2 2.8-11.4 0-14.6-1.6-1.9-5.2-3.1-9.7-3.1ZM41 20c1.4.6 2.5 1.3 3.2 2.2 2.2 2.7 2.2 9.1 0 11.8-.6.7-1.4 1.3-2.3 1.7l-.6 2.9q-.3 1.4-1.6.5l-3.2-2.1q-.3-.2-.8-.2c-3 0-5.7-.7-7.5-2';
+  'M40.18 18.58C44.4 20 47.15 23.55 47.15 28.3C47.15 31.83 45.78 34.64 43.45 36.45C42.94 36.773 42.5065 37.011 42.4385 37.47L42.209 39.34C42.141 39.901 41.5885 40.241 41.053 40.003L37.6105 38.5495C37.0495 38.269 36.4375 38.116 35.8085 38.099C31.53 37.93 28.33 36.77 26.38 34.62C34.74 34.36 40.35 28.96 40.35 21C40.35 20.14 40.3 19.35 40.18 18.58ZM25.5 9.2C32.9 9.2 38.5 13.9 38.5 21C38.5 27.7 33.55 32.55 26.23 32.78C25.49 32.8 24.77 32.98 24.11 33.31L20.06 35.02C19.43 35.3 18.78 34.9 18.7 34.24L18.43 32.04C18.35 31.5 17.84 31.22 17.24 30.84C14.2 28.93 12.5 25.42 12.5 21C12.5 13.9 18.1 9.2 25.5 9.2ZM23.5793 17.595C23.0941 17.3548 22.5247 17.7078 22.5247 18.2493V24.9514C22.5247 25.4929 23.0941 25.8459 23.5793 25.6057L30.3508 22.2551C30.8924 21.987 30.8924 21.2137 30.3508 20.9456L23.5793 17.595Z';
 export const CHEVRON_BACKWARD_ICON_PATH = 'M14.5 5 7.5 12l7 7';
 export const CLOSE_ICON_PATH = 'M6 6l12 12 M18 6 6 18';
 export const EXPAND_ICON_PATH =
@@ -70,15 +70,7 @@ export function createSvgIcon(
 export function createChatEnhancerIcon(): SVGSVGElement {
   return el<SVGSVGElement>(
     <svg viewBox={CHAT_ENHANCER_ICON_VIEW_BOX} focusable="false" aria-hidden="true">
-      <path
-        d={CHAT_ENHANCER_ICON_PATH}
-        fill="none"
-        stroke="currentColor"
-        stroke-width="3"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-      <path d="M23 17.5v7.7l7.8-3.85Z" fill="currentColor" />
+      <path d={CHAT_ENHANCER_ICON_PATH} fill="currentColor" fill-rule="evenodd" />
     </svg>
   );
 }
