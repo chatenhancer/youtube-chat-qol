@@ -491,14 +491,13 @@ html[dir="rtl"] .bookmarks-undo-button svg {
 }
 
 .bookmark-name {
-  overflow: hidden;
   min-width: 0;
   color: var(--ytcq-popup-text);
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .bookmark-name-remembered {
