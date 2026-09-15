@@ -130,11 +130,11 @@ export function initOnboarding(): void {
     if (playgroundEnabled) {
       animateSettingIcon(
         document.querySelector('#onboardingPlaygroundIcon .playground-join-icon'),
-        SETTING_ICON_ANIMATIONS.gameInvites
+        SETTING_ICON_ANIMATIONS.dice
       );
       animateSettingIcon(
         document.querySelector('#previewGamesIcon .game-invites-icon'),
-        SETTING_ICON_ANIMATIONS.gameInvites
+        SETTING_ICON_ANIMATIONS.dice
       );
     }
   });

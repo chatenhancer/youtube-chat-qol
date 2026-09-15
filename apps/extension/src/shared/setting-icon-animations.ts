@@ -14,9 +14,9 @@ export const SETTING_ICON_ANIMATIONS = {
     className: 'ytcq-palette-pop',
     durationMs: 1200
   },
-  gameInvites: {
-    className: 'ytcq-game-controller-hop',
-    durationMs: 850
+  dice: {
+    className: 'ytcq-dice-tilt',
+    durationMs: 600
   },
   liteMode: {
     className: 'ytcq-bolt-redraw',

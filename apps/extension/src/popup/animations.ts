@@ -33,11 +33,11 @@ export function animatePopupMessageDensityIcon(): void {
 }
 
 export function animatePopupPlaygroundIcon(): void {
-  animatePopupIcon('.playground-join-icon', SETTING_ICON_ANIMATIONS.gameInvites);
+  animatePopupIcon('.playground-join-icon', SETTING_ICON_ANIMATIONS.dice);
 }
 
 export function animatePopupGameInvitesIcon(): void {
-  animatePopupIcon('.game-invites-icon', SETTING_ICON_ANIMATIONS.gameInvites);
+  animatePopupIcon('.game-invites-icon', SETTING_ICON_ANIMATIONS.dice);
 }
 
 function animatePopupIcon(selector: string, animation: SettingIconAnimation): void {

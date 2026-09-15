@@ -1734,10 +1734,10 @@ describe('popup', () => {
     expect(
       document
         .querySelector('.playground-join-icon')
-        ?.classList.contains('ytcq-game-controller-hop')
+        ?.classList.contains('ytcq-dice-tilt')
     ).toBe(false);
     expect(
-      document.querySelector('.game-invites-icon')?.classList.contains('ytcq-game-controller-hop')
+      document.querySelector('.game-invites-icon')?.classList.contains('ytcq-dice-tilt')
     ).toBe(false);
     document.querySelector<HTMLButtonElement>('#appearanceMoreSettingsToggle')?.click();
     expect(

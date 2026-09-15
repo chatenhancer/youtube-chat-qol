@@ -88,6 +88,20 @@ describe('onboarding settings', () => {
     expect(document.querySelector('#previewBelowTranslateIcon')).toBeNull();
   });
 
+  it('tilts both Playground dice icons when enabling Playground', async () => {
+    await import('./index');
+    const playgroundEnabled = document.querySelector<HTMLInputElement>('#onboardingPlaygroundEnabled')!;
+    playgroundEnabled.click();
+
+    expect(preview.setPlaygroundEnabled).toHaveBeenCalledWith(true);
+    const icons = [...document.querySelectorAll('#onboardingPlaygroundIcon svg, #previewGamesIcon svg')];
+    expect(icons).toHaveLength(2);
+    icons.forEach((icon) => expect(icon.classList.contains('ytcq-dice-tilt')).toBe(true));
+
+    await vi.advanceTimersByTimeAsync(600);
+    icons.forEach((icon) => expect(icon.classList.contains('ytcq-dice-tilt')).toBe(false));
+  });
+
   it('does not animate onboarding setting icons when reduced motion is preferred', async () => {
     installMatchMedia(true);
     await import('./index');
@@ -133,10 +147,10 @@ describe('onboarding settings', () => {
     expect(
       document
         .querySelector('.playground-join-icon')
-        ?.classList.contains('ytcq-game-controller-hop')
+        ?.classList.contains('ytcq-dice-tilt')
     ).toBe(false);
     expect(
-      document.querySelector('.game-invites-icon')?.classList.contains('ytcq-game-controller-hop')
+      document.querySelector('.game-invites-icon')?.classList.contains('ytcq-dice-tilt')
     ).toBe(false);
   });
 });

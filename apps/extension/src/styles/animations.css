@@ -65,19 +65,34 @@
   animation: ytcq-density-line-compress 620ms cubic-bezier(0.18, 0.89, 0.32, 1.18);
 }
 
+.translation-target-icon.ytcq-translation-pulse {
+  animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
 .playground-join-icon,
 .game-invites-icon {
-  transform-box: fill-box;
+  overflow: visible;
+  transform-box: view-box;
   transform-origin: center;
 }
 
-.playground-join-icon.ytcq-game-controller-hop,
-.game-invites-icon.ytcq-game-controller-hop {
-  animation: ytcq-game-controller-hop 720ms ease-in-out;
+.ytcq-dice-tilt {
+  animation: ytcq-dice-tilt 520ms ease-in-out;
 }
 
-.translation-target-icon.ytcq-translation-pulse {
-  animation: ytcq-translation-icon-pop 560ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+@keyframes ytcq-dice-tilt {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  35% {
+    transform: rotate(-8deg);
+  }
+
+  70% {
+    transform: rotate(3deg);
+  }
 }
 
 .translation-target-icon.ytcq-translation-pulse .translation-source-mark {
@@ -297,37 +312,6 @@
   }
 }
 
-@keyframes ytcq-game-controller-hop {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0);
-  }
-
-  14% {
-    transform: translateY(-1.5px) rotate(-6deg);
-  }
-
-  28% {
-    transform: translateY(-3px) rotate(6deg);
-  }
-
-  42% {
-    transform: translateY(-4px) rotate(-5deg);
-  }
-
-  56% {
-    transform: translateY(-3px) rotate(4deg);
-  }
-
-  70% {
-    transform: translateY(-1.5px) rotate(-3deg);
-  }
-
-  84% {
-    transform: translateY(-0.4px) rotate(1.5deg);
-  }
-}
-
 @keyframes ytcq-display-flow-step {
   0% {
     transform: translateY(-14px);
@@ -485,8 +469,7 @@
   .chat-skin-icon.ytcq-palette-pop .chat-skin-paint,
   .message-density-icon.ytcq-density-compress .message-density-line,
   .translation-display-icon.ytcq-display-reflow .translation-display-flow,
-  .playground-join-icon.ytcq-game-controller-hop,
-  .game-invites-icon.ytcq-game-controller-hop,
+  .ytcq-dice-tilt,
   .startup-effect-icon.ytcq-sparkle-burst .startup-sparkle,
   .lite-mode-icon.ytcq-bolt-redraw .lite-mode-leaf,
   .lite-mode-icon.ytcq-bolt-redraw .lite-mode-wind path {
