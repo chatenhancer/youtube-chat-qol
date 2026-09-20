@@ -3,19 +3,15 @@ import { expectThemeContrast } from '../support/theme-contrast';
 import type { BrowserScenario } from './types';
 import { getExtensionId } from '../support/extension';
 import { clearChatComposer, setChatComposerText } from '../support/composer';
-import { fixtureLoggedInLiveChatUrl } from '../support/live-chat-fixture';
+import { installThemeWatchFixture } from '../support/theme-watch-fixture';
 import { openChatEnhancerMenu, openMessageMenu, closeOpenMenus } from '../support/menu-openers';
 import { installMockPlaygroundBackend, createMockPlaygroundSnapshot } from '../support/playground-backend';
 import { withExtensionStorageValues } from '../support/extension-storage';
 import { openGamesCard, getGameCard } from './playground/interactions';
-import { closeProfileCardIfPresent, getProfileCardRecord, getProfileSourceMessage, openStableProfileCardFromRecentMessage } from './profile/card-fixture';
+import { closeProfileCardIfPresent, getProfileCardRecord, openStableProfileCardFromRecentMessage } from './profile/card-fixture';
 
 export const customThemesScenario: BrowserScenario = async ({ page, context }) => {
-  const watchUrl = 'https://www.youtube.com/watch?v=ytcq-themes';
-  await page.route(watchUrl, (route) => route.fulfill({
-    contentType: 'text/html',
-    body: `<html><head><style>ytd-live-chat-frame { display:block; width:380px; border:1px solid #b0b0b0; border-radius:12px; overflow:hidden; } iframe#chatframe { border-radius:12px 12px 0 0; }</style></head><body style="margin:0"><ytd-live-chat-frame><iframe id="chatframe" src="${fixtureLoggedInLiveChatUrl}" style="display:block;width:100%;height:700px;border:0"></iframe></ytd-live-chat-frame></body></html>`
-  }));
+  const watchUrl = await installThemeWatchFixture(page);
   const extensionId = await getExtensionId(context);
   const worker = context.serviceWorkers()[0];
   // Start with the released Aero selection and no custom-theme library.
@@ -470,168 +466,6 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
 
     await editor.locator('#themeEditorPicker').selectOption({ label: 'Ocean' });
     await editor.getByRole('button', { name: 'Discard', exact: true }).click();
-    await test.step('New palette controls reach real chat menus, Inbox tags, buttons, fonts, and jump highlights', async () => {
-      for (const mode of ['light', 'dark']) {
-        await editor!.locator(`[data-theme-mode="${mode}"]`).click();
-
-        await editor!.locator('[data-theme-field="secondary"]').fill('#a622dd');
-        await editor!.locator('[data-theme-field="accent"]').fill('#bb2255');
-
-      }
-
-      await editor!.locator('[data-theme-field="font"]').selectOption('mono');
-      for (const finish of ['flat', 'glossy', 'glass']) {
-        await editor!.locator('[data-theme-field="finish"]').selectOption(finish);
-        await editor!.locator('#themeSaveApply').click();
-        await expect(editor!.locator('.theme-status')).toHaveText('Theme saved and applied.');
-        for (const mode of ['light', 'dark']) {
-          await page.locator('html').evaluate((element, value) => element.toggleAttribute('dark', value === 'dark'), mode);
-          await chat.locator('html').evaluate((element, value) => element.toggleAttribute('dark', value === 'dark'), mode);
-          await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin-theme', mode);
-          const frameBorder = await outerFrame.evaluate(element => getComputedStyle(element).borderColor);
-          await expect(chat.locator('yt-live-chat-header-renderer')).toHaveCSS('border-bottom', `1px solid ${frameBorder}`);
-          const menu = await openChatEnhancerMenu(chat);
-          await editor!.locator(`[data-theme-mode="${mode}"]`).click();
-          await preview.locator('#previewMenuButton').click();
-          await expect(menu).toHaveCSS('border-radius', finish === 'glass' ? '4px' : '12px');
-          await expect(menu.locator('.native-setting-label')).toHaveCSS('color', await preview.locator('.preview-native-menu-item .ytcq-menu-label').first().evaluate(element => getComputedStyle(element).color));
-          await preview.locator('#previewMenuButton').click();
-          await closeOpenMenus(chat);
-          await chat.locator('.ytcq-inbox-button').click();
-          const card = chat.locator('.ytcq-inbox-card');
-          if (await card.locator('.ytcq-inbox-keyword-toggle').getAttribute('aria-expanded') !== 'true') {
-            await card.locator('.ytcq-inbox-keyword-toggle').click();
-          }
-          if (!await card.locator('.ytcq-inbox-keyword-chip').count()) {
-            await card.locator('.ytcq-inbox-keyword-input').fill('theme-check');
-            await card.locator('.ytcq-inbox-keyword-add').click();
-          }
-          await card.locator('.ytcq-inbox-keyword-input').focus();
-          await page.mouse.move(0, 0);
-          await expect(card.locator('.ytcq-inbox-keyword-chip').first()).toHaveCSS('font-family', /Consolas/);
-          await expect(card.locator('.ytcq-inbox-keyword-count')).toHaveCSS('background-color', 'rgb(166, 34, 221)');
-          const add = card.locator('.ytcq-inbox-keyword-add');
-          await expect(add).toHaveCSS('border-radius', finish === 'glass' ? '4px' : '12px');
-          if (await preview.locator('#previewInboxIcon').getAttribute('aria-expanded') !== 'true') await preview.locator('#previewInboxIcon').click();
-          const previewAdd = editor!.frameLocator('#themePreview').locator('.preview-inbox-card .ytcq-inbox-keyword-add');
-          await editor!.locator(`[data-theme-mode="${mode}"]`).click();
-          await expect(add).toHaveCSS('color', await previewAdd.evaluate(element => getComputedStyle(element).color));
-          await expect(add).toHaveCSS('background-image', await previewAdd.evaluate(element => getComputedStyle(element).backgroundImage));
-          const tagHighlight = await card.locator('.ytcq-inbox-keyword-chip').first().evaluate(element => ({
-            image: getComputedStyle(element).backgroundImage,
-            color: getComputedStyle(element).backgroundColor
-          }));
-          await card.locator('.ytcq-profile-card-close').click();
-          const source = await openStableProfileCardFromRecentMessage(chat);
-          const profile = chat.locator('.ytcq-profile-card:not(.ytcq-inbox-card)');
-          const ringToggle = profile.locator('.ytcq-avatar-ring-toggle');
-          await ringToggle.click();
-          for (const avatar of [getProfileSourceMessage(chat, source).locator('#author-photo'), profile.locator('.ytcq-profile-card-avatar-button')]) {
-            await expect(avatar).toHaveClass(/ytcq-avatar-ring-active/);
-            await expect(avatar).toHaveCSS('box-shadow', /0px 0px 0px 2px/);
-          }
-          await ringToggle.click();
-          const record = await getProfileCardRecord(chat, source);
-          const jump = record.locator('.ytcq-profile-card-jump');
-          await jump.focus();
-          await expect(jump).toHaveCSS('opacity', '1');
-          await jump.press('Enter');
-          const target = chat.locator('.ytcq-message-jump-target').first();
-          const highlight = await target.evaluate(element => ({
-            image: getComputedStyle(element, '::before').backgroundImage,
-            color: getComputedStyle(element, '::before').backgroundColor
-          }));
-          expect(highlight).toEqual(tagHighlight);
-          await closeProfileCardIfPresent(chat);
-        }
-      }
-    });
-    await test.step('Gothic quick-toggle labels fit in both the preview and a narrower YouTube frame', async () => {
-      await editor!.locator('[data-theme-field="font"]').selectOption('gothic');
-      await editor!.locator('#themeSaveApply').click();
-      await expect(editor!.locator('.theme-status')).toHaveText('Theme saved and applied.');
-      const menu = await openChatEnhancerMenu(chat);
-      await preview.locator('#previewMenuButton').click();
-      const sample = preview.locator('#previewSettingsMenu');
-      for (const target of [menu, sample]) {
-        const label = target.locator('[data-ytcq-action="picture-in-picture"] .ytcq-menu-label');
-        await expect(label).toHaveText('Floating player');
-        await expect(label).toHaveCSS('font-family', /Manufacturing Consent/);
-        await expect(label).toHaveCSS('height', '14px');
-      }
-      const actual = await menu.locator('.ytcq-settings-grid').boundingBox();
-      const expected = await sample.locator('.ytcq-settings-grid').boundingBox();
-      expect(Math.abs(actual!.height - expected!.height)).toBeLessThan(1);
-      await test.info().attach('theme-gothic-menu-youtube', { body: await menu.screenshot(), contentType: 'image/png' });
-      await test.info().attach('theme-gothic-menu-preview', { body: await sample.screenshot(), contentType: 'image/png' });
-      await closeOpenMenus(chat);
-      await preview.locator('#previewMenuButton').click();
-      await editor!.locator('[data-theme-field="font"]').selectOption('mono');
-      await editor!.locator('#themeSaveApply').click();
-      await expect(editor!.locator('.theme-status')).toHaveText('Theme saved and applied.');
-    });
-    await test.step('Emoji search matches composer corners and neutral themes retain YouTube’s search and category fills', async () => {
-      await chat.locator('#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button').click();
-      const picker = chat.locator('yt-emoji-picker-renderer');
-      await expect(editor!.locator('[data-theme-field="surfaceTint"]')).toHaveValue('0');
-      for (const finish of ['flat', 'glossy', 'glass']) {
-        await editor!.locator('[data-theme-field="finish"]').selectOption(finish);
-        await editor!.locator('#themeSaveApply').click();
-        await expect(editor!.locator('.theme-status')).toHaveText('Theme saved and applied.');
-        for (const mode of ['light', 'dark']) {
-          await editor!.locator(`[data-theme-mode="${mode}"]`).click();
-          await chat.locator('html').evaluate((element, value) => element.toggleAttribute('dark', value === 'dark'), mode);
-          await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin-theme', mode);
-          await expect(picker.locator('#search-panel')).toHaveCSS('border-width', '0px');
-          await expect(picker.locator('#search-panel')).toHaveCSS('box-shadow', 'none');
-          const field = picker.locator(finish === 'glass' ? '#search' : '#search-panel');
-          const radius = await preview.locator('#input-container').evaluate(element => getComputedStyle(element).borderRadius);
-          await expect(field).toHaveCSS('border-radius', radius);
-          await expect(field).toHaveCSS('corner-shape', /^(round|superellipse\(1\))$/);
-          await expect(picker.locator('#search')).toHaveCSS('border-width', finish === 'glass' ? '1px' : '0px');
-          await expect(picker.locator('#search input')).toHaveCSS('border-width', '0px');
-          await expect(picker.locator('#search input')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-          await expect(picker.locator('#search .underline')).toBeHidden();
-          const heading = picker.locator('yt-emoji-picker-category-renderer #title');
-          await expect(heading).toBeVisible();
-          await expect(heading).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-          if (finish === 'glass') {
-            await expect(picker.locator('#search-panel')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-          } else {
-            await expect(field).toHaveCSS('background-color', mode === 'dark' ? 'rgb(68, 68, 68)' : 'rgb(249, 249, 249)');
-            expect((await field.boundingBox())!.height).toBe(32);
-            await expect(picker.locator('#search')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-            await expect(heading).toHaveCSS('background-color', mode === 'dark' ? 'rgba(40, 40, 40, 0.8)' : 'rgba(247, 247, 247, 0.8)');
-          }
-          await test.info().attach(`theme-${finish}-${mode}-emoji-picker`, { body: await picker.screenshot(), contentType: 'image/png' });
-        }
-      }
-    });
-    await test.step('Bundled fonts load on YouTube and survive saving and reopening', async () => {
-      await chat.locator('yt-emoji-picker-renderer [role="option"]').first().click();
-      const frequentTitle = chat.locator('.ytcq-frequent-emoji-label');
-      await expect(frequentTitle).toHaveText('MOST USED');
-      await expect(frequentTitle).toHaveCSS('font-family', /Consolas/);
-      await clearChatComposer(chat);
-      for (const [id, family] of [
-        ['gothic', 'Manufacturing Consent'], ['playful', 'Dongle'],
-        ['pixel', 'Pixelify Sans'], ['elegant', 'Instrument Serif']
-      ]) {
-        await editor!.locator('[data-theme-field="font"]').selectOption(id);
-        await editor!.locator('#themeSaveApply').click();
-        await expect(editor!.locator('.theme-status')).toHaveText('Theme saved and applied.');
-        await expect(chat.locator('yt-live-chat-text-message-renderer #message').first()).toHaveCSS('font-family', new RegExp(family));
-        await expect(frequentTitle).toHaveCSS('font-family', new RegExp(family));
-        expect(await chat.locator('html').evaluate(async (element, family) => {
-          const fonts = await element.ownerDocument.fonts.load(`13px "${family}"`);
-          return fonts.some(font => font.family === family && font.status === 'loaded');
-        }, family)).toBe(true);
-      }
-      await editor!.reload();
-      await expect(editor!.locator('#themeName')).toBeEnabled();
-
-      await expect(editor!.locator('[data-theme-field="font"]')).toHaveValue('elegant');
-    });
     await editor.locator('#themeDelete').click();
     await expect(editor.locator('.popup-reset-dialog-message')).toContainText('Chat will return to Default.');
     await editor.locator('.popup-reset-dialog').getByRole('button', { name: 'Close', exact: true }).click();
@@ -641,101 +475,6 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
     await expect(editor.locator('#themeEditorPicker option')).toHaveText(['New theme', 'Aero · Preinstalled']);
     await expect(chat.locator('html')).not.toHaveAttribute('data-ytcq-chat-skin');
     await expect(outerFrame).toHaveCSS('border-color', 'rgb(176, 176, 176)');
-
-    await test.step('Image contrast follows the actual background in preview and applied chat', async () => {
-      await setChatComposerText(chat, 'Image contrast preview');
-      await preview.locator('#previewDraft').fill('Image contrast preview');
-      const files = await editor!.evaluate(() => ['#000000', '#ffffff'].map(color => {
-        const canvas = document.createElement('canvas');
-        canvas.width = canvas.height = 2;
-        const context = canvas.getContext('2d')!;
-        context.fillStyle = color;
-        context.fillRect(0, 0, 2, 2);
-        return canvas.toDataURL('image/png').split(',')[1];
-      }));
-      await editor!.locator('#themeName').fill('Image contrast');
-      for (const area of ['header', 'chat', 'composer']) {
-        await editor!.locator(`[data-theme-area="${area}"]`).click();
-        await editor!.locator('[data-theme-field="fill"]').selectOption('image');
-        for (const [index, field] of ['image', 'darkImage'].entries()) {
-          await editor!.locator(`[data-theme-field="${field}"]`).setInputFiles({ name: `${field}.png`, mimeType: 'image/png', buffer: Buffer.from(files[index], 'base64') });
-          await expect(editor!.locator('[data-theme-field="imageText"]')).toBeEnabled();
-        }
-      }
-      for (const finish of ['flat', 'glossy', 'glass']) {
-        await editor!.locator('[data-theme-field="finish"]').selectOption(finish);
-        await editor!.locator('#themeSaveApply').click();
-        await expect(editor!.locator('.theme-status')).toHaveText('Theme saved and applied.');
-        for (const mode of ['light', 'dark']) {
-          await editor!.locator(`[data-theme-mode="${mode}"]`).click();
-          await chat.locator('html').evaluate((element, mode) => element.toggleAttribute('dark', mode === 'dark'), mode);
-          const background = mode === 'light' ? '#000000' : '#ffffff';
-          for (const frame of [preview, chat]) {
-            for (const selector of ['yt-live-chat-header-renderer', 'yt-live-chat-text-message-renderer #message', 'yt-live-chat-message-input-renderer', 'button#send-button, #send-button button']) {
-              await expectThemeContrast(frame.locator(selector).first(), background);
-            }
-            await expectThemeContrast(frame.locator('yt-live-chat-text-message-renderer #author-name').first(), background);
-          }
-          // The preview has YouTube's separate input surface; the minimal chat fixture does not.
-          await expectThemeContrast(preview.locator('#previewDraft'), '--ytcq-theme-composer-input');
-          await expectThemeContrast(chat.locator('yt-live-chat-message-input-renderer #author-name'), background);
-          await test.info().attach(`image-contrast-${finish}-${mode}`, { body: await preview.locator('#chatPreview').screenshot(), contentType: 'image/png' });
-        }
-      }
-      await clearChatComposer(chat);
-      await preview.locator('#previewDraft').fill('');
-      await editor!.locator('[data-theme-area="header"]').click();
-      const contrast = editor!.getByRole('combobox', { name: 'Text over image', exact: true });
-      await contrast.selectOption('light');
-      await expect(header).toHaveCSS('color', 'rgb(241, 241, 241)');
-      await contrast.press('Control+z');
-      await expect(contrast).toHaveValue('auto');
-      await expect(header).toHaveCSS('color', 'rgb(15, 15, 15)');
-      await contrast.selectOption('light');
-      await editor!.locator('#themeSaveApply').click();
-      await expect(chat.locator('yt-live-chat-header-renderer')).toHaveCSS('color', 'rgb(241, 241, 241)');
-      await editor!.reload();
-      await expect(editor!.getByRole('combobox', { name: 'Text over image', exact: true })).toHaveValue('light');
-      await editor!.locator('#themeDelete').click();
-      await editor!.locator('.popup-reset-dialog .popup-reset-dialog-confirm').click();
-      await expect(chat.locator('html')).not.toHaveAttribute('data-ytcq-chat-skin');
-    });
-
-    await test.step('GIF backgrounds keep their animation through upload, saving, and reopening', async () => {
-      const buffer = Buffer.from('R0lGODlhAQABAIAAACAwRGBAYCH/C05FVFNDQVBFMi4wAwEAAAAh+QQAMgAAACwAAAAAAQABAAACAkQBACH5BAAyAAAALAAAAAABAAEAAAICTAEAOw==', 'base64');
-      const source = `data:image/gif;base64,${buffer.toString('base64')}`;
-      await editor!.locator('#themeName').fill('Animated');
-      await editor!.locator('[data-theme-field="fill"]').selectOption('image');
-      for (const key of ['image', 'darkImage']) {
-        const picker = editor!.locator(`[data-theme-field="${key}"]`);
-        await expect(picker).toHaveAttribute('accept', /image\/gif/);
-        await picker.setInputFiles({ name: 'background.gif', mimeType: 'image/gif', buffer });
-        await expect(picker.locator('..').locator('img')).toHaveAttribute('src', source);
-      }
-      await editor!.locator('[data-theme-details="artwork"] summary').click();
-      await editor!.locator('[data-theme-field="avatarFrame"]').setInputFiles({ name: 'frame.gif', mimeType: 'image/gif', buffer });
-      await editor!.locator('#themeSaveApply').click();
-      await expect(editor!.locator('.theme-status')).toHaveText('Theme saved and applied.');
-      const applied = await worker.evaluate(async () => (await chrome.storage.local.get('ytcqAppliedCustomTheme:v1'))['ytcqAppliedCustomTheme:v1']);
-      expect(applied.avatarFrame).toBe(source);
-      expect(applied.surfaces.header).toMatchObject({ image: source, darkImage: source });
-      await editor!.reload();
-      const thumbnail = editor!.locator('[data-theme-field="image"]').locator('..').locator('img');
-      await expect(thumbnail).toHaveAttribute('src', source);
-      const firstFrame = await thumbnail.screenshot({ animations: 'allow' });
-      await expect.poll(async () => (await thumbnail.screenshot({ animations: 'allow' })).equals(firstFrame)).toBe(false);
-      for (const mode of ['light', 'dark']) {
-        await editor!.locator(`[data-theme-mode="${mode}"]`).click();
-        await chat.locator('html').evaluate((element, value) => element.toggleAttribute('dark', value === 'dark'), mode);
-        for (const frame of [preview, chat]) await expect(frame.locator('yt-live-chat-header-renderer')).toHaveCSS('background-image', /data:image\/gif;base64,/);
-      }
-      await editor!.locator('[data-theme-field="image"]').setInputFiles({ name: 'large.gif', mimeType: 'image/gif', buffer: Buffer.alloc(2 * 1024 * 1024 + 1) });
-      await expect(editor!.locator('.theme-status')).toHaveText('Choose a smaller image (PNG, JPEG, WebP: up to 10 MB; GIF: up to 2 MB).');
-      await expect(thumbnail).toHaveAttribute('src', source);
-      await editor!.locator('#themeDelete').click();
-      await editor!.locator('.popup-reset-dialog .popup-reset-dialog-confirm').click();
-      await expect(chat.locator('html')).not.toHaveAttribute('data-ytcq-chat-skin');
-    });
 
     await editor.close();
     await expect(chat.locator('html')).not.toHaveAttribute('data-ytcq-chat-skin');

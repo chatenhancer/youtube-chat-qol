@@ -44,7 +44,7 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
     await test.step('Slider gestures form one undo step and preview text keeps native undo', async () => {
       const chatDraft = preview.locator('#previewDraft');
       await chatDraft.pressSequentially('Preview text');
-      await chatDraft.press('Meta+z');
+      await chatDraft.press('ControlOrMeta+z');
       await expect(chatDraft).toHaveValue('');
       await expect(status).toHaveText('Undid: Accent.');
       await editor.locator('[data-theme-details="style"] summary').click();

@@ -21,6 +21,8 @@ import {
 import { settingsMenuBehaviorScenario } from '../../scenarios/settings';
 import { compactMessageDensityScenario } from '../../scenarios/message-density';
 import { customThemesScenario } from '../../scenarios/custom-themes';
+import { customThemeRenderingScenario } from '../../scenarios/custom-theme-rendering';
+import { customThemeImagesScenario } from '../../scenarios/custom-theme-images';
 import {
   youtubeScenarioPairs as pair,
   youtubeScenarioTargets as target,
@@ -39,6 +41,18 @@ export const chatScenarios: readonly YouTubeScenario[] = [
     run: customThemesScenario,
     on: [target.mockLiveLoggedIn],
     reason: 'Checks the standalone editor and isolated sample chat against a deterministic YouTube tab.'
+  },
+  {
+    title: 'Custom theme palettes and fonts match the preview in YouTube panels and menus',
+    run: customThemeRenderingScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Compares theme rendering across appearances and finishes with deterministic chat geometry.'
+  },
+  {
+    title: 'Custom theme images preserve contrast, overrides, and GIF animation',
+    run: customThemeImagesScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Checks image uploads and saved theme rendering against deterministic chat content.'
   },
   {
     title: 'Compact message density combines with themes without changing typography',
