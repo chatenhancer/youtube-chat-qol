@@ -20,6 +20,21 @@ The documentation site and extension popup bundle Inter font files.
 - License: SIL Open Font License 1.1
 - Local license copy: `licenses/OFL-1.1-Inter.txt`
 
+## Dongle, Manufacturing Consent, Pixelify Sans, and Instrument Serif
+
+The extension bundles these optional custom-theme fonts locally. Selecting a font does not contact Google Fonts.
+
+- Dongle: https://github.com/google/fonts/tree/main/ofl/dongle
+  - Bundled license copy: `fonts/dongle-OFL.txt`
+- Manufacturing Consent: https://github.com/google/fonts/tree/main/ofl/manufacturingconsent
+  - Bundled license copy: `fonts/manufacturing-consent-OFL.txt`
+- Pixelify Sans: https://github.com/google/fonts/tree/main/ofl/pixelifysans
+  - Bundled license copy: `fonts/pixelify-sans-OFL.txt`
+- Instrument Serif: https://github.com/google/fonts/tree/main/ofl/instrumentserif
+  - Bundled license copy: `fonts/instrument-serif-OFL.txt`
+
+All four use the SIL Open Font License 1.1.
+
 ## Project-owned assets
 
 The Chat Enhancer for YouTube name, logo, app icon, screenshots, and store listing assets are project-owned assets. See `README.md` and `LICENSE` for the project license and branding restriction.

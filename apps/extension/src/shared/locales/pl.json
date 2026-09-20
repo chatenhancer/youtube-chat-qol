@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "Nie udało się zaktualizować zakładek."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "Ustawienia domyślne są już używane."
+    },
+    "themeReset": {
+      "message": "Resetuj"
+    },
+    "themeResetSavedDone": {
+      "message": "Przywrócono zapisaną wersję motywu. Możesz cofnąć tę zmianę."
+    },
+    "themeResetDone": {
+      "message": "Przywrócono domyślne ustawienia motywu. Nie zapisano; możesz to cofnąć."
+    },
+    "theme_playful": {
+      "message": "Zabawny"
+    },
+    "theme_pixel": {
+      "message": "Pikselowy"
+    },
+    "theme_elegant": {
+      "message": "Elegancki"
+    },
+    "themeCustomize": {
+      "message": "Dostosuj"
+    },
+    "themeSection_colors": {
+      "message": "Kolory"
+    },
+    "themeSection_style": {
+      "message": "Styl"
+    },
+    "themeSection_artwork": {
+      "message": "Grafika"
+    },
+    "themeShapeDepth": {
+      "message": "Kształt i głębia"
+    },
+    "themeGradientAngle": {
+      "message": "Kierunek gradientu"
+    },
+    "themeImageText": {
+      "message": "Tekst na obrazie"
+    },
+    "themeImageTextHint": {
+      "message": "Tryb automatyczny uwzględnia jasność i widoczność obrazu. Wybierz Jasny lub Ciemny, aby ustawić kolor tekstu ręcznie."
+    },
+    "theme_auto": {
+      "message": "Automatycznie"
+    },
+    "themeImagePlacement": {
+      "message": "Położenie obrazu"
+    },
+    "themePositionX": {
+      "message": "Pozycja pozioma"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Krycie powierzchni"
+    },
+    "themeShine": {
+      "message": "Siła połysku"
+    },
+    "themeWorking": {
+      "message": "Poczekaj na zakończenie bieżącej czynności."
+    },
+    "themeNoChanges": {
+      "message": "Wprowadź zmianę przed zapisaniem."
+    },
+    "themeAlreadyApplied": {
+      "message": "Ta wersja jest już zastosowana."
+    },
+    "themePreinstalled": {
+      "message": "Preinstalowany"
+    },
+    "themePresetNote": {
+      "message": "Aero to preinstalowany motyw. Wpisz inną nazwę, aby zapisać ten motyw."
+    },
+    "themePresetNameRequired": {
+      "message": "Wpisz nazwę inną niż Aero, aby zapisać kopię."
+    },
+    "themePresetLocked": {
+      "message": "Nie można usuwać preinstalowanych motywów."
+    },
+    "themeFinishHint_flat": {
+      "message": "Proste powierzchnie bez odbić."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Błyszczące elementy sterujące i nieprzezroczyste panele z delikatnym rozświetleniem u góry."
+    },
+    "themeFinishHint_glass": {
+      "message": "Delikatne odbicia i półprzezroczyste, rozmyte panele. Otwórz panel, by zobaczyć efekt."
+    },
+    "themeShadowHint": {
+      "message": "Dodaje głębi pod nagłówkiem, nad obszarem wpisywania i wokół paneli."
+    },
+    "themeZoom": {
+      "message": "Powiększenie obrazu"
+    },
+    "theme_stretch": {
+      "message": "Rozciągnij"
+    },
+    "theme_banner": {
+      "message": "Baner"
+    },
+    "themeImageHeight": {
+      "message": "Wysokość obrazu"
+    },
+    "themeAvatarShape": {
+      "message": "Kształt awatara"
+    },
+    "theme_round": {
+      "message": "Okrągły"
+    },
+    "theme_square": {
+      "message": "Kwadratowy"
+    },
+    "themeAvatarFrame": {
+      "message": "Obraz ramki awatara"
+    },
+    "themeOpenImage": {
+      "message": "Otwórz obraz w nowej karcie"
+    },
+    "themeImagePreview": {
+      "message": "Podgląd obrazu"
+    },
+    "themeRemoveImage": {
+      "message": "Usuń obraz"
+    },
+    "theme_gothic": {
+      "message": "Gotycki"
+    },
+    "themeEditor": {
+      "message": "Edytor motywów"
+    },
+    "themeSelect": {
+      "message": "Wybierz motyw do edycji"
+    },
+    "themeNew": {
+      "message": "Nowy motyw"
+    },
+    "themeName": {
+      "message": "Nazwa motywu"
+    },
+    "themeSave": {
+      "message": "Zapisz"
+    },
+    "themeSaveApply": {
+      "message": "Zapisz i użyj"
+    },
+    "themeUndone": {
+      "message": "Cofnięto: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "Nie ma nic do cofnięcia."
+    },
+    "themeDelete": {
+      "message": "Usuń motyw"
+    },
+    "themeClear": {
+      "message": "Wyczyść nowy motyw"
+    },
+    "themeDiscardConfirm": {
+      "message": "Odrzucić niezapisane zmiany motywu?"
+    },
+    "themeKeepEditing": {
+      "message": "Edytuj dalej"
+    },
+    "themeDiscard": {
+      "message": "Odrzuć"
+    },
+    "themeDeleteConfirm": {
+      "message": "Usunąć ten motyw?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "Czat wróci do motywu domyślnego."
+    },
+    "themeAppearance": {
+      "message": "Podgląd wyglądu"
+    },
+    "theme_light": {
+      "message": "Jasny"
+    },
+    "theme_dark": {
+      "message": "Ciemny"
+    },
+    "themeArea": {
+      "message": "Dostosuj obszar"
+    },
+    "themeArea_header": {
+      "message": "Nagłówek"
+    },
+    "themeArea_chat": {
+      "message": "Czat"
+    },
+    "themeArea_composer": {
+      "message": "Wpisywanie"
+    },
+    "themeBackgroundColor": {
+      "message": "Kolor tła"
+    },
+    "themeMarkerColor": {
+      "message": "Kolor znacznika"
+    },
+    "themeFinishStyle": {
+      "message": "Styl wykończenia"
+    },
+    "themeBackground": {
+      "message": "Tło"
+    },
+    "themeFill": {
+      "message": "Styl tła"
+    },
+    "theme_solid": {
+      "message": "Jednolity kolor"
+    },
+    "theme_gradient": {
+      "message": "Gradient"
+    },
+    "theme_image": {
+      "message": "Obraz"
+    },
+    "themeGradientColor": {
+      "message": "Drugi kolor"
+    },
+    "themeChooseImage": {
+      "message": "Wybierz obraz"
+    },
+    "themeFit": {
+      "message": "Dopasowanie obrazu"
+    },
+    "theme_cover": {
+      "message": "Wypełnij"
+    },
+    "theme_contain": {
+      "message": "Dopasuj"
+    },
+    "theme_repeat": {
+      "message": "Kafelki"
+    },
+    "themeVisibility": {
+      "message": "Widoczność obrazu"
+    },
+    "themePosition": {
+      "message": "Pozycja pionowa"
+    },
+    "themeAccent": {
+      "message": "Akcent"
+    },
+    "theme_flat": {
+      "message": "Płaskie"
+    },
+    "theme_glossy": {
+      "message": "Błyszczące"
+    },
+    "theme_glass": {
+      "message": "Szkło"
+    },
+    "themeCorners": {
+      "message": "Promień narożników"
+    },
+    "themeShadow": {
+      "message": "Cień"
+    },
+    "themeFont": {
+      "message": "Czcionka"
+    },
+    "theme_default": {
+      "message": "Domyślna"
+    },
+    "theme_classic": {
+      "message": "Klasyczna"
+    },
+    "theme_mono": {
+      "message": "Stała szerokość"
+    },
+    "themeEditorDescription": {
+      "message": "Stwórz motyw z własnymi kolorami, obrazami i detalami."
+    },
+    "themeSaved": {
+      "message": "Motyw zapisany. Aktywny motyw się nie zmienił."
+    },
+    "themeApplied": {
+      "message": "Motyw zapisany i zastosowany."
+    },
+    "themeSaveError": {
+      "message": "Nie udało się zapisać. Wybierz mniejszy obraz lub zwolnij miejsce rozszerzenia."
+    },
+    "themeApplyError": {
+      "message": "Nie udało się zastosować motywu. Spróbuj ponownie."
+    },
+    "themeImageError": {
+      "message": "Wybierz mniejszy obraz (PNG, JPEG, WebP: do 10 MB; GIF: do 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "Wpisz nazwę motywu."
+    },
+    "themeCustom": {
+      "message": "Moje motywy"
+    },
+    "themeResetItem": {
+      "message": "Własne motywy"
+    },
     "close": {
       "message": "Zamknij"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Zachowaj wideo i czat w oknie zawsze na wierzchu podczas korzystania z innych kart."
+    },
+    "themeBlur": {
+      "message": "Rozmycie paneli"
+    },
+    "themeAddMessageMark": {
+      "message": "Dodaj znacznik wiadomości"
+    },
+    "themeSecondary": {
+      "message": "Dodatkowy akcent"
+    },
+    "themePaletteHint": {
+      "message": "Przyciski i ikony używają akcentu, a etykiety i wyróżnienia — akcentu dodatkowego. Panele, menu i tekst automatycznie dostosowują się do trybu jasnego i ciemnego."
+    },
+    "theme_theme": {
+      "message": "Kolory motywu"
+    },
+    "themeDarkImage": {
+      "message": "Obraz w trybie ciemnym (opcjonalny)"
+    },
+    "themeSurfaceTint": {
+      "message": "Zabarwienie tła"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Dodaje kolor akcentu do tła. Przy 0% używane są neutralne kolory YouTube."
+    },
+    "themeBorder": {
+      "message": "Obramowania"
     }
   }
 }

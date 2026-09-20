@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "Bookmark tidak dapat diperbarui."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "Sudah menggunakan default."
+    },
+    "themeReset": {
+      "message": "Reset"
+    },
+    "themeResetSavedDone": {
+      "message": "Versi tema yang tersimpan telah dipulihkan. Anda dapat membatalkannya."
+    },
+    "themeResetDone": {
+      "message": "Tema direset ke default. Belum disimpan; Anda dapat mengurungkannya."
+    },
+    "theme_playful": {
+      "message": "Ceria"
+    },
+    "theme_pixel": {
+      "message": "Piksel"
+    },
+    "theme_elegant": {
+      "message": "Elegan"
+    },
+    "themeCustomize": {
+      "message": "Sesuaikan"
+    },
+    "themeSection_colors": {
+      "message": "Warna"
+    },
+    "themeSection_style": {
+      "message": "Gaya"
+    },
+    "themeSection_artwork": {
+      "message": "Gambar"
+    },
+    "themeShapeDepth": {
+      "message": "Bentuk dan kedalaman"
+    },
+    "themeGradientAngle": {
+      "message": "Arah gradien"
+    },
+    "themeImageText": {
+      "message": "Teks di atas gambar"
+    },
+    "themeImageTextHint": {
+      "message": "Otomatis menyesuaikan kecerahan dan visibilitas gambar. Pilih Terang atau Gelap untuk mengaturnya sendiri."
+    },
+    "theme_auto": {
+      "message": "Otomatis"
+    },
+    "themeImagePlacement": {
+      "message": "Penempatan gambar"
+    },
+    "themePositionX": {
+      "message": "Posisi horizontal"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Opasitas permukaan"
+    },
+    "themeShine": {
+      "message": "Kekuatan kilau"
+    },
+    "themeWorking": {
+      "message": "Tunggu hingga tindakan saat ini selesai."
+    },
+    "themeNoChanges": {
+      "message": "Buat perubahan sebelum menyimpan."
+    },
+    "themeAlreadyApplied": {
+      "message": "Versi ini sudah diterapkan."
+    },
+    "themePreinstalled": {
+      "message": "Prainstal"
+    },
+    "themePresetNote": {
+      "message": "Aero adalah tema bawaan. Masukkan nama lain untuk menyimpan tema ini."
+    },
+    "themePresetNameRequired": {
+      "message": "Masukkan nama selain Aero untuk menyimpan salinan."
+    },
+    "themePresetLocked": {
+      "message": "Tema prainstal tidak dapat dihapus."
+    },
+    "themeFinishHint_flat": {
+      "message": "Permukaan sederhana tanpa pantulan."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Kontrol mengilap dan panel buram dengan kilau lembut di tepi atas."
+    },
+    "themeFinishHint_glass": {
+      "message": "Pantulan lembut dan panel transparan dengan efek buram. Buka panel untuk melihat efeknya."
+    },
+    "themeShadowHint": {
+      "message": "Menambah kedalaman di bawah header, di atas area input, dan di sekitar panel."
+    },
+    "themeZoom": {
+      "message": "Zoom gambar"
+    },
+    "theme_stretch": {
+      "message": "Regangkan"
+    },
+    "theme_banner": {
+      "message": "Spanduk"
+    },
+    "themeImageHeight": {
+      "message": "Tinggi gambar"
+    },
+    "themeAvatarShape": {
+      "message": "Bentuk avatar"
+    },
+    "theme_round": {
+      "message": "Bulat"
+    },
+    "theme_square": {
+      "message": "Persegi"
+    },
+    "themeAvatarFrame": {
+      "message": "Gambar bingkai avatar"
+    },
+    "themeOpenImage": {
+      "message": "Buka gambar di tab baru"
+    },
+    "themeImagePreview": {
+      "message": "Pratinjau gambar"
+    },
+    "themeRemoveImage": {
+      "message": "Hapus gambar"
+    },
+    "theme_gothic": {
+      "message": "Gotik"
+    },
+    "themeEditor": {
+      "message": "Editor tema"
+    },
+    "themeSelect": {
+      "message": "Pilih tema untuk diedit"
+    },
+    "themeNew": {
+      "message": "Tema baru"
+    },
+    "themeName": {
+      "message": "Nama tema"
+    },
+    "themeSave": {
+      "message": "Simpan"
+    },
+    "themeSaveApply": {
+      "message": "Simpan dan gunakan"
+    },
+    "themeUndone": {
+      "message": "Dibatalkan: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "Tidak ada yang bisa dibatalkan."
+    },
+    "themeDelete": {
+      "message": "Hapus tema"
+    },
+    "themeClear": {
+      "message": "Kosongkan tema baru"
+    },
+    "themeDiscardConfirm": {
+      "message": "Buang perubahan tema yang belum disimpan?"
+    },
+    "themeKeepEditing": {
+      "message": "Lanjutkan mengedit"
+    },
+    "themeDiscard": {
+      "message": "Buang"
+    },
+    "themeDeleteConfirm": {
+      "message": "Hapus tema ini?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "Chat akan kembali ke tema Default."
+    },
+    "themeAppearance": {
+      "message": "Pratinjau tampilan"
+    },
+    "theme_light": {
+      "message": "Terang"
+    },
+    "theme_dark": {
+      "message": "Gelap"
+    },
+    "themeArea": {
+      "message": "Sesuaikan area"
+    },
+    "themeArea_header": {
+      "message": "Header"
+    },
+    "themeArea_chat": {
+      "message": "Chat"
+    },
+    "themeArea_composer": {
+      "message": "Input"
+    },
+    "themeBackgroundColor": {
+      "message": "Warna latar"
+    },
+    "themeMarkerColor": {
+      "message": "Warna penanda"
+    },
+    "themeFinishStyle": {
+      "message": "Gaya permukaan"
+    },
+    "themeBackground": {
+      "message": "Latar belakang"
+    },
+    "themeFill": {
+      "message": "Gaya latar"
+    },
+    "theme_solid": {
+      "message": "Warna solid"
+    },
+    "theme_gradient": {
+      "message": "Gradien"
+    },
+    "theme_image": {
+      "message": "Gambar"
+    },
+    "themeGradientColor": {
+      "message": "Warna kedua"
+    },
+    "themeChooseImage": {
+      "message": "Pilih gambar"
+    },
+    "themeFit": {
+      "message": "Penyesuaian gambar"
+    },
+    "theme_cover": {
+      "message": "Isi"
+    },
+    "theme_contain": {
+      "message": "Pas"
+    },
+    "theme_repeat": {
+      "message": "Ubin"
+    },
+    "themeVisibility": {
+      "message": "Visibilitas gambar"
+    },
+    "themePosition": {
+      "message": "Posisi vertikal"
+    },
+    "themeAccent": {
+      "message": "Aksen"
+    },
+    "theme_flat": {
+      "message": "Datar"
+    },
+    "theme_glossy": {
+      "message": "Mengilap"
+    },
+    "theme_glass": {
+      "message": "Kaca"
+    },
+    "themeCorners": {
+      "message": "Radius sudut"
+    },
+    "themeShadow": {
+      "message": "Bayangan"
+    },
+    "themeFont": {
+      "message": "Font"
+    },
+    "theme_default": {
+      "message": "Bawaan"
+    },
+    "theme_classic": {
+      "message": "Klasik"
+    },
+    "theme_mono": {
+      "message": "Monospace"
+    },
+    "themeEditorDescription": {
+      "message": "Buat tema dengan warna, gambar, dan detail pilihan Anda."
+    },
+    "themeSaved": {
+      "message": "Tema disimpan. Tema yang diterapkan tidak berubah."
+    },
+    "themeApplied": {
+      "message": "Tema disimpan dan diterapkan."
+    },
+    "themeSaveError": {
+      "message": "Perubahan tidak dapat disimpan. Coba gambar lebih kecil atau kosongkan penyimpanan ekstensi."
+    },
+    "themeApplyError": {
+      "message": "Tema tidak dapat diterapkan. Coba lagi."
+    },
+    "themeImageError": {
+      "message": "Pilih gambar yang lebih kecil (PNG, JPEG, WebP: hingga 10 MB; GIF: hingga 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "Masukkan nama tema."
+    },
+    "themeCustom": {
+      "message": "Tema saya"
+    },
+    "themeResetItem": {
+      "message": "Tema kustom"
+    },
     "close": {
       "message": "Tutup"
     },
@@ -713,6 +1013,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Pertahankan video dan chat di jendela yang selalu di atas saat menggunakan tab lain."
+    },
+    "themeBlur": {
+      "message": "Buram panel"
+    },
+    "themeAddMessageMark": {
+      "message": "Tambahkan penanda pesan"
+    },
+    "themeSecondary": {
+      "message": "Aksen sekunder"
+    },
+    "themePaletteHint": {
+      "message": "Tombol dan ikon mengikuti warna aksen; tag dan sorotan memakai aksen sekunder. Panel, menu, dan teks otomatis menyesuaikan mode terang dan gelap."
+    },
+    "theme_theme": {
+      "message": "Warna tema"
+    },
+    "themeDarkImage": {
+      "message": "Gambar mode gelap (opsional)"
+    },
+    "themeSurfaceTint": {
+      "message": "Rona latar belakang"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Tambahkan warna aksen ke latar belakang. Pada 0%, latar menggunakan warna netral YouTube."
+    },
+    "themeBorder": {
+      "message": "Garis tepi"
     }
   }
 }

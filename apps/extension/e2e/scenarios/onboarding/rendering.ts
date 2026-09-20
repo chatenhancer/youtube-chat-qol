@@ -80,10 +80,17 @@ export const onboardingRenderingScenario: ExtensionScenario = async ({ context }
     await expect(onboarding.locator('#previewDraftTranslatorTooltip')).toBeHidden();
     await expect(onboarding.locator('#previewEmojiPickerTooltip')).toBeHidden();
     await expect(onboarding.locator('.ytcq-lite-mode-button')).toHaveCount(0);
+    expect(await onboarding.evaluate(async () => {
+      await document.fonts.ready;
+      return [...document.fonts].some(font => font.family === 'Inter' && font.status === 'loaded');
+    })).toBe(true);
     for (const theme of ['light', 'dark'] as const) {
       await onboarding.emulateMedia({ colorScheme: theme });
       const preview = onboarding.locator('#chatPreview');
       await expect(preview).toHaveAttribute('data-chat-theme', theme);
+      for (const selector of ['body', '#onboardingChatSkin', '.preview-top-chat', '.preview-message-featured #message', '#previewDraft']) {
+        await expect(onboarding.locator(selector)).toHaveCSS('font-family', 'Inter, Arial, sans-serif');
+      }
       await expect(preview).toBeInViewport();
       await expect(onboarding.locator('.preview-top-chat')).toHaveCSS(
         'color',

@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "बुकमार्क अपडेट नहीं हो सके।"
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "पहले से डिफ़ॉल्ट पर है।"
+    },
+    "themeReset": {
+      "message": "रीसेट"
+    },
+    "themeResetSavedDone": {
+      "message": "थीम का सहेजा गया संस्करण बहाल कर दिया गया है। आप इसे पूर्ववत कर सकते हैं।"
+    },
+    "themeResetDone": {
+      "message": "थीम डिफ़ॉल्ट पर रीसेट हो गई। सेव नहीं हुई; आप इसे पूर्ववत कर सकते हैं।"
+    },
+    "theme_playful": {
+      "message": "चंचल"
+    },
+    "theme_pixel": {
+      "message": "पिक्सेल"
+    },
+    "theme_elegant": {
+      "message": "सुरुचिपूर्ण"
+    },
+    "themeCustomize": {
+      "message": "कस्टमाइज़ करें"
+    },
+    "themeSection_colors": {
+      "message": "रंग"
+    },
+    "themeSection_style": {
+      "message": "शैली"
+    },
+    "themeSection_artwork": {
+      "message": "चित्र"
+    },
+    "themeShapeDepth": {
+      "message": "आकार और गहराई"
+    },
+    "themeGradientAngle": {
+      "message": "ग्रेडिएंट की दिशा"
+    },
+    "themeImageText": {
+      "message": "छवि पर टेक्स्ट"
+    },
+    "themeImageTextHint": {
+      "message": "स्वचालित विकल्प छवि की चमक और दृश्यता के अनुसार चुनता है। खुद सेट करने के लिए हल्का या गहरा चुनें।"
+    },
+    "theme_auto": {
+      "message": "अपने आप"
+    },
+    "themeImagePlacement": {
+      "message": "चित्र की स्थिति"
+    },
+    "themePositionX": {
+      "message": "क्षैतिज स्थिति"
+    },
+    "themeSurfaceOpacity": {
+      "message": "सतह की अपारदर्शिता"
+    },
+    "themeShine": {
+      "message": "चमक की तीव्रता"
+    },
+    "themeWorking": {
+      "message": "मौजूदा कार्रवाई पूरी होने तक प्रतीक्षा करें।"
+    },
+    "themeNoChanges": {
+      "message": "सहेजने से पहले कोई बदलाव करें।"
+    },
+    "themeAlreadyApplied": {
+      "message": "यह संस्करण पहले से लागू है।"
+    },
+    "themePreinstalled": {
+      "message": "पहले से इंस्टॉल"
+    },
+    "themePresetNote": {
+      "message": "Aero पहले से इंस्टॉल की गई थीम है। इस थीम को सहेजने के लिए दूसरा नाम दर्ज करें।"
+    },
+    "themePresetNameRequired": {
+      "message": "अपनी प्रति सहेजने के लिए Aero के अलावा कोई नाम दें।"
+    },
+    "themePresetLocked": {
+      "message": "पहले से इंस्टॉल थीम मिटाई नहीं जा सकतीं।"
+    },
+    "themeFinishHint_flat": {
+      "message": "बिना प्रतिबिंब वाली साधारण सतहें।"
+    },
+    "themeFinishHint_glossy": {
+      "message": "चमकदार कंट्रोल और अपारदर्शी पैनल, जिनके ऊपरी किनारे पर हल्की चमक है।"
+    },
+    "themeFinishHint_glass": {
+      "message": "हल्के प्रतिबिंब और धुंधली पृष्ठभूमि वाले अर्धपारदर्शी पैनल। असर देखने के लिए पैनल खोलें।"
+    },
+    "themeShadowHint": {
+      "message": "हेडर के नीचे, इनपुट के ऊपर और पैनल के आसपास गहराई जोड़ता है।"
+    },
+    "themeZoom": {
+      "message": "चित्र ज़ूम"
+    },
+    "theme_stretch": {
+      "message": "खिंचाव"
+    },
+    "theme_banner": {
+      "message": "बैनर"
+    },
+    "themeImageHeight": {
+      "message": "चित्र की ऊँचाई"
+    },
+    "themeAvatarShape": {
+      "message": "अवतार का आकार"
+    },
+    "theme_round": {
+      "message": "गोल"
+    },
+    "theme_square": {
+      "message": "चौकोर"
+    },
+    "themeAvatarFrame": {
+      "message": "अवतार फ़्रेम चित्र"
+    },
+    "themeOpenImage": {
+      "message": "इमेज नए टैब में खोलें"
+    },
+    "themeImagePreview": {
+      "message": "इमेज प्रीव्यू"
+    },
+    "themeRemoveImage": {
+      "message": "चित्र हटाएँ"
+    },
+    "theme_gothic": {
+      "message": "गॉथिक"
+    },
+    "themeEditor": {
+      "message": "थीम संपादक"
+    },
+    "themeSelect": {
+      "message": "संपादन के लिए थीम चुनें"
+    },
+    "themeNew": {
+      "message": "नई थीम"
+    },
+    "themeName": {
+      "message": "थीम का नाम"
+    },
+    "themeSave": {
+      "message": "सहेजें"
+    },
+    "themeSaveApply": {
+      "message": "सहेजें और उपयोग करें"
+    },
+    "themeUndone": {
+      "message": "पूर्ववत किया गया: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "पूर्ववत करने के लिए कुछ नहीं है।"
+    },
+    "themeDelete": {
+      "message": "थीम मिटाएँ"
+    },
+    "themeClear": {
+      "message": "नई थीम साफ़ करें"
+    },
+    "themeDiscardConfirm": {
+      "message": "थीम में किए गए बिना सहेजे बदलाव हटाएँ?"
+    },
+    "themeKeepEditing": {
+      "message": "संपादन जारी रखें"
+    },
+    "themeDiscard": {
+      "message": "बदलाव हटाएँ"
+    },
+    "themeDeleteConfirm": {
+      "message": "यह थीम मिटाएं?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "चैट डिफ़ॉल्ट थीम पर लौट जाएगी."
+    },
+    "themeAppearance": {
+      "message": "रूप का पूर्वावलोकन"
+    },
+    "theme_light": {
+      "message": "हल्की"
+    },
+    "theme_dark": {
+      "message": "गहरी"
+    },
+    "themeArea": {
+      "message": "क्षेत्र कस्टमाइज़ करें"
+    },
+    "themeArea_header": {
+      "message": "हेडर"
+    },
+    "themeArea_chat": {
+      "message": "चैट"
+    },
+    "themeArea_composer": {
+      "message": "इनपुट"
+    },
+    "themeBackgroundColor": {
+      "message": "पृष्ठभूमि का रंग"
+    },
+    "themeMarkerColor": {
+      "message": "चिह्न का रंग"
+    },
+    "themeFinishStyle": {
+      "message": "फ़िनिश शैली"
+    },
+    "themeBackground": {
+      "message": "बैकग्राउंड"
+    },
+    "themeFill": {
+      "message": "बैकग्राउंड शैली"
+    },
+    "theme_solid": {
+      "message": "एक रंग"
+    },
+    "theme_gradient": {
+      "message": "ग्रेडिएंट"
+    },
+    "theme_image": {
+      "message": "इमेज"
+    },
+    "themeGradientColor": {
+      "message": "दूसरा रंग"
+    },
+    "themeChooseImage": {
+      "message": "इमेज चुनें"
+    },
+    "themeFit": {
+      "message": "इमेज फ़िट"
+    },
+    "theme_cover": {
+      "message": "भरें"
+    },
+    "theme_contain": {
+      "message": "फ़िट करें"
+    },
+    "theme_repeat": {
+      "message": "दोहराएँ"
+    },
+    "themeVisibility": {
+      "message": "इमेज दृश्यता"
+    },
+    "themePosition": {
+      "message": "लंबवत स्थिति"
+    },
+    "themeAccent": {
+      "message": "मुख्य रंग"
+    },
+    "theme_flat": {
+      "message": "सपाट"
+    },
+    "theme_glossy": {
+      "message": "चमकदार"
+    },
+    "theme_glass": {
+      "message": "काँच"
+    },
+    "themeCorners": {
+      "message": "कोनों की गोलाई"
+    },
+    "themeShadow": {
+      "message": "छाया"
+    },
+    "themeFont": {
+      "message": "फ़ॉन्ट"
+    },
+    "theme_default": {
+      "message": "डिफ़ॉल्ट"
+    },
+    "theme_classic": {
+      "message": "क्लासिक"
+    },
+    "theme_mono": {
+      "message": "मोनोस्पेस"
+    },
+    "themeEditorDescription": {
+      "message": "अपने रंगों, चित्रों और विवरणों से थीम बनाएँ।"
+    },
+    "themeSaved": {
+      "message": "थीम सहेजी गई। लागू थीम में कोई बदलाव नहीं हुआ।"
+    },
+    "themeApplied": {
+      "message": "थीम सहेजी और लागू की गई।"
+    },
+    "themeSaveError": {
+      "message": "बदलाव सहेजे नहीं जा सके। छोटी इमेज चुनें या एक्सटेंशन का कुछ स्टोरेज खाली करें।"
+    },
+    "themeApplyError": {
+      "message": "थीम लागू नहीं हो सकी। फिर कोशिश करें।"
+    },
+    "themeImageError": {
+      "message": "छोटी इमेज चुनें (PNG, JPEG, WebP: 10 MB तक; GIF: 2 MB तक)।"
+    },
+    "themeNameRequired": {
+      "message": "थीम का नाम डालें।"
+    },
+    "themeCustom": {
+      "message": "मेरी थीम"
+    },
+    "themeResetItem": {
+      "message": "कस्टम थीम"
+    },
     "close": {
       "message": "बंद करें"
     },
@@ -713,6 +1013,33 @@
     },
     "onboardingPipTooltip": {
       "message": "दूसरे टैब इस्तेमाल करते समय वीडियो और चैट को हमेशा ऊपर रहने वाली विंडो में रखें।"
+    },
+    "themeBlur": {
+      "message": "पैनल का धुंधलापन"
+    },
+    "themeAddMessageMark": {
+      "message": "संदेश चिह्न जोड़ें"
+    },
+    "themeSecondary": {
+      "message": "दूसरा एक्सेंट रंग"
+    },
+    "themePaletteHint": {
+      "message": "बटन और आइकन मुख्य रंग, जबकि टैग और हाइलाइट द्वितीयक रंग का उपयोग करते हैं। पैनल, मेन्यू और टेक्स्ट लाइट और डार्क मोड के अनुसार अपने आप बदलते हैं।"
+    },
+    "theme_theme": {
+      "message": "थीम के रंग"
+    },
+    "themeDarkImage": {
+      "message": "डार्क मोड की छवि (वैकल्पिक)"
+    },
+    "themeSurfaceTint": {
+      "message": "बैकग्राउंड का रंग-प्रभाव"
+    },
+    "themeSurfaceTintHint": {
+      "message": "बैकग्राउंड में एक्सेंट रंग जोड़ें। 0% पर YouTube के तटस्थ रंग इस्तेमाल होते हैं।"
+    },
+    "themeBorder": {
+      "message": "बॉर्डर"
     }
   }
 }

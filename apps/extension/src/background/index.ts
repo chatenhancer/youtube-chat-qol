@@ -12,3 +12,7 @@ import './playground';
 import './profile-avatar';
 import './translate';
 import './window-focus';
+import { loadCustomThemes } from '../shared/custom-themes';
+
+// Install the protected preset in the same local library as user-created themes.
+void loadCustomThemes().catch(() => {});

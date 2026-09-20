@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "Не вдалося оновити закладки."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "Уже використовуються типові налаштування."
+    },
+    "themeReset": {
+      "message": "Скинути"
+    },
+    "themeResetSavedDone": {
+      "message": "Відновлено збережену версію теми. Цю дію можна скасувати."
+    },
+    "themeResetDone": {
+      "message": "Відновлено типові налаштування теми. Не збережено; можна скасувати."
+    },
+    "theme_playful": {
+      "message": "Грайливий"
+    },
+    "theme_pixel": {
+      "message": "Піксельний"
+    },
+    "theme_elegant": {
+      "message": "Елегантний"
+    },
+    "themeCustomize": {
+      "message": "Налаштувати"
+    },
+    "themeSection_colors": {
+      "message": "Кольори"
+    },
+    "themeSection_style": {
+      "message": "Стиль"
+    },
+    "themeSection_artwork": {
+      "message": "Зображення"
+    },
+    "themeShapeDepth": {
+      "message": "Форма й глибина"
+    },
+    "themeGradientAngle": {
+      "message": "Напрямок градієнта"
+    },
+    "themeImageText": {
+      "message": "Текст поверх зображення"
+    },
+    "themeImageTextHint": {
+      "message": "Автоматичний режим враховує яскравість і видимість зображення. Виберіть світлий або темний текст вручну."
+    },
+    "theme_auto": {
+      "message": "Автоматично"
+    },
+    "themeImagePlacement": {
+      "message": "Розміщення зображення"
+    },
+    "themePositionX": {
+      "message": "Горизонтальне положення"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Непрозорість поверхні"
+    },
+    "themeShine": {
+      "message": "Сила блиску"
+    },
+    "themeWorking": {
+      "message": "Дочекайтеся завершення поточної дії."
+    },
+    "themeNoChanges": {
+      "message": "Внесіть зміну перед збереженням."
+    },
+    "themeAlreadyApplied": {
+      "message": "Цю версію вже застосовано."
+    },
+    "themePreinstalled": {
+      "message": "Попередньо встановлено"
+    },
+    "themePresetNote": {
+      "message": "Aero — попередньо встановлена тема. Введіть іншу назву, щоб зберегти цю тему."
+    },
+    "themePresetNameRequired": {
+      "message": "Введіть назву, відмінну від Aero, щоб зберегти копію."
+    },
+    "themePresetLocked": {
+      "message": "Попередньо встановлені теми не можна видалити."
+    },
+    "themeFinishHint_flat": {
+      "message": "Прості поверхні без відблисків."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Глянцеві елементи керування й непрозорі панелі з легким відблиском угорі."
+    },
+    "themeFinishHint_glass": {
+      "message": "М’які відблиски та напівпрозорі розмиті панелі. Відкрийте панель, щоб побачити ефект."
+    },
+    "themeShadowHint": {
+      "message": "Додає глибини під заголовком, над областю введення та навколо панелей."
+    },
+    "themeZoom": {
+      "message": "Масштаб зображення"
+    },
+    "theme_stretch": {
+      "message": "Розтягнути"
+    },
+    "theme_banner": {
+      "message": "Смуга"
+    },
+    "themeImageHeight": {
+      "message": "Висота зображення"
+    },
+    "themeAvatarShape": {
+      "message": "Форма аватара"
+    },
+    "theme_round": {
+      "message": "Кругла"
+    },
+    "theme_square": {
+      "message": "Квадратна"
+    },
+    "themeAvatarFrame": {
+      "message": "Зображення рамки аватара"
+    },
+    "themeOpenImage": {
+      "message": "Відкрити зображення в новій вкладці"
+    },
+    "themeImagePreview": {
+      "message": "Попередній перегляд зображення"
+    },
+    "themeRemoveImage": {
+      "message": "Видалити зображення"
+    },
+    "theme_gothic": {
+      "message": "Готичний"
+    },
+    "themeEditor": {
+      "message": "Редактор тем"
+    },
+    "themeSelect": {
+      "message": "Виберіть тему для редагування"
+    },
+    "themeNew": {
+      "message": "Нова тема"
+    },
+    "themeName": {
+      "message": "Назва теми"
+    },
+    "themeSave": {
+      "message": "Зберегти"
+    },
+    "themeSaveApply": {
+      "message": "Зберегти й використовувати"
+    },
+    "themeUndone": {
+      "message": "Скасовано: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "Немає змін для скасування."
+    },
+    "themeDelete": {
+      "message": "Видалити тему"
+    },
+    "themeClear": {
+      "message": "Очистити нову тему"
+    },
+    "themeDiscardConfirm": {
+      "message": "Відкинути незбережені зміни теми?"
+    },
+    "themeKeepEditing": {
+      "message": "Редагувати далі"
+    },
+    "themeDiscard": {
+      "message": "Відкинути"
+    },
+    "themeDeleteConfirm": {
+      "message": "Видалити цю тему?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "Чат повернеться до типової теми."
+    },
+    "themeAppearance": {
+      "message": "Попередній перегляд вигляду"
+    },
+    "theme_light": {
+      "message": "Світла"
+    },
+    "theme_dark": {
+      "message": "Темна"
+    },
+    "themeArea": {
+      "message": "Налаштувати область"
+    },
+    "themeArea_header": {
+      "message": "Шапка"
+    },
+    "themeArea_chat": {
+      "message": "Чат"
+    },
+    "themeArea_composer": {
+      "message": "Введення"
+    },
+    "themeBackgroundColor": {
+      "message": "Колір тла"
+    },
+    "themeMarkerColor": {
+      "message": "Колір маркера"
+    },
+    "themeFinishStyle": {
+      "message": "Стиль оформлення"
+    },
+    "themeBackground": {
+      "message": "Тло"
+    },
+    "themeFill": {
+      "message": "Стиль тла"
+    },
+    "theme_solid": {
+      "message": "Суцільний колір"
+    },
+    "theme_gradient": {
+      "message": "Градієнт"
+    },
+    "theme_image": {
+      "message": "Зображення"
+    },
+    "themeGradientColor": {
+      "message": "Другий колір"
+    },
+    "themeChooseImage": {
+      "message": "Вибрати зображення"
+    },
+    "themeFit": {
+      "message": "Розміщення зображення"
+    },
+    "theme_cover": {
+      "message": "Заповнити"
+    },
+    "theme_contain": {
+      "message": "Вмістити"
+    },
+    "theme_repeat": {
+      "message": "Плитка"
+    },
+    "themeVisibility": {
+      "message": "Видимість зображення"
+    },
+    "themePosition": {
+      "message": "Положення по вертикалі"
+    },
+    "themeAccent": {
+      "message": "Акцент"
+    },
+    "theme_flat": {
+      "message": "Пласке"
+    },
+    "theme_glossy": {
+      "message": "Глянцеве"
+    },
+    "theme_glass": {
+      "message": "Скло"
+    },
+    "themeCorners": {
+      "message": "Радіус кутів"
+    },
+    "themeShadow": {
+      "message": "Тінь"
+    },
+    "themeFont": {
+      "message": "Шрифт"
+    },
+    "theme_default": {
+      "message": "Стандартний"
+    },
+    "theme_classic": {
+      "message": "Класичний"
+    },
+    "theme_mono": {
+      "message": "Моноширинний"
+    },
+    "themeEditorDescription": {
+      "message": "Створіть тему зі своїми кольорами, зображеннями й деталями."
+    },
+    "themeSaved": {
+      "message": "Тему збережено. Застосована тема не змінилася."
+    },
+    "themeApplied": {
+      "message": "Тему збережено й застосовано."
+    },
+    "themeSaveError": {
+      "message": "Не вдалося зберегти зміни. Виберіть менше зображення або звільніть сховище розширення."
+    },
+    "themeApplyError": {
+      "message": "Не вдалося застосувати тему. Спробуйте ще раз."
+    },
+    "themeImageError": {
+      "message": "Виберіть менше зображення (PNG, JPEG, WebP: до 10 МБ; GIF: до 2 МБ)."
+    },
+    "themeNameRequired": {
+      "message": "Введіть назву теми."
+    },
+    "themeCustom": {
+      "message": "Мої теми"
+    },
+    "themeResetItem": {
+      "message": "Власні теми"
+    },
     "close": {
       "message": "Закрити"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Тримайте відео й чат у вікні поверх інших, поки користуєтеся іншими вкладками."
+    },
+    "themeBlur": {
+      "message": "Розмиття панелей"
+    },
+    "themeAddMessageMark": {
+      "message": "Додати маркер повідомлення"
+    },
+    "themeSecondary": {
+      "message": "Другорядний акцент"
+    },
+    "themePaletteHint": {
+      "message": "Кнопки та значки використовують основний акцент, мітки й виділення — додатковий. Панелі, меню й текст автоматично адаптуються до світлого й темного режиму."
+    },
+    "theme_theme": {
+      "message": "Кольори теми"
+    },
+    "themeDarkImage": {
+      "message": "Зображення для темного режиму (необов’язково)"
+    },
+    "themeSurfaceTint": {
+      "message": "Відтінок тла"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Додає акцентний колір до тла. За 0% використовуються нейтральні кольори YouTube."
+    },
+    "themeBorder": {
+      "message": "Межі"
     }
   }
 }

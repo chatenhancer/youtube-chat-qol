@@ -72,13 +72,13 @@ describe('onboarding preview', () => {
         ?.classList.contains('preview-element-visible')
     ).toBe(true);
 
-    preview.setChatSkin('aero');
+    preview.setChatSkin('custom:aero');
     preview.setPlaygroundEnabled(true);
     preview.setLiteModeEnabled(true);
 
-    expect(root.dataset.chatSkin).toBe('aero');
+    await vi.waitFor(() => expect(root.dataset.chatSkin).toBe('custom'));
     expect(root.dataset.chatTheme).toBe('light');
-    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('aero');
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('custom');
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBe('light');
     expect(
       document
@@ -132,7 +132,7 @@ describe('onboarding preview', () => {
     expect(document.querySelector('#previewPrimaryText')?.textContent).toBe('La traduction actuelle');
   });
 
-  it('keeps the preview skin in sync with the system color scheme', () => {
+  it('keeps the preview skin in sync with the system color scheme', async () => {
     document.body.innerHTML = `
       <div id="preview">
         <span id="previewFeaturedMessage"></span>
@@ -162,7 +162,9 @@ describe('onboarding preview', () => {
 
     const root = document.querySelector<HTMLElement>('#preview')!;
     const preview = createOnboardingPreview(root, 'en')!;
-    preview.setChatSkin('aero');
+    preview.setChatSkin('custom:aero');
+
+    await vi.waitFor(() => expect(root.dataset.chatSkin).toBe('custom'));
 
     expect(root.dataset.chatTheme).toBe('light');
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBe('light');

@@ -20,6 +20,7 @@ import {
 } from '../../scenarios/menus';
 import { settingsMenuBehaviorScenario } from '../../scenarios/settings';
 import { compactMessageDensityScenario } from '../../scenarios/message-density';
+import { customThemesScenario } from '../../scenarios/custom-themes';
 import {
   youtubeScenarioPairs as pair,
   youtubeScenarioTargets as target,
@@ -33,6 +34,12 @@ const menuSurfaces = [
 ] as const;
 
 export const chatScenarios: readonly YouTubeScenario[] = [
+  {
+    title: 'Custom themes use a standalone preview and apply only saved changes',
+    run: customThemesScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Checks the standalone editor and isolated sample chat against a deterministic YouTube tab.'
+  },
   {
     title: 'Compact message density combines with themes without changing typography',
     run: compactMessageDensityScenario,

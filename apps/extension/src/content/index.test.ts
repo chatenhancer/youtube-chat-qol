@@ -96,6 +96,8 @@ describe('content script entrypoint wiring', () => {
     expect(lifecycleMocks.handleFeatureParticipant.mock.calls[0][0]).toBe(participant);
     expect(lifecycleMocks.bootFeatures).toHaveBeenCalledOnce();
     expect(observe).toHaveBeenCalledWith(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['dark'],
       childList: true,
       characterData: true,
       subtree: true
@@ -418,7 +420,7 @@ describe('content script entrypoint wiring', () => {
 
     storageListener?.({
       chatSkin: {
-        newValue: 'aero',
+        newValue: 'custom:aero',
         oldValue: 'system'
       },
       targetLanguage: {
@@ -433,7 +435,7 @@ describe('content script entrypoint wiring', () => {
     document.documentElement.setAttribute('dark', '');
     storageListener?.({
       chatSkin: {
-        newValue: 'aero',
+        newValue: 'custom:aero',
         oldValue: 'system'
       },
       targetLanguage: {
@@ -443,11 +445,11 @@ describe('content script entrypoint wiring', () => {
     }, 'sync');
 
     expect(getOptions().targetLanguage).toBe('fr');
-    expect(getOptions().chatSkin).toBe('aero');
-    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('aero');
+    expect(getOptions().chatSkin).toBe('custom:aero');
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('custom');
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBe('dark');
     expect(lifecycleMocks.handleFeatureOptionsChanged).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
-      chatSkin: 'aero',
+      chatSkin: 'custom:aero',
       targetLanguage: 'fr'
     }));
 
@@ -457,9 +459,9 @@ describe('content script entrypoint wiring', () => {
         oldValue: 'default'
       }
     }, 'sync');
-    expect(getOptions().chatSkin).toBe('aero');
+    expect(getOptions().chatSkin).toBe('custom:aero');
     expect(getOptions().messageDensity).toBe('compact');
-    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('aero');
+    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('custom');
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBe('dark');
     expect(document.documentElement.getAttribute('data-ytcq-message-density')).toBe('compact');
 
@@ -470,7 +472,7 @@ describe('content script entrypoint wiring', () => {
       },
       chatSkin: {
         newValue: 'system',
-        oldValue: 'aero'
+        oldValue: 'custom:aero'
       }
     }, 'sync');
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBeNull();

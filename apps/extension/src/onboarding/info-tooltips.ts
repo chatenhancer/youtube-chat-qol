@@ -6,6 +6,7 @@ export function wirePreviewInfo(
   controls: ReadonlyArray<readonly [selector: string, messageKey: string]>,
   signal?: AbortSignal
 ): () => void {
+  if (root.ownerDocument.documentElement.hasAttribute('data-ytcq-theme-preview')) return () => {};
   const tooltip = document.createElement('div');
   tooltip.id = `${root.id || 'previewProfile'}Info`;
   tooltip.className = 'preview-tooltip preview-floating-tooltip';

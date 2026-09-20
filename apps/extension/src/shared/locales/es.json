@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "No se pudieron actualizar los marcadores."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "Ya tiene los valores predeterminados."
+    },
+    "themeReset": {
+      "message": "Restablecer"
+    },
+    "themeResetSavedDone": {
+      "message": "Se ha restaurado la versión guardada del tema. Puedes deshacerlo."
+    },
+    "themeResetDone": {
+      "message": "Tema restablecido a los valores predeterminados. No se ha guardado; puedes deshacerlo."
+    },
+    "theme_playful": {
+      "message": "Juguetón"
+    },
+    "theme_pixel": {
+      "message": "Píxel"
+    },
+    "theme_elegant": {
+      "message": "Elegante"
+    },
+    "themeCustomize": {
+      "message": "Personalizar"
+    },
+    "themeSection_colors": {
+      "message": "Colores"
+    },
+    "themeSection_style": {
+      "message": "Estilo"
+    },
+    "themeSection_artwork": {
+      "message": "Imágenes"
+    },
+    "themeShapeDepth": {
+      "message": "Forma y profundidad"
+    },
+    "themeGradientAngle": {
+      "message": "Dirección del degradado"
+    },
+    "themeImageText": {
+      "message": "Texto sobre la imagen"
+    },
+    "themeImageTextHint": {
+      "message": "Automático usa el brillo y la visibilidad de la imagen. Elige Claro u Oscuro para ajustarlo manualmente."
+    },
+    "theme_auto": {
+      "message": "Automático"
+    },
+    "themeImagePlacement": {
+      "message": "Posición de la imagen"
+    },
+    "themePositionX": {
+      "message": "Posición horizontal"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Opacidad de la superficie"
+    },
+    "themeShine": {
+      "message": "Intensidad del brillo"
+    },
+    "themeWorking": {
+      "message": "Espera a que termine la acción actual."
+    },
+    "themeNoChanges": {
+      "message": "Haz un cambio antes de guardar."
+    },
+    "themeAlreadyApplied": {
+      "message": "Esta versión ya está aplicada."
+    },
+    "themePreinstalled": {
+      "message": "Preinstalado"
+    },
+    "themePresetNote": {
+      "message": "Aero es un tema preinstalado. Introduce otro nombre para guardar este tema."
+    },
+    "themePresetNameRequired": {
+      "message": "Introduce un nombre distinto de Aero para guardar tu copia."
+    },
+    "themePresetLocked": {
+      "message": "Los temas preinstalados no se pueden eliminar."
+    },
+    "themeFinishHint_flat": {
+      "message": "Superficies lisas sin reflejos."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Controles brillantes y paneles opacos con un reflejo sutil en el borde superior."
+    },
+    "themeFinishHint_glass": {
+      "message": "Reflejos suaves y paneles translúcidos y difuminados. Abre un panel para ver a través de él."
+    },
+    "themeShadowHint": {
+      "message": "Añade profundidad bajo la cabecera, sobre el área de entrada y alrededor de los paneles."
+    },
+    "themeZoom": {
+      "message": "Zoom de imagen"
+    },
+    "theme_stretch": {
+      "message": "Estirar"
+    },
+    "theme_banner": {
+      "message": "Franja"
+    },
+    "themeImageHeight": {
+      "message": "Altura de imagen"
+    },
+    "themeAvatarShape": {
+      "message": "Forma del avatar"
+    },
+    "theme_round": {
+      "message": "Redondo"
+    },
+    "theme_square": {
+      "message": "Cuadrado"
+    },
+    "themeAvatarFrame": {
+      "message": "Imagen del marco del avatar"
+    },
+    "themeOpenImage": {
+      "message": "Abrir imagen en una pestaña nueva"
+    },
+    "themeImagePreview": {
+      "message": "Vista previa de imagen"
+    },
+    "themeRemoveImage": {
+      "message": "Quitar imagen"
+    },
+    "theme_gothic": {
+      "message": "Gótico"
+    },
+    "themeEditor": {
+      "message": "Editor de temas"
+    },
+    "themeSelect": {
+      "message": "Seleccionar un tema para editar"
+    },
+    "themeNew": {
+      "message": "Nuevo tema"
+    },
+    "themeName": {
+      "message": "Nombre del tema"
+    },
+    "themeSave": {
+      "message": "Guardar"
+    },
+    "themeSaveApply": {
+      "message": "Guardar y usar"
+    },
+    "themeUndone": {
+      "message": "Deshecho: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "No hay cambios que deshacer."
+    },
+    "themeDelete": {
+      "message": "Eliminar tema"
+    },
+    "themeClear": {
+      "message": "Vaciar tema nuevo"
+    },
+    "themeDiscardConfirm": {
+      "message": "¿Descartar los cambios del tema sin guardar?"
+    },
+    "themeKeepEditing": {
+      "message": "Seguir editando"
+    },
+    "themeDiscard": {
+      "message": "Descartar"
+    },
+    "themeDeleteConfirm": {
+      "message": "¿Eliminar este tema?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "El chat volverá al tema predeterminado."
+    },
+    "themeAppearance": {
+      "message": "Vista previa de apariencia"
+    },
+    "theme_light": {
+      "message": "Claro"
+    },
+    "theme_dark": {
+      "message": "Oscuro"
+    },
+    "themeArea": {
+      "message": "Personalizar zona"
+    },
+    "themeArea_header": {
+      "message": "Cabecera"
+    },
+    "themeArea_chat": {
+      "message": "Chat"
+    },
+    "themeArea_composer": {
+      "message": "Entrada"
+    },
+    "themeBackgroundColor": {
+      "message": "Color de fondo"
+    },
+    "themeMarkerColor": {
+      "message": "Color del marcador"
+    },
+    "themeFinishStyle": {
+      "message": "Estilo de acabado"
+    },
+    "themeBackground": {
+      "message": "Fondo"
+    },
+    "themeFill": {
+      "message": "Estilo de fondo"
+    },
+    "theme_solid": {
+      "message": "Color sólido"
+    },
+    "theme_gradient": {
+      "message": "Degradado"
+    },
+    "theme_image": {
+      "message": "Imagen"
+    },
+    "themeGradientColor": {
+      "message": "Segundo color"
+    },
+    "themeChooseImage": {
+      "message": "Elegir imagen"
+    },
+    "themeFit": {
+      "message": "Ajuste de imagen"
+    },
+    "theme_cover": {
+      "message": "Rellenar"
+    },
+    "theme_contain": {
+      "message": "Ajustar"
+    },
+    "theme_repeat": {
+      "message": "Mosaico"
+    },
+    "themeVisibility": {
+      "message": "Visibilidad de imagen"
+    },
+    "themePosition": {
+      "message": "Posición vertical"
+    },
+    "themeAccent": {
+      "message": "Acento"
+    },
+    "theme_flat": {
+      "message": "Plano"
+    },
+    "theme_glossy": {
+      "message": "Brillante"
+    },
+    "theme_glass": {
+      "message": "Cristal"
+    },
+    "themeCorners": {
+      "message": "Radio de esquinas"
+    },
+    "themeShadow": {
+      "message": "Sombra"
+    },
+    "themeFont": {
+      "message": "Fuente"
+    },
+    "theme_default": {
+      "message": "Predeterminada"
+    },
+    "theme_classic": {
+      "message": "Clásica"
+    },
+    "theme_mono": {
+      "message": "Monoespaciada"
+    },
+    "themeEditorDescription": {
+      "message": "Crea un tema con tus propios colores, imágenes y detalles."
+    },
+    "themeSaved": {
+      "message": "Tema guardado. El tema aplicado no ha cambiado."
+    },
+    "themeApplied": {
+      "message": "Tema guardado y aplicado."
+    },
+    "themeSaveError": {
+      "message": "No se pudieron guardar los cambios. Prueba una imagen más pequeña o libera espacio de la extensión."
+    },
+    "themeApplyError": {
+      "message": "No se pudo aplicar el tema. Inténtalo de nuevo."
+    },
+    "themeImageError": {
+      "message": "Elige una imagen más pequeña (PNG, JPEG, WebP: hasta 10 MB; GIF: hasta 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "Introduce un nombre para el tema."
+    },
+    "themeCustom": {
+      "message": "Mis temas"
+    },
+    "themeResetItem": {
+      "message": "Temas personalizados"
+    },
     "close": {
       "message": "Cerrar"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Mantén el vídeo y el chat en una ventana siempre visible mientras usas otras pestañas."
+    },
+    "themeBlur": {
+      "message": "Desenfoque de paneles"
+    },
+    "themeAddMessageMark": {
+      "message": "Añadir marcador de mensaje"
+    },
+    "themeSecondary": {
+      "message": "Acento secundario"
+    },
+    "themePaletteHint": {
+      "message": "Los botones e iconos siguen el acento; las etiquetas y los resaltados usan el acento secundario. Los paneles, menús y textos se adaptan automáticamente al modo claro y oscuro."
+    },
+    "theme_theme": {
+      "message": "Colores del tema"
+    },
+    "themeDarkImage": {
+      "message": "Imagen para modo oscuro (opcional)"
+    },
+    "themeSurfaceTint": {
+      "message": "Tinte de fondo"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Añade el color de acento a los fondos. Al 0 %, se usan los colores neutros de YouTube."
+    },
+    "themeBorder": {
+      "message": "Bordes"
     }
   }
 }

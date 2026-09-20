@@ -5,6 +5,7 @@ import { withOnboardingPage } from './fixture';
 
 export const onboardingTooltipScenario: ExtensionScenario = async ({ context }) => {
   await withOnboardingPage(context, async (onboarding) => {
+    await expect(onboarding.locator('#previewMenuButton')).toHaveCSS('cursor', 'pointer');
     await onboarding.locator('#previewMenuButton').hover();
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute(
       'data-lite-mode-enabled',
@@ -86,6 +87,10 @@ export const onboardingTooltipScenario: ExtensionScenario = async ({ context }) 
     await expect(onboarding.locator('#previewDraftTranslatorTooltip')).toBeHidden();
     await expect(onboarding.locator('#previewEmojiPickerTooltip')).toBeVisible();
     await expect(onboarding.locator('#previewEmojiPickerTooltip')).not.toBeEmpty();
+    await expect(onboarding.locator('.preview-emoji')).toBeDisabled();
+    await onboarding.locator('.preview-emoji').click({ force: true });
+    await expect(onboarding.locator('.preview-emoji')).not.toBeFocused();
+    await expect(onboarding.locator('[aria-hidden="true"]:has(:focus)')).toHaveCount(0);
     await expect
       .poll(async () => {
         const [preview, composer, tooltip] = await Promise.all([

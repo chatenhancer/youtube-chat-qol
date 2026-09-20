@@ -16,12 +16,12 @@ describe('popup', () => {
       <a id="supportLink"></a>
       <button id="resetExtension"></button>
       <nav class="popup-tabs">
-        <button id="settingsTab" data-popup-tab-target="settingsPanel" aria-selected="true"></button>
-        <button id="bookmarksTab" data-popup-tab-target="bookmarksPanel" aria-selected="false">
+        <button id="settingsTab" class="popup-tab popup-tab-active" data-popup-tab-target="settingsPanel" aria-selected="true"></button>
+        <button id="bookmarksTab" class="popup-tab" data-popup-tab-target="bookmarksPanel" aria-selected="false">
           <span data-i18n="bookmarks"></span>
           <span id="bookmarksCount"></span>
         </button>
-        <button id="playgroundTab" data-popup-tab-target="playgroundPanel" aria-selected="false"></button>
+        <button id="playgroundTab" class="popup-tab" data-popup-tab-target="playgroundPanel" aria-selected="false"></button>
       </nav>
       <div class="popup-tab-panels">
       <span class="popup-scrollbar" aria-hidden="true" hidden>
@@ -90,7 +90,7 @@ describe('popup', () => {
           <input id="playgroundGamesAvailable" type="checkbox">
         </section>
         <section>
-          <select id="chatSkin"></select>
+          <select id="chatSkin"></select><button id="editThemes">Theme editor</button>
           <select id="messageDensity"></select>
         </section>
       </div>
@@ -1038,8 +1038,10 @@ describe('popup', () => {
       url: 'https://www.youtube.com/watch?v=stream-a'
     });
 
-    const storageListener = vi.mocked(chrome.storage.onChanged.addListener).mock.calls.at(-1)?.[0];
-    storageListener?.(
+    const notifyStorage = (...args: Parameters<Parameters<typeof chrome.storage.onChanged.addListener>[0]>) => {
+      for (const [listener] of vi.mocked(chrome.storage.onChanged.addListener).mock.calls) listener(...args);
+    };
+    notifyStorage(
       {
         [BOOKMARKS_STORAGE_KEY]: {
           newValue: {
@@ -1056,7 +1058,7 @@ describe('popup', () => {
     );
     expect(document.querySelector('.bookmark-name')?.textContent).toBe('@AlphaUser');
 
-    storageListener?.(
+    notifyStorage(
       {
         [BOOKMARKS_STORAGE_KEY]: {
           newValue: {
@@ -1255,7 +1257,7 @@ describe('popup', () => {
 
   it('loads saved settings into their controls', async () => {
     await chrome.storage.sync.set({
-      chatSkin: 'aero',
+      chatSkin: 'custom:aero',
       liteModeEnabled: true,
       messageDensity: 'compact',
       sound: false,
@@ -1266,7 +1268,7 @@ describe('popup', () => {
     await import('./index');
 
     for (const [id, value] of [
-      ['chatSkin', 'aero'], ['messageDensity', 'compact'],
+      ['chatSkin', 'custom:aero'], ['messageDensity', 'compact'],
       ['targetLanguage', 'ja'], ['translationDisplay', 'below']
     ]) {
       expect(document.querySelector<HTMLSelectElement>(`#${id}`)?.value).toBe(value);
@@ -1294,7 +1296,7 @@ describe('popup', () => {
 
     const changes: Array<[string, string | boolean]> = [
       ['translationDisplay', 'below'], ['translationDisplay', 'replace'],
-      ['chatSkin', 'aero'], ['chatSkin', 'system'],
+      ['chatSkin', 'custom:aero'], ['chatSkin', 'system'],
       ['messageDensity', 'compact'], ['messageDensity', 'default'],
       ['sound', false], ['sound', true],
       ['startupEffect', false], ['startupEffect', true],
@@ -1308,7 +1310,7 @@ describe('popup', () => {
         control.value = value;
       }
       control.dispatchEvent(new Event('change', { bubbles: true }));
-      expect(chrome.storage.sync.set).toHaveBeenLastCalledWith({ [id]: value });
+      await vi.waitFor(() => expect(chrome.storage.sync.set).toHaveBeenLastCalledWith({ [id]: value }));
     }
   });
 
@@ -1698,7 +1700,7 @@ describe('popup', () => {
     const chatSkin = document.querySelector<HTMLSelectElement>('#chatSkin')!;
     targetLanguage.value = 'ja';
     targetLanguage.dispatchEvent(new Event('change', { bubbles: true }));
-    chatSkin.value = 'aero';
+    chatSkin.value = 'custom:aero';
     chatSkin.dispatchEvent(new Event('change', { bubbles: true }));
     const messageDensity = document.querySelector<HTMLSelectElement>('#messageDensity')!;
     messageDensity.value = 'compact';
@@ -1815,7 +1817,7 @@ describe('popup', () => {
       return Promise.resolve({ activeTabIds: [] });
     }) as never);
     await import('./index');
-    document.querySelector<HTMLSelectElement>('#chatSkin')!.value = 'aero';
+    document.querySelector<HTMLSelectElement>('#chatSkin')!.value = 'custom:aero';
     document.querySelector<HTMLSelectElement>('#messageDensity')!.value = 'compact';
     document.querySelector<HTMLSelectElement>('#targetLanguage')!.value = 'ja';
     document.querySelector<HTMLInputElement>('#sound')!.checked = false;
@@ -1840,7 +1842,8 @@ describe('popup', () => {
       'popupResetItemBookmarks',
       'popupResetItemRememberedUsers',
       'popupResetItemPlaygroundIdentity',
-      'popupResetItemGamePreferences'
+      'popupResetItemGamePreferences',
+      'themeResetItem'
     ]);
     expect(document.querySelector('.popup-reset-dialog-cancel')?.textContent).toBe('Close');
     expect(document.querySelector('.popup-reset-dialog-confirm')?.textContent).toBe(

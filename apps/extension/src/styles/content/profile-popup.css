@@ -50,12 +50,12 @@
   opacity: 0.11;
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card) {
   transition: border-color 180ms ease-out;
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)::before {
   position: absolute;
   inset: 0;
@@ -68,7 +68,7 @@
   transition: opacity 180ms ease-out;
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent {
   --ytcq-profile-avatar-accent: var(--ytcq-profile-avatar-accent-light);
   --ytcq-profile-avatar-accent-foreground: var(
@@ -83,7 +83,7 @@
   );
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent::before {
   background:
     radial-gradient(
@@ -99,14 +99,14 @@
   opacity: 1;
 }
 
-:root[dark]:not([data-ytcq-chat-skin="aero"])
+:root[dark]:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent,
-:root[data-ytcq-chat-skin-theme="dark"]:not([data-ytcq-chat-skin="aero"])
+:root[data-ytcq-chat-skin-theme="dark"]:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent {
   --ytcq-profile-avatar-accent: var(--ytcq-profile-avatar-accent-dark);
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent
   :where(
     .ytcq-profile-card-author,
@@ -120,7 +120,7 @@
   );
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent
   :where(
     .ytcq-profile-card-author,
@@ -134,7 +134,7 @@
   );
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)
   :where(
     .ytcq-profile-card-author,
@@ -172,6 +172,7 @@
   z-index: 7;
   width: 42px;
   height: 13px;
+  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
   cursor: inherit;
   transform: translateX(-50%);
 }
@@ -207,7 +208,7 @@
   width: 25px;
   height: 4px;
   background:
-    radial-gradient(circle, var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa)) 1px, transparent 1.4px)
+    radial-gradient(circle, currentColor 1px, transparent 1.4px)
     0 0 / 6px 4px repeat-x;
   content: "";
   opacity: 0.52;
@@ -382,10 +383,10 @@
 }
 
 .ytcq-avatar-ring-active {
-  box-shadow: 0 0 0 2px var(--ytcq-avatar-ring-color, #3ea6ff);
-  box-shadow:
+  --ytcq-avatar-ring-shadow:
     0 0 0 2px var(--ytcq-avatar-ring-color, #3ea6ff),
     0 0 0 4px color-mix(in srgb, var(--ytcq-avatar-ring-color, #3ea6ff) 22%, transparent);
+  box-shadow: var(--ytcq-avatar-ring-shadow);
 }
 
 #author-name.ytcq-remembered-author-target {
@@ -434,8 +435,8 @@
 }
 
 .ytcq-inbox-keyword-toggle-has-count .ytcq-inbox-keyword-count {
-  color: #111;
-  background: #ffb74d;
+  color: var(--ytcq-theme-highlight-count-text, #111);
+  background: var(--ytcq-theme-highlight, #ffb74d);
 }
 
 .ytcq-profile-card-messages {
@@ -556,13 +557,13 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
   outline: none;
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)
   .ytcq-profile-card-message {
   isolation: isolate;
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)
   .ytcq-profile-card-message::before {
   position: absolute;
@@ -576,20 +577,20 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
   transition: opacity 180ms ease-out;
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent
   .ytcq-profile-card-message::before {
   background: color-mix(in srgb, var(--ytcq-profile-avatar-accent) 7%, transparent);
   opacity: 1;
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent
   .ytcq-profile-card-message:where(:hover, :focus)::before {
   background: color-mix(in srgb, var(--ytcq-profile-avatar-accent) 11%, transparent);
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card).ytcq-profile-card-has-avatar-accent
   .ytcq-profile-card-message-origin {
   box-shadow:
@@ -605,7 +606,7 @@ button.ytcq-inbox-avatar:focus .ytcq-inbox-avatar-open-icon {
     );
 }
 
-:root:not([data-ytcq-chat-skin="aero"])
+:root:not([data-ytcq-chat-skin="custom"])
   .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)
   .ytcq-profile-card-message-origin {
   transition: box-shadow 180ms ease-out;
@@ -721,7 +722,7 @@ yt-live-chat-paid-message-renderer #menu:has(> .ytcq-chat-bookmark-toggle) {
   color: var(--yt-spec-call-to-action, #3ea6ff);
 }
 
-/* Paid cards supply their own contrasting foreground, including in Aero and when saved. */
+/* Paid cards supply their own contrasting foreground, including in custom themes and when saved. */
 :is(
   yt-live-chat-paid-message-renderer,
   .ytcq-lite-message-paid,
@@ -730,7 +731,7 @@ yt-live-chat-paid-message-renderer #menu:has(> .ytcq-chat-bookmark-toggle) {
   color: inherit !important;
 }
 
-:root[data-ytcq-chat-skin="aero"] :is(
+:root[data-ytcq-chat-skin="custom"] :is(
   yt-live-chat-paid-message-renderer,
   .ytcq-lite-message-paid,
   .ytcq-lite-message-sticker
@@ -839,20 +840,20 @@ yt-live-chat-paid-message-renderer #menu:has(> .ytcq-chat-bookmark-toggle) {
   padding: 0 8px;
   border: 0;
   border-radius: 12px;
-  color: var(--yt-spec-call-to-action, #3ea6ff);
-  background: transparent;
+  color: var(--ytcq-theme-button-text, var(--yt-spec-call-to-action, #3ea6ff));
+  background: var(--ytcq-theme-button-background, transparent);
   font: 500 11px/14px Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 
 .ytcq-profile-card-open:hover,
 .ytcq-profile-card-open:focus {
-  background: var(--ytcq-hover-background);
+  background: var(--ytcq-theme-button-hover, var(--ytcq-hover-background));
   outline: none;
 }
 
 .ytcq-profile-card-open:disabled {
-  color: var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa));
+  color: var(--ytcq-theme-button-text, var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, #aaa)));
   cursor: default;
   opacity: 0.5;
 }
@@ -863,17 +864,17 @@ yt-live-chat-paid-message-renderer #menu:has(> .ytcq-chat-bookmark-toggle) {
     opacity: 1;
   }
 
-  :root:not([data-ytcq-chat-skin="aero"])
+  :root:not([data-ytcq-chat-skin="custom"])
     .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card),
-  :root:not([data-ytcq-chat-skin="aero"])
+  :root:not([data-ytcq-chat-skin="custom"])
     .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)::before,
-  :root:not([data-ytcq-chat-skin="aero"])
+  :root:not([data-ytcq-chat-skin="custom"])
     .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)
     .ytcq-profile-card-message::before,
-  :root:not([data-ytcq-chat-skin="aero"])
+  :root:not([data-ytcq-chat-skin="custom"])
     .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)
     .ytcq-profile-card-message-origin,
-  :root:not([data-ytcq-chat-skin="aero"])
+  :root:not([data-ytcq-chat-skin="custom"])
     .ytcq-profile-card:not(.ytcq-inbox-card):not(.ytcq-games-card)
     :where(
       .ytcq-profile-card-author,

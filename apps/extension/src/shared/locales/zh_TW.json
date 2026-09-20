@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "無法更新書籤。"
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "已是預設值。"
+    },
+    "themeReset": {
+      "message": "重設"
+    },
+    "themeResetSavedDone": {
+      "message": "已還原此主題的已儲存版本。你可以復原此操作。"
+    },
+    "themeResetDone": {
+      "message": "佈景主題已恢復預設值。尚未儲存，可以復原。"
+    },
+    "theme_playful": {
+      "message": "活潑"
+    },
+    "theme_pixel": {
+      "message": "像素"
+    },
+    "theme_elegant": {
+      "message": "優雅"
+    },
+    "themeCustomize": {
+      "message": "自訂"
+    },
+    "themeSection_colors": {
+      "message": "顏色"
+    },
+    "themeSection_style": {
+      "message": "樣式"
+    },
+    "themeSection_artwork": {
+      "message": "裝飾"
+    },
+    "themeShapeDepth": {
+      "message": "形狀與層次"
+    },
+    "themeGradientAngle": {
+      "message": "漸層方向"
+    },
+    "themeImageText": {
+      "message": "圖片上的文字"
+    },
+    "themeImageTextHint": {
+      "message": "自動模式會根據圖片的亮度和可見度調整。選擇淺色或深色可手動設定。"
+    },
+    "theme_auto": {
+      "message": "自動"
+    },
+    "themeImagePlacement": {
+      "message": "圖片配置"
+    },
+    "themePositionX": {
+      "message": "水平位置"
+    },
+    "themeSurfaceOpacity": {
+      "message": "表面不透明度"
+    },
+    "themeShine": {
+      "message": "光澤強度"
+    },
+    "themeWorking": {
+      "message": "請等待目前操作完成。"
+    },
+    "themeNoChanges": {
+      "message": "修改後才能儲存。"
+    },
+    "themeAlreadyApplied": {
+      "message": "此版本已套用。"
+    },
+    "themePreinstalled": {
+      "message": "預先安裝"
+    },
+    "themePresetNote": {
+      "message": "Aero 是預先安裝的主題。請輸入其他名稱以儲存此主題。"
+    },
+    "themePresetNameRequired": {
+      "message": "請輸入 Aero 以外的名稱來儲存副本。"
+    },
+    "themePresetLocked": {
+      "message": "無法刪除預先安裝的主題。"
+    },
+    "themeFinishHint_flat": {
+      "message": "無反光的簡潔表面。"
+    },
+    "themeFinishHint_glossy": {
+      "message": "亮面控制項與不透明面板，面板頂部帶有柔和高光。"
+    },
+    "themeFinishHint_glass": {
+      "message": "柔和反光與帶背景模糊的半透明面板。開啟面板即可查看效果。"
+    },
+    "themeShadowHint": {
+      "message": "在標題列下方、輸入區上方和面板周圍加入陰影。"
+    },
+    "themeZoom": {
+      "message": "圖片縮放"
+    },
+    "theme_stretch": {
+      "message": "拉伸"
+    },
+    "theme_banner": {
+      "message": "橫幅"
+    },
+    "themeImageHeight": {
+      "message": "圖片高度"
+    },
+    "themeAvatarShape": {
+      "message": "頭像形狀"
+    },
+    "theme_round": {
+      "message": "圓形"
+    },
+    "theme_square": {
+      "message": "方形"
+    },
+    "themeAvatarFrame": {
+      "message": "頭像框圖片"
+    },
+    "themeOpenImage": {
+      "message": "在新分頁開啟圖片"
+    },
+    "themeImagePreview": {
+      "message": "圖片預覽"
+    },
+    "themeRemoveImage": {
+      "message": "移除圖片"
+    },
+    "theme_gothic": {
+      "message": "哥德"
+    },
+    "themeEditor": {
+      "message": "主題編輯器"
+    },
+    "themeSelect": {
+      "message": "選擇要編輯的主題"
+    },
+    "themeNew": {
+      "message": "新增主題"
+    },
+    "themeName": {
+      "message": "主題名稱"
+    },
+    "themeSave": {
+      "message": "儲存"
+    },
+    "themeSaveApply": {
+      "message": "儲存並使用"
+    },
+    "themeUndone": {
+      "message": "已復原：{change}。"
+    },
+    "themeNothingToUndo": {
+      "message": "沒有可復原的變更。"
+    },
+    "themeDelete": {
+      "message": "刪除主題"
+    },
+    "themeClear": {
+      "message": "清空新主題"
+    },
+    "themeDiscardConfirm": {
+      "message": "放棄尚未儲存的主題變更？"
+    },
+    "themeKeepEditing": {
+      "message": "繼續編輯"
+    },
+    "themeDiscard": {
+      "message": "放棄"
+    },
+    "themeDeleteConfirm": {
+      "message": "刪除此主題？"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "聊天室將還原為預設主題。"
+    },
+    "themeAppearance": {
+      "message": "外觀預覽"
+    },
+    "theme_light": {
+      "message": "淺色"
+    },
+    "theme_dark": {
+      "message": "深色"
+    },
+    "themeArea": {
+      "message": "自訂區域"
+    },
+    "themeArea_header": {
+      "message": "頂部列"
+    },
+    "themeArea_chat": {
+      "message": "聊天室"
+    },
+    "themeArea_composer": {
+      "message": "輸入區"
+    },
+    "themeBackgroundColor": {
+      "message": "背景顏色"
+    },
+    "themeMarkerColor": {
+      "message": "標記顏色"
+    },
+    "themeFinishStyle": {
+      "message": "表面樣式"
+    },
+    "themeBackground": {
+      "message": "背景"
+    },
+    "themeFill": {
+      "message": "背景樣式"
+    },
+    "theme_solid": {
+      "message": "純色"
+    },
+    "theme_gradient": {
+      "message": "漸層"
+    },
+    "theme_image": {
+      "message": "圖片"
+    },
+    "themeGradientColor": {
+      "message": "第二種顏色"
+    },
+    "themeChooseImage": {
+      "message": "選擇圖片"
+    },
+    "themeFit": {
+      "message": "圖片配置"
+    },
+    "theme_cover": {
+      "message": "填滿"
+    },
+    "theme_contain": {
+      "message": "符合"
+    },
+    "theme_repeat": {
+      "message": "並排"
+    },
+    "themeVisibility": {
+      "message": "圖片可見度"
+    },
+    "themePosition": {
+      "message": "垂直位置"
+    },
+    "themeAccent": {
+      "message": "強調色"
+    },
+    "theme_flat": {
+      "message": "平面"
+    },
+    "theme_glossy": {
+      "message": "光澤"
+    },
+    "theme_glass": {
+      "message": "玻璃"
+    },
+    "themeCorners": {
+      "message": "圓角半徑"
+    },
+    "themeShadow": {
+      "message": "陰影"
+    },
+    "themeFont": {
+      "message": "字型"
+    },
+    "theme_default": {
+      "message": "預設"
+    },
+    "theme_classic": {
+      "message": "經典"
+    },
+    "theme_mono": {
+      "message": "等寬"
+    },
+    "themeEditorDescription": {
+      "message": "使用你喜歡的顏色、圖片和細節建立主題。"
+    },
+    "themeSaved": {
+      "message": "主題已儲存，目前套用的主題保持不變。"
+    },
+    "themeApplied": {
+      "message": "主題已儲存並套用。"
+    },
+    "themeSaveError": {
+      "message": "無法儲存變更。請嘗試較小的圖片或釋放擴充功能儲存空間。"
+    },
+    "themeApplyError": {
+      "message": "無法套用主題，請再試一次。"
+    },
+    "themeImageError": {
+      "message": "請選擇較小的圖片（PNG、JPEG、WebP：最大 10 MB；GIF：最大 2 MB）。"
+    },
+    "themeNameRequired": {
+      "message": "請輸入主題名稱。"
+    },
+    "themeCustom": {
+      "message": "我的主題"
+    },
+    "themeResetItem": {
+      "message": "自訂主題"
+    },
     "close": {
       "message": "關閉"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "使用其他分頁時，讓影片和聊天保留在一律置頂的視窗中。"
+    },
+    "themeBlur": {
+      "message": "面板模糊"
+    },
+    "themeAddMessageMark": {
+      "message": "新增訊息標記"
+    },
+    "themeSecondary": {
+      "message": "次要強調色"
+    },
+    "themePaletteHint": {
+      "message": "按鈕和圖示使用強調色；標籤和醒目提示使用次要強調色。面板、選單和文字會自動適應淺色和深色模式。"
+    },
+    "theme_theme": {
+      "message": "主題色彩"
+    },
+    "themeDarkImage": {
+      "message": "深色模式圖片（選填）"
+    },
+    "themeSurfaceTint": {
+      "message": "背景著色"
+    },
+    "themeSurfaceTintHint": {
+      "message": "為背景加入強調色。設為 0% 時，使用 YouTube 的中性色。"
+    },
+    "themeBorder": {
+      "message": "邊框"
     }
   }
 }

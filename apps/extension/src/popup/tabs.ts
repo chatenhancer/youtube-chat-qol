@@ -1,4 +1,5 @@
 import { controls } from './controls';
+import { initTabHighlight } from '../shared/extension-tabs';
 
 const SCROLL_FADE_TOP_CLASS = 'popup-scroll-fade-top';
 const SCROLL_FADE_BOTTOM_CLASS = 'popup-scroll-fade-bottom';
@@ -11,7 +12,6 @@ const POPUP_SCROLLBAR_INSET_PX = 2;
 const POPUP_SCROLLBAR_MIN_THUMB_HEIGHT_PX = 20;
 const NESTED_SCROLL_FADE_REGION_SELECTOR = '[data-popup-scroll-fade-region]';
 const NESTED_SCROLL_TARGET_SELECTOR = '[data-popup-scroll-target]';
-const POPUP_TAB_HIGHLIGHT_ANIMATED_CLASS = 'popup-tab-highlight-animated';
 const POPUP_LAST_TAB_STORAGE_KEY = 'ytcqPopupLastTab';
 const popupScrollbarTargets = new WeakMap<HTMLElement, HTMLElement>();
 const popupTabSelectionListeners = new Set<(panelId: string) => void>();
@@ -27,8 +27,7 @@ let popupScrollbarFadeTimer = 0;
 let popupScrollFadeRegion: HTMLElement | null = null;
 let popupScrollFadeRefreshTimer = 0;
 let popupTabSelectedByUser = false;
-let popupTabList: HTMLElement | null = null;
-let previewedPopupTab: HTMLButtonElement | null = null;
+let syncPopupTabHighlight = (): void => {};
 
 export function addPopupTabSelectionListener(listener: (panelId: string) => void): void {
   popupTabSelectionListeners.add(listener);
@@ -38,69 +37,19 @@ export function addPopupTabSelectionListener(listener: (panelId: string) => void
 
 export function initPopupTabs(): void {
   initPopupScrollFades();
-  initPopupTabHighlight();
+  const tabList = document.querySelector<HTMLElement>('.popup-tabs');
+  if (tabList) syncPopupTabHighlight = initTabHighlight(tabList);
   restoreLastPopupTab();
 
   controls.tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const targetId = tab.dataset.popupTabTarget;
       if (!targetId) return;
-      enablePopupTabHighlightAnimation();
       popupTabSelectedByUser = true;
       selectPopupTab(targetId);
       chrome.storage.session?.set({ [POPUP_LAST_TAB_STORAGE_KEY]: targetId });
     });
   });
-}
-
-function initPopupTabHighlight(): void {
-  const tabList = document.querySelector<HTMLElement>('.popup-tabs');
-  if (!tabList) return;
-  popupTabList = tabList;
-
-  controls.tabs.forEach((tab) => {
-    const previewTab = () => {
-      enablePopupTabHighlightAnimation();
-      previewedPopupTab = tab;
-      syncPopupTabHighlight();
-    };
-    tab.addEventListener('pointerenter', previewTab);
-    tab.addEventListener('focus', previewTab);
-  });
-
-  tabList.addEventListener('pointerleave', () => {
-    previewedPopupTab = null;
-    syncPopupTabHighlight();
-  });
-  tabList.addEventListener('focusout', (event) => {
-    if (event.relatedTarget instanceof Node && tabList.contains(event.relatedTarget)) return;
-
-    previewedPopupTab = null;
-    syncPopupTabHighlight();
-  });
-  window.addEventListener('resize', syncPopupTabHighlight);
-  syncPopupTabHighlight();
-}
-
-function enablePopupTabHighlightAnimation(): void {
-  popupTabList?.classList.add(POPUP_TAB_HIGHLIGHT_ANIMATED_CLASS);
-}
-
-function syncPopupTabHighlight(): void {
-  const activeTab = controls.tabs.find((tab) => tab.getAttribute('aria-selected') === 'true');
-  positionPopupTabHighlight(previewedPopupTab || activeTab || null);
-}
-
-function positionPopupTabHighlight(tab: HTMLButtonElement | null): void {
-  if (!popupTabList || !tab) {
-    popupTabList?.style.setProperty('--ytcq-popup-tab-highlight-opacity', '0');
-    return;
-  }
-
-  popupTabList.style.setProperty('--ytcq-popup-tab-highlight-x', `${tab.offsetLeft}px`);
-  popupTabList.style.setProperty('--ytcq-popup-tab-highlight-width', `${tab.offsetWidth}px`);
-  popupTabList.style.setProperty('--ytcq-popup-tab-highlight-height', `${tab.offsetHeight}px`);
-  popupTabList.style.setProperty('--ytcq-popup-tab-highlight-opacity', '1');
 }
 
 function restoreLastPopupTab(): void {

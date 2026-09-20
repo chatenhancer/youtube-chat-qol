@@ -34,7 +34,8 @@ const htmlMinifyOptions = {
   removeRedundantAttributes: false
 };
 const contentSkinCssSources = [
-  ['skins', 'src/styles/content/skins/aero.css']
+  ['skins', 'src/styles/content/skins/custom.css'],
+  ['skins', 'src/styles/content/skins/glass.css']
 ];
 const contentCssSources = [
   ['tokens', 'src/styles/content/tokens.css'],
@@ -64,9 +65,12 @@ const popupCssSources = [
   ['tokens', 'src/styles/popup/tokens.css'],
   ['base', 'src/styles/popup/controls.css'],
   ['base', 'src/styles/popup/layout.css'],
+  ['base', 'src/styles/extension-tabs.css'],
+  ['features', 'src/styles/extension-dialog.css'],
   ['features', 'src/styles/popup/playground.css'],
   ['features', 'src/styles/popup/bookmarks.css'],
   ['features', 'src/styles/popup/options.css'],
+  ['features', 'src/styles/popup/themes.css'],
   ['features', 'src/styles/animations.css'],
   ['browser-fixes', 'src/styles/popup/browser-fixes.css']
 ];
@@ -74,7 +78,18 @@ const onboardingCssSources = [
   [null, 'src/styles/popup/fonts.css'],
   [null, 'src/styles/popup/tokens.css'],
   [null, 'src/styles/animations.css'],
+  [null, 'src/styles/extension-preview-heading.css'],
   [null, 'src/styles/onboarding.css']
+];
+const themeCssSources = [
+  [null, 'src/styles/popup/fonts.css'],
+  [null, 'src/styles/popup/tokens.css'],
+  [null, 'src/styles/popup/controls.css'],
+  [null, 'src/styles/extension-tabs.css'],
+  [null, 'src/styles/extension-dialog.css'],
+  [null, 'src/styles/popup/browser-fixes.css'],
+  [null, 'src/styles/extension-preview-heading.css'],
+  [null, 'src/styles/themes.css']
 ];
 const targetOutputDirs = {
   chrome: path.join(root, 'dist', 'extension-chrome'),
@@ -170,6 +185,18 @@ async function buildTarget(target) {
       outfile: path.join(extensionDir, 'onboarding.js'),
       format: 'iife'
     }),
+    build({
+      ...getBuildOptions(target),
+      entryPoints: [path.join(extensionRoot, 'src', 'themes', 'index.tsx')],
+      outfile: path.join(extensionDir, 'themes.js'),
+      format: 'iife'
+    }),
+    build({
+      ...getBuildOptions(target),
+      entryPoints: [path.join(extensionRoot, 'src', 'themes', 'image-preview.ts')],
+      outfile: path.join(extensionDir, 'theme-image.js'),
+      format: 'iife'
+    }),
     ...(target === 'safari' ? [build({
       ...getBuildOptions(target),
       entryPoints: [path.join(extensionRoot, 'src', 'youtube', 'chat-feed', 'loader-entry.ts')],
@@ -199,7 +226,19 @@ async function buildTarget(target) {
       }
     ),
     copyFile(path.join(root, 'LICENSE'), path.join(extensionDir, 'LICENSE')),
+    writeMinifiedHtml(
+      path.join(extensionRoot, 'src', 'themes.html'),
+      path.join(extensionDir, 'themes.html'),
+      {
+        inlineCss: buildCssBundle(themeCssSources),
+        stylesheetHref: 'themes.css'
+      }
+    ),
     copyFile(path.join(root, 'THIRD_PARTY_NOTICES.md'), path.join(extensionDir, 'THIRD_PARTY_NOTICES.md')),
+    writeMinifiedHtml(
+      path.join(extensionRoot, 'src', 'theme-image.html'),
+      path.join(extensionDir, 'theme-image.html')
+    ),
     copyFile(path.join(extensionAssetsDir, 'logos', 'logo.png'), path.join(extensionDir, 'logo.png')),
     copyFile(path.join(extensionAssetsDir, 'logos', 'logo-white.png'), path.join(extensionDir, 'logo-white.png')),
     syncExtensionLocales(path.join(extensionDir, '_locales')),

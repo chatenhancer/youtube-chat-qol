@@ -15,6 +15,7 @@ import { expectSettingsMenuControlsInjected } from './menus';
 import type { BrowserScenario, ChatSurface } from './types';
 
 const SETTINGS_INITIAL_VALUES = {
+  chatSkin: 'system',
   composerTranslateLanguage: '',
   targetLanguage: '',
   lastTranslationTarget: 'ja',
@@ -40,6 +41,18 @@ export const popupSettingsBehaviorScenario: BrowserScenario = async ({ context }
     const popup = await openExtensionPopup(context);
 
     try {
+      await test.step('The popup renders its bundled Inter font', async () => {
+        expect(await popup.evaluate(async () => {
+          await document.fonts.ready;
+          return [...document.fonts].some(font => font.family === 'Inter' && font.status === 'loaded');
+        })).toBe(true);
+        for (const colorScheme of ['light', 'dark'] as const) {
+          await popup.emulateMedia({ colorScheme });
+          for (const selector of ['body', '#settingsTab', '#chatSkinLabel', '#chatSkin']) {
+            await expect(popup.locator(selector)).toHaveCSS('font-family', 'Inter, Arial, sans-serif');
+          }
+        }
+      });
       await changePopupTranslationTarget({ context, popup });
       await changePopupTranslationDisplay({ context, popup });
       await changePopupMessageDensity({ context, popup });
@@ -96,6 +109,9 @@ async function toggleAlertSoundsFromChatSettings({
     await item.click();
     await expectStorageValue(context, 'sound', true);
     await expect(item).toHaveAttribute('aria-checked', 'true');
+    const dark = await menu.evaluate(element => element.ownerDocument.documentElement.hasAttribute('dark'));
+    await expect(item.locator('.ytcq-paper-item')).toHaveCSS('color', dark ? 'rgb(112, 187, 255)' : 'rgb(62, 166, 255)');
+    await expect(item.locator('.ytcq-paper-item')).toHaveCSS('background-color', dark ? 'rgba(62, 166, 255, 0.18)' : 'rgba(62, 166, 255, 0.14)');
   });
 
   await test.step('Disable alert sounds from chat settings', async () => {

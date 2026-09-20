@@ -4,7 +4,9 @@
  * The controls write the same sync-storage options as the popup while the
  * adjacent mock chat reflects each choice immediately.
  */
-import { CHAT_SKIN_OPTIONS, DEFAULT_CHAT_SKIN, type ChatSkin } from '../shared/chat-skins';
+import { CHAT_SKIN_OPTIONS, DEFAULT_CHAT_SKIN, isCustomChatSkin, type ChatSkin } from '../shared/chat-skins';
+import { APPLIED_CUSTOM_THEME_KEY, normalizeCustomTheme, loadCustomThemes, applyCustomTheme, selectedThemeId } from '../shared/custom-themes';
+import { setMessageDensity } from '../shared/message-density';
 import {
   createLiteModeIcon,
   createGamesIcon,
@@ -53,6 +55,31 @@ export function initOnboarding(): void {
 
   const uiLocale = localizeExtensionPage(true);
   installIcons();
+  const themePreview = new URLSearchParams(location.search).get('preview') === 'theme';
+  chrome.storage.sync.get(['messageDensity', 'liteModeEnabled'], (stored) => {
+    setMessageDensity(document.documentElement, stored.messageDensity);
+    if (themePreview) {
+      controls.liteModeEnabled.checked = stored.liteModeEnabled === true;
+      controls.chatPreview.dataset.liteModeEnabled = String(controls.liteModeEnabled.checked);
+    }
+  });
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'sync') return;
+    if (changes.messageDensity) setMessageDensity(document.documentElement, changes.messageDensity.newValue);
+    if (themePreview && changes.liteModeEnabled) {
+      controls.liteModeEnabled.checked = changes.liteModeEnabled.newValue === true;
+      controls.chatPreview.dataset.liteModeEnabled = String(controls.liteModeEnabled.checked);
+    }
+  });
+  // Only feed layout follows saved settings in the editor. Theme drafts and
+  // preview interactions stay in this frame, without translation requests.
+  if (themePreview) {
+    document.documentElement.setAttribute('data-ytcq-theme-preview', '');
+    void initProfilePreview(controls.chatPreview);
+    void initInboxPreview(controls.chatPreview);
+    void initMenuPreview(controls.chatPreview, controls, { readSavedSound: false });
+    return;
+  }
   populateLanguageOptions(controls.targetLanguage, uiLocale);
   populateChatSkinOptions(controls.chatSkin);
 
@@ -65,6 +92,19 @@ export function initOnboarding(): void {
     const options = normalizeOptions(storedOptions);
     lastKnownTranslationTarget = options.lastTranslationTarget;
     controls.chatSkin.value = options.chatSkin;
+    if (isCustomChatSkin(options.chatSkin) && !controls.chatSkin.value) {
+      // Keep an already-applied custom theme selectable when revisiting the guide.
+      chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY, (stored) => {
+        const theme = normalizeCustomTheme(stored[APPLIED_CUSTOM_THEME_KEY]);
+        if (theme && options.chatSkin === `custom:${theme.id}`) {
+          const restoreSelection = !controls.chatSkin.value;
+          controls.chatSkin.add(new Option(theme.name, options.chatSkin));
+          if (restoreSelection) controls.chatSkin.value = options.chatSkin;
+        } else if (!controls.chatSkin.value) {
+          controls.chatSkin.value = DEFAULT_CHAT_SKIN;
+        }
+      });
+    }
     controls.liteModeEnabled.checked = options.liteModeEnabled;
     controls.playgroundEnabled.checked = options.playgroundEnabled;
     controls.targetLanguage.value = options.targetLanguage;
@@ -75,10 +115,7 @@ export function initOnboarding(): void {
     );
     preview.applyOptions(options);
     // The menu reads these controls, so initialize it after saved options load.
-    void initMenuPreview(controls.chatPreview, controls, () => {
-      controls.targetLanguage.value = controls.targetLanguage.value ? '' : lastKnownTranslationTarget;
-      controls.targetLanguage.dispatchEvent(new Event('change'));
-    });
+    void initMenuPreview(controls.chatPreview, controls);
     void initProfilePreview(controls.chatPreview);
     void initInboxPreview(controls.chatPreview);
   });
@@ -119,7 +156,11 @@ export function initOnboarding(): void {
         SETTING_ICON_ANIMATIONS.chatSkin
       );
     }
-    chrome.storage.sync.set({ chatSkin });
+    if (chatSkin === 'custom:aero') {
+      void loadCustomThemes().then((themes) => applyCustomTheme(themes.find((theme) => theme.id === selectedThemeId(chatSkin))!));
+    } else {
+      chrome.storage.sync.set({ chatSkin });
+    }
     preview.setChatSkin(chatSkin);
   });
 

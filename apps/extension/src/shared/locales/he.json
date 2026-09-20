@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "לא ניתן לעדכן את הסימניות."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "ברירות המחדל כבר בשימוש."
+    },
+    "themeReset": {
+      "message": "איפוס"
+    },
+    "themeResetSavedDone": {
+      "message": "הגרסה השמורה של ערכת הנושא שוחזרה. ניתן לבטל פעולה זו."
+    },
+    "themeResetDone": {
+      "message": "ערכת העיצוב אופסה לברירות המחדל. לא נשמרה; ניתן לבטל."
+    },
+    "theme_playful": {
+      "message": "שובב"
+    },
+    "theme_pixel": {
+      "message": "פיקסלי"
+    },
+    "theme_elegant": {
+      "message": "אלגנטי"
+    },
+    "themeCustomize": {
+      "message": "התאמה אישית"
+    },
+    "themeSection_colors": {
+      "message": "צבעים"
+    },
+    "themeSection_style": {
+      "message": "סגנון"
+    },
+    "themeSection_artwork": {
+      "message": "תמונות"
+    },
+    "themeShapeDepth": {
+      "message": "צורה ועומק"
+    },
+    "themeGradientAngle": {
+      "message": "כיוון מעבר הצבע"
+    },
+    "themeImageText": {
+      "message": "טקסט על התמונה"
+    },
+    "themeImageTextHint": {
+      "message": "המצב האוטומטי מתחשב בבהירות התמונה ובמידת הנראות שלה. בחרו בהיר או כהה להגדרה ידנית."
+    },
+    "theme_auto": {
+      "message": "אוטומטי"
+    },
+    "themeImagePlacement": {
+      "message": "מיקום תמונה"
+    },
+    "themePositionX": {
+      "message": "מיקום אופקי"
+    },
+    "themeSurfaceOpacity": {
+      "message": "אטימות המשטח"
+    },
+    "themeShine": {
+      "message": "עוצמת הברק"
+    },
+    "themeWorking": {
+      "message": "יש להמתין לסיום הפעולה הנוכחית."
+    },
+    "themeNoChanges": {
+      "message": "יש לבצע שינוי לפני השמירה."
+    },
+    "themeAlreadyApplied": {
+      "message": "הגרסה הזאת כבר מוחלת."
+    },
+    "themePreinstalled": {
+      "message": "מותקן מראש"
+    },
+    "themePresetNote": {
+      "message": "Aero היא ערכת נושא מותקנת מראש. הזינו שם אחר כדי לשמור את ערכת הנושא הזו."
+    },
+    "themePresetNameRequired": {
+      "message": "הזינו שם שאינו Aero כדי לשמור את העותק."
+    },
+    "themePresetLocked": {
+      "message": "אי אפשר למחוק ערכות נושא מותקנות מראש."
+    },
+    "themeFinishHint_flat": {
+      "message": "משטחים פשוטים ללא השתקפויות."
+    },
+    "themeFinishHint_glossy": {
+      "message": "פקדים מבריקים ולוחות אטומים עם ברק עדין בקצה העליון."
+    },
+    "themeFinishHint_glass": {
+      "message": "השתקפויות עדינות ולוחות שקופים למחצה עם רקע מטושטש. פתחו לוח כדי לראות את האפקט."
+    },
+    "themeShadowHint": {
+      "message": "מוסיף עומק מתחת לכותרת, מעל אזור הקלט ומסביב ללוחות."
+    },
+    "themeZoom": {
+      "message": "זום תמונה"
+    },
+    "theme_stretch": {
+      "message": "מתיחה"
+    },
+    "theme_banner": {
+      "message": "רצועה"
+    },
+    "themeImageHeight": {
+      "message": "גובה תמונה"
+    },
+    "themeAvatarShape": {
+      "message": "צורת תמונת פרופיל"
+    },
+    "theme_round": {
+      "message": "עגולה"
+    },
+    "theme_square": {
+      "message": "מרובעת"
+    },
+    "themeAvatarFrame": {
+      "message": "תמונה למסגרת פרופיל"
+    },
+    "themeOpenImage": {
+      "message": "פתיחת התמונה בכרטיסייה חדשה"
+    },
+    "themeImagePreview": {
+      "message": "תצוגה מקדימה של התמונה"
+    },
+    "themeRemoveImage": {
+      "message": "הסרת תמונה"
+    },
+    "theme_gothic": {
+      "message": "גותי"
+    },
+    "themeEditor": {
+      "message": "עורך ערכות נושא"
+    },
+    "themeSelect": {
+      "message": "בחירת ערכת נושא לעריכה"
+    },
+    "themeNew": {
+      "message": "ערכת נושא חדשה"
+    },
+    "themeName": {
+      "message": "שם ערכת הנושא"
+    },
+    "themeSave": {
+      "message": "שמירה"
+    },
+    "themeSaveApply": {
+      "message": "שמירה ושימוש"
+    },
+    "themeUndone": {
+      "message": "בוטל: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "אין מה לבטל."
+    },
+    "themeDelete": {
+      "message": "מחיקת ערכת נושא"
+    },
+    "themeClear": {
+      "message": "ניקוי ערכת הנושא החדשה"
+    },
+    "themeDiscardConfirm": {
+      "message": "לבטל שינויים בערכת הנושא שלא נשמרו?"
+    },
+    "themeKeepEditing": {
+      "message": "המשך עריכה"
+    },
+    "themeDiscard": {
+      "message": "ביטול השינויים"
+    },
+    "themeDeleteConfirm": {
+      "message": "למחוק את ערכת הנושא הזו?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "הצ'אט יחזור לברירת המחדל."
+    },
+    "themeAppearance": {
+      "message": "תצוגה מקדימה של המראה"
+    },
+    "theme_light": {
+      "message": "בהיר"
+    },
+    "theme_dark": {
+      "message": "כהה"
+    },
+    "themeArea": {
+      "message": "התאמה אישית של אזור"
+    },
+    "themeArea_header": {
+      "message": "כותרת"
+    },
+    "themeArea_chat": {
+      "message": "צ'אט"
+    },
+    "themeArea_composer": {
+      "message": "קלט"
+    },
+    "themeBackgroundColor": {
+      "message": "צבע רקע"
+    },
+    "themeMarkerColor": {
+      "message": "צבע הסמן"
+    },
+    "themeFinishStyle": {
+      "message": "סגנון גימור"
+    },
+    "themeBackground": {
+      "message": "רקע"
+    },
+    "themeFill": {
+      "message": "סגנון הרקע"
+    },
+    "theme_solid": {
+      "message": "צבע אחיד"
+    },
+    "theme_gradient": {
+      "message": "מעבר צבעים"
+    },
+    "theme_image": {
+      "message": "תמונה"
+    },
+    "themeGradientColor": {
+      "message": "צבע שני"
+    },
+    "themeChooseImage": {
+      "message": "בחירת תמונה"
+    },
+    "themeFit": {
+      "message": "התאמת התמונה"
+    },
+    "theme_cover": {
+      "message": "מילוי"
+    },
+    "theme_contain": {
+      "message": "התאמה"
+    },
+    "theme_repeat": {
+      "message": "אריחים"
+    },
+    "themeVisibility": {
+      "message": "נראות התמונה"
+    },
+    "themePosition": {
+      "message": "מיקום אנכי"
+    },
+    "themeAccent": {
+      "message": "צבע הדגשה"
+    },
+    "theme_flat": {
+      "message": "שטוח"
+    },
+    "theme_glossy": {
+      "message": "מבריק"
+    },
+    "theme_glass": {
+      "message": "זכוכית"
+    },
+    "themeCorners": {
+      "message": "רדיוס פינות"
+    },
+    "themeShadow": {
+      "message": "צל"
+    },
+    "themeFont": {
+      "message": "גופן"
+    },
+    "theme_default": {
+      "message": "ברירת מחדל"
+    },
+    "theme_classic": {
+      "message": "קלאסי"
+    },
+    "theme_mono": {
+      "message": "רוחב קבוע"
+    },
+    "themeEditorDescription": {
+      "message": "צרו ערכת נושא עם הצבעים, התמונות והפרטים שלכם."
+    },
+    "themeSaved": {
+      "message": "ערכת הנושא נשמרה. ערכת הנושא שבשימוש לא השתנתה."
+    },
+    "themeApplied": {
+      "message": "ערכת הנושא נשמרה והוחלה."
+    },
+    "themeSaveError": {
+      "message": "לא ניתן לשמור. נסו תמונה קטנה יותר או פנו מקום באחסון התוסף."
+    },
+    "themeApplyError": {
+      "message": "לא ניתן להחיל את ערכת הנושא. נסו שוב."
+    },
+    "themeImageError": {
+      "message": "בחרו תמונה קטנה יותר (PNG, JPEG, WebP: עד 10 MB; GIF: עד 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "הזינו שם לערכת הנושא."
+    },
+    "themeCustom": {
+      "message": "ערכות הנושא שלי"
+    },
+    "themeResetItem": {
+      "message": "ערכות נושא מותאמות"
+    },
     "close": {
       "message": "סגירה"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "השאירו את הווידאו והצ׳אט בחלון שתמיד נמצא מעל חלונות אחרים בזמן השימוש בכרטיסיות אחרות."
+    },
+    "themeBlur": {
+      "message": "טשטוש לוחות"
+    },
+    "themeAddMessageMark": {
+      "message": "הוספת סמן הודעה"
+    },
+    "themeSecondary": {
+      "message": "צבע הדגשה משני"
+    },
+    "themePaletteHint": {
+      "message": "כפתורים וסמלים משתמשים בצבע ההדגשה; תגיות וסימונים משתמשים בצבע המשני. לוחות, תפריטים וטקסט מותאמים אוטומטית למצב בהיר וכהה."
+    },
+    "theme_theme": {
+      "message": "צבעי ערכת הנושא"
+    },
+    "themeDarkImage": {
+      "message": "תמונה למצב כהה (לא חובה)"
+    },
+    "themeSurfaceTint": {
+      "message": "גוון רקע"
+    },
+    "themeSurfaceTintHint": {
+      "message": "הוספת צבע ההדגשה לרקעים. ב־0% נעשה שימוש בצבעים הניטרליים של YouTube."
+    },
+    "themeBorder": {
+      "message": "גבולות"
     }
   }
 }

@@ -1,4 +1,5 @@
 :root[data-ytcq-onboarding] {
+  --ytcq-default-font: Inter, Arial, sans-serif;
   color-scheme: light;
   font-family: "Inter", Arial, sans-serif;
   font-synthesis: none;
@@ -69,6 +70,17 @@ option,
 optgroup {
   font: inherit;
   font-family: "Inter", Arial, sans-serif;
+}
+
+/* Override reused chat fonts, including sample panels appended outside the preview. */
+:root[data-ytcq-onboarding][data-ytcq-preview-default-font] :is(body, body *) {
+  font-family: "Inter", Arial, sans-serif !important;
+}
+
+:root[data-ytcq-onboarding][data-ytcq-chat-skin="custom"] :is(
+  #chatPreview *, .preview-profile-card, .preview-profile-card *, .preview-inbox-card, .preview-inbox-card *
+) {
+  font-family: var(--ytcq-theme-font) !important;
 }
 
 .onboarding-shell {
@@ -411,42 +423,7 @@ optgroup {
 }
 
 .preview-heading {
-  display: flex;
-  align-items: center;
-  align-self: center;
-  max-width: 100%;
-  flex-direction: column;
-  gap: 4px;
-  margin: 0 0 9px;
   transform: translateX(-10px);
-}
-
-.preview-title {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 350;
-  line-height: 1;
-}
-
-.preview-title img {
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
-  flex: 0 0 auto;
-  border-radius: 12px;
-  corner-shape: var(--ytcq-popup-squircle-corner-shape);
-}
-
-.preview-hover-hint {
-  margin: 0;
-  color: var(--onboarding-muted);
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.35;
-  text-align: center;
 }
 
 .preview-feature-breakdown {
@@ -506,6 +483,65 @@ optgroup {
     box-shadow 220ms ease;
 }
 
+.chat-preview[data-chat-skin="custom"] {
+  --preview-bg: var(--ytcq-theme-chat-color);
+  --preview-field: var(--ytcq-theme-composer-input);
+  --preview-text: var(--ytcq-theme-chat-text);
+  --preview-muted: var(--ytcq-theme-chat-muted);
+  --preview-subtle: var(--ytcq-theme-border);
+  --preview-skeleton-author: var(--ytcq-theme-chat-muted);
+  --preview-border: var(--ytcq-theme-border);
+  --preview-action: var(--ytcq-theme-accent-text);
+  --preview-native-icon: var(--ytcq-theme-header-text);
+  --preview-disabled-icon: var(--ytcq-theme-muted);
+}
+
+/* The theme editor embeds the same chat samples as a self-contained preview. */
+:root[data-ytcq-theme-preview] { --onboarding-page: transparent; }
+:root[data-ytcq-theme-preview],
+:root[data-ytcq-theme-preview] body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+:root[data-ytcq-theme-preview] :is(.settings-column, .preview-heading, .preview-feature-breakdown) {
+  display: none;
+}
+:root[data-ytcq-theme-preview] :is(.onboarding-shell, .preview-column) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  transform: none;
+}
+:root[data-ytcq-theme-preview] .chat-preview {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  aspect-ratio: auto;
+  /* The embedded frame has no room for the skin's outside shadow. */
+  box-shadow: none !important;
+}
+:root[data-ytcq-theme-preview][data-ytcq-chat-skin-theme="dark"] .chat-preview { color-scheme: dark; }
+:root[data-ytcq-theme-preview][data-ytcq-chat-skin-theme="light"] .chat-preview { color-scheme: light; }
+
+:root[data-ytcq-theme-preview] .theme-area-highlight {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  border-radius: inherit;
+  corner-shape: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .chat-preview[data-chat-skin="system"] {
   --yt-spec-call-to-action: #3ea6ff;
   --yt-spec-touch-response: rgba(128, 128, 128, 0.16);
@@ -545,7 +581,7 @@ optgroup {
   display: contents;
 }
 
-.preview-chat-header {
+:root[data-ytcq-onboarding] .preview-chat-header {
   position: relative;
   z-index: 4;
   display: flex;
@@ -602,6 +638,11 @@ optgroup {
     border-color 220ms ease;
 }
 
+/* Help explanations belong to onboarding, outside the theme editor. */
+:root[data-ytcq-theme-preview] .preview-tooltip {
+  display: none;
+}
+
 .preview-chat-menu-tooltip {
   top: 56px;
   inset-inline-end: 14px;
@@ -625,7 +666,7 @@ optgroup {
 
 .preview-pip-tooltip a {
   display: inline-block;
-  color: var(--ytcq-aero-accent-strong, var(--onboarding-action));
+  color: var(--ytcq-theme-accent-text, var(--onboarding-action));
   text-underline-offset: 2px;
 }
 
@@ -817,6 +858,8 @@ ytd-menu-popup-renderer.preview-settings-menu {
   height: 24px;
 }
 
+#previewMenuButton { cursor: pointer; }
+
 .preview-native-header-icon,
 .preview-native-header-icon svg,
 .preview-native-header-icon path {
@@ -918,6 +961,8 @@ ytd-menu-popup-renderer.preview-settings-menu {
   min-height: 32px;
   margin: 0;
   padding: 4px 24px;
+  overflow: hidden;
+  contain: content;
   border-radius: 4px;
   corner-shape: var(--ytcq-popup-squircle-corner-shape);
   font-size: 13px;
@@ -928,6 +973,27 @@ ytd-menu-popup-renderer.preview-settings-menu {
 .preview-message:hover {
   background: rgba(128, 128, 128, 0.1);
 }
+
+/* Use the real feed's density values for the sample placeholders, too. */
+:root[data-ytcq-message-density="compact"] .preview-skeleton-row {
+  height: 24px;
+  padding-inline: 12px;
+  padding-inline-start: 40px;
+}
+:root[data-ytcq-message-density="compact"] .preview-skeleton-row::before {
+  top: 2px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+}
+:root[data-ytcq-message-density="compact"] .preview-skeleton-row::after { margin-top: 9px; }
+
+/* Lite's compact rows keep a 24px content box plus 2px padding per side.
+   Native rows use a 24px border box. Match the renderer selected by the user. */
+.chat-preview[data-lite-mode-enabled="true"] .preview-message { overflow: visible; contain: none; font-size: 14px; }
+.chat-preview[data-lite-mode-enabled="true"] .preview-message > #content { padding-top: 0 !important; }
+:root[data-ytcq-message-density="compact"] .chat-preview[data-lite-mode-enabled="true"] .preview-message { min-height: 28px !important; }
+:root[data-ytcq-message-density="compact"] .chat-preview[data-lite-mode-enabled="true"] .preview-skeleton-row { height: 28px; }
 
 .preview-avatar {
   display: inline-flex;
@@ -947,6 +1013,8 @@ ytd-menu-popup-renderer.preview-settings-menu {
   width: 100%;
   height: 100%;
   fill: currentColor;
+  /* Clip the person independently of the outer, overflowing decorative frame. */
+  clip-path: inset(0 round var(--ytcq-theme-avatar-radius, 50%));
 }
 
 .preview-avatar[role="button"] {
@@ -1039,8 +1107,10 @@ ytd-menu-popup-renderer.preview-settings-menu {
 
 .preview-message-copy {
   flex: 1 1 auto;
-  padding-top: 4px;
+  align-self: center;
 }
+
+.preview-message yt-live-chat-author-chip { display: inline-flex; align-items: baseline; }
 
 .preview-author {
   margin-inline-end: 8px;
@@ -1170,11 +1240,10 @@ ytd-menu-popup-renderer.preview-settings-menu {
   align-items: center;
   justify-content: space-between;
   min-width: 0;
-  height: 40px;
-  padding: 0 0 0 14px;
-  border: 1px solid transparent;
-  border-radius: 20px;
-  corner-shape: var(--ytcq-popup-squircle-corner-shape);
+  height: 36px;
+  padding: 0 0 0 12px;
+  border: 0;
+  border-radius: 18px;
   color: #979797;
   background: var(--preview-field);
 }
@@ -1205,6 +1274,10 @@ ytd-menu-popup-renderer.preview-settings-menu {
   opacity: 0.65;
 }
 
+.chat-preview[data-chat-skin="custom"] #previewDraft {
+  color: var(--ytcq-theme-panels-text);
+}
+
 .preview-composer-actions {
   display: flex;
   align-items: center;
@@ -1221,18 +1294,18 @@ ytd-menu-popup-renderer.preview-settings-menu {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 }
 
 .preview-emoji {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   margin: 0;
-  padding: 8px;
+  padding: 6px;
   border: 0;
   color: inherit;
   background: transparent;
@@ -1262,6 +1335,15 @@ ytd-menu-popup-renderer.preview-settings-menu {
   color: var(--preview-disabled-icon);
 }
 
+.chat-preview[data-chat-skin="system"] .preview-composer:has(#previewDraft:not(:placeholder-shown)) .preview-send {
+  color: var(--preview-native-icon);
+}
+
+/* The preview button stays unfocusable, but reflects whether its draft can be sent. */
+:root[data-ytcq-onboarding][data-ytcq-chat-skin="custom"] .preview-composer:has(#previewDraft:not(:placeholder-shown)) #send-button button {
+  color: var(--ytcq-theme-composer-accent) !important;
+}
+
 .preview-send button {
   display: inline-flex;
   align-items: center;
@@ -1282,55 +1364,50 @@ ytd-menu-popup-renderer.preview-settings-menu {
   transform: translateX(1px);
 }
 
-:root[data-ytcq-onboarding][data-ytcq-chat-skin="aero"] {
-  --preview-callout-text: var(--ytcq-aero-text);
-  --preview-callout-bg: var(--ytcq-aero-panel-bg);
+:root[data-ytcq-onboarding][data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] {
+  --preview-callout-text: var(--ytcq-glass-text);
+  --preview-callout-bg: var(--ytcq-glass-panel-bg);
   --preview-callout-border: color-mix(
     in srgb,
-    var(--ytcq-aero-border) 82%,
-    var(--ytcq-aero-panel-bg)
+    var(--ytcq-glass-border) 82%,
+    var(--ytcq-glass-panel-bg)
   );
   --preview-callout-shadow:
-    0 7px 20px color-mix(in srgb, var(--ytcq-aero-accent-strong) 20%, transparent),
+    0 7px 20px color-mix(in srgb, var(--ytcq-glass-accent-strong) 20%, transparent),
     inset 0 0 0 1px color-mix(in srgb, white 45%, transparent);
 }
 
-:root[data-ytcq-chat-skin="aero"] .chat-preview {
-  --preview-bg: var(--ytcq-aero-page-bg);
-  --preview-field: var(--ytcq-aero-input-bg);
-  --preview-text: var(--ytcq-aero-text);
-  --preview-muted: var(--ytcq-aero-muted-text);
-  --preview-subtle: color-mix(in srgb, var(--ytcq-aero-muted-text) 58%, transparent);
-  --preview-skeleton-author: color-mix(in srgb, var(--ytcq-aero-accent-strong) 62%, transparent);
-  --preview-border: var(--ytcq-aero-border);
-  --preview-action: var(--ytcq-aero-accent-strong);
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] .chat-preview {
+  --preview-bg: var(--ytcq-glass-page-bg);
+  --preview-field: var(--ytcq-theme-composer-input);
+  --preview-text: var(--ytcq-glass-text);
+  --preview-muted: var(--ytcq-theme-chat-muted);
+  --preview-subtle: color-mix(in srgb, var(--ytcq-theme-chat-muted) 58%, transparent);
+  --preview-skeleton-author: color-mix(in srgb, var(--ytcq-theme-accent-text) 62%, transparent);
+  --preview-border: var(--ytcq-glass-border);
+  --preview-action: var(--ytcq-glass-accent-strong);
   box-shadow:
     0 18px 38px rgba(0, 87, 135, 0.24),
     inset 0 0 0 1px rgba(255, 255, 255, 0.72);
 }
 
-:root[data-ytcq-chat-skin="aero"] .preview-composer-field yt-live-chat-text-input-field-renderer {
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] .preview-composer-field yt-live-chat-text-input-field-renderer {
   display: flex;
   align-items: center;
 }
 
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="light"] .chat-preview {
-  --preview-subtle: color-mix(in srgb, var(--ytcq-aero-border) 34%, white);
-  --preview-skeleton-author: color-mix(in srgb, var(--ytcq-aero-accent-strong) 28%, white);
-}
-
-:root[data-ytcq-chat-skin="aero"] .preview-native-header-icon,
-:root[data-ytcq-chat-skin="aero"] .preview-native-header-icon svg,
-:root[data-ytcq-chat-skin="aero"] .preview-native-header-icon path {
-  color: #fff !important;
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] .preview-native-header-icon,
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] .preview-native-header-icon svg,
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] .preview-native-header-icon path {
+  color: var(--ytcq-theme-header-text) !important;
   fill: currentColor !important;
 }
 
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .chat-preview {
-  box-shadow: var(--ytcq-aero-card-shadow);
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"][data-ytcq-chat-skin-theme="dark"] .chat-preview {
+  box-shadow: var(--ytcq-glass-card-shadow);
 }
 
-:root[data-ytcq-chat-skin="aero"][data-ytcq-chat-skin-theme="dark"] .chat-preview :where(
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"][data-ytcq-chat-skin-theme="dark"] .chat-preview :where(
   .preview-chat-feed,
   .preview-chat-header,
   .preview-composer

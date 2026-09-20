@@ -27,11 +27,8 @@ import {
   type FeatureMutationBatch
 } from './dispatcher';
 import { DEFAULT_OPTIONS, getTargetLanguageUpdate, normalizeOptions, type Options } from '../shared/options';
-import {
-  DEFAULT_CHAT_SKIN,
-  type ChatSkinTheme
-} from '../shared/chat-skins';
-import { DEFAULT_MESSAGE_DENSITY } from '../shared/message-density';
+import { createChatThemeController } from '../features/custom-themes/controller';
+import { setMessageDensity } from '../shared/message-density';
 import {
   CONTENT_INSTANCE_ATTRIBUTE,
   CONTENT_INSTANCE_CLAIM_EVENT,
@@ -54,14 +51,11 @@ interface NormalizedMutationBatch {
 }
 
 const CONTENT_INSTANCE_ID = `${Date.now()}-${Math.random()}`;
-const CHAT_SKIN_ATTRIBUTE = 'data-ytcq-chat-skin';
-const CHAT_SKIN_THEME_ATTRIBUTE = 'data-ytcq-chat-skin-theme';
-const MESSAGE_DENSITY_ATTRIBUTE = 'data-ytcq-message-density';
-const YOUTUBE_DARK_ATTRIBUTE = 'dark';
 
 let observer: MutationObserver | null = null;
 let visibilityRecoveryTimer = 0;
 let contentSuspended = false;
+let chatTheme: ReturnType<typeof createChatThemeController> | null = null;
 
 claimContentInstance();
 injectYouTubeChatFeedPage();
@@ -73,6 +67,7 @@ async function init(): Promise<void> {
   if (!isCurrentContentInstance()) return;
   startYouTubeChatFeedRecordStore();
   initFeatures({ saveOptions });
+  chatTheme = createChatThemeController();
 
   chrome.storage.sync.get(DEFAULT_OPTIONS, (storedOptions) => {
     if (!isCurrentContentInstance()) return;
@@ -137,6 +132,10 @@ function boot(): void {
       return;
     }
 
+    if (mutations.some((mutation) => mutation.type === 'attributes' && mutation.target === document.documentElement)) {
+      applyChatSkin(getOptions());
+    }
+
     const batch = createNormalizedMutationBatch(mutations);
     const handledMessages = new WeakSet<HTMLElement>();
     handleFeatureMutations(batch.featureBatch);
@@ -147,6 +146,8 @@ function boot(): void {
   });
 
   observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['dark'],
     childList: true,
     characterData: true,
     subtree: true
@@ -318,38 +319,12 @@ function saveOptions(values: Partial<Options>): void {
 }
 
 function applyChatSkin(options: Pick<Options, 'chatSkin'>): void {
-  const previousSkin = document.documentElement.getAttribute(CHAT_SKIN_ATTRIBUTE) || DEFAULT_CHAT_SKIN;
-  const previousTheme = document.documentElement.getAttribute(CHAT_SKIN_THEME_ATTRIBUTE);
-  const resolvedTheme = options.chatSkin === DEFAULT_CHAT_SKIN
-    ? null
-    : resolveChatSkinTheme();
-
-  if (previousSkin === options.chatSkin && previousTheme === resolvedTheme) {
-    return;
-  }
-
-  if (options.chatSkin === DEFAULT_CHAT_SKIN) {
-    document.documentElement.removeAttribute(CHAT_SKIN_ATTRIBUTE);
-    document.documentElement.removeAttribute(CHAT_SKIN_THEME_ATTRIBUTE);
-    return;
-  }
-
-  document.documentElement.setAttribute(CHAT_SKIN_ATTRIBUTE, options.chatSkin);
-  document.documentElement.setAttribute(CHAT_SKIN_THEME_ATTRIBUTE, resolvedTheme ?? resolveChatSkinTheme());
-}
-
-function resolveChatSkinTheme(): ChatSkinTheme {
-  return document.documentElement.hasAttribute(YOUTUBE_DARK_ATTRIBUTE) ? 'dark' : 'light';
+  chatTheme?.apply(options.chatSkin);
 }
 
 function applyMessageDensity(options: Pick<Options, 'messageDensity'>): void {
   const density = isPictureInPictureChat() ? 'compact' : options.messageDensity;
-  if (density === DEFAULT_MESSAGE_DENSITY) {
-    document.documentElement.removeAttribute(MESSAGE_DENSITY_ATTRIBUTE);
-    return;
-  }
-
-  document.documentElement.setAttribute(MESSAGE_DENSITY_ATTRIBUTE, density);
+  setMessageDensity(document.documentElement, density);
 }
 
 function notifyFeatureOptionsChanged(previousOptions: Options, nextOptions: Options): void {
@@ -361,6 +336,7 @@ function resetPageState(): void {
   if (!isCurrentContentInstance()) return;
   const previousOptions = getOptions();
   setOptions(DEFAULT_OPTIONS);
+  chatTheme?.reset();
   applyChatSkin(DEFAULT_OPTIONS);
   applyMessageDensity(DEFAULT_OPTIONS);
   resetFeatures();
@@ -403,6 +379,8 @@ function suspendContentInstance(): void {
   document.removeEventListener(CONTENT_INSTANCE_CLAIM_EVENT, handleContentInstanceClaim);
   chrome.storage?.onChanged.removeListener(handleStorageChanged);
   chrome.runtime?.onMessage.removeListener(handleRuntimeMessage);
+  chatTheme?.dispose();
+  chatTheme = null;
   stopYouTubeChatFeedRecordStore();
   suspendFeatures();
 }

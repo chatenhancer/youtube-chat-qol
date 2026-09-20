@@ -145,9 +145,9 @@ export async function sampleMenuIconThemes(
   const snapshots: HeaderIconSnapshot[] = [];
   for (const theme of ['light', 'dark'] as const) {
     await chat.locator('html').evaluate((element, value) => {
-      element.setAttribute('data-ytcq-chat-skin', 'aero');
-      element.setAttribute('data-ytcq-chat-skin-theme', value);
+      element.toggleAttribute('dark', value === 'dark');
     }, theme);
+    await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin-theme', theme);
     const menu = await openChatEnhancerMenu(chat);
     const snapshot = await chat
       .locator('[data-ytcq-setting="liteModeEnabled"] .ytcq-paper-item')

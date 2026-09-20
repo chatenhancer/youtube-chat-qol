@@ -30,12 +30,12 @@ export const liteModeAeroBehaviorScenario: BrowserScenario = async ({ chat, cont
   await withExtensionStorageValues(
     context,
     'sync',
-    { chatSkin: 'aero', liteModeEnabled: false },
+    { chatSkin: 'custom:aero', liteModeEnabled: false },
     async () => {
       try {
         await clearLiteTestCooldown(chat);
         await expectLiteModeMenuState(chat, false);
-        await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
+        await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'custom');
         await chat
           .locator('yt-live-chat-text-message-renderer')
           .last()
@@ -98,7 +98,7 @@ export const liteModeAeroBehaviorScenario: BrowserScenario = async ({ chat, cont
           await expect(chat.locator(LITE_NATIVE_RESTORE_SELECTOR)).toHaveCount(0, {
             timeout: 20_000
           });
-          await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
+          await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'custom');
           await expectLiteModeMenuState(chat, false);
         });
       } finally {

@@ -26,16 +26,16 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     await expect(lite).toHaveAttribute('aria-checked', 'true');
     const translate = menu.locator('[data-ytcq-setting="targetLanguage"]');
     await expect(translate).toHaveAttribute('aria-checked', 'true');
-    await translate.click();
-    await expect(onboarding.locator('#onboardingTargetLanguage')).toHaveValue('');
-    await expect(translate).toHaveAttribute('aria-checked', 'false');
-    await translate.click();
+    for (const setting of ['targetLanguage', 'sound', 'liteModeEnabled']) {
+      const toggle = menu.locator(`[data-ytcq-setting="${setting}"]`);
+      const checked = await toggle.getAttribute('aria-checked');
+      await toggle.click();
+      await toggle.press('Enter');
+      await toggle.press('Space');
+      await expect(toggle).toHaveAttribute('aria-checked', checked!);
+    }
     await expect(onboarding.locator('#onboardingTargetLanguage')).toHaveValue('ja');
     await expect(translate).toHaveAttribute('aria-checked', 'true');
-    await lite.click();
-    await expect(onboarding.locator('#onboardingLiteModeEnabled')).not.toBeChecked();
-    await expect(lite).toHaveAttribute('aria-checked', 'false');
-    await lite.click();
     await expect(onboarding.locator('#onboardingLiteModeEnabled')).toBeChecked();
     await lite.press('Escape');
     await expect(menu).toBeHidden();
@@ -49,7 +49,7 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
       'background-color',
       'rgba(0, 0, 0, 0.2)'
     );
-    await onboarding.locator('#onboardingChatSkin').selectOption('aero');
+    await onboarding.locator('#onboardingChatSkin').selectOption('custom:aero');
 
     await expect(onboarding.locator('#previewGamesIcon')).toBeVisible();
     await expect(onboarding.locator('#previewGamesIcon')).toHaveCSS(
@@ -58,9 +58,9 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     );
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('role', 'group');
     await expect(onboarding.locator('.preview-chat-feed')).not.toHaveAttribute('aria-hidden', 'true');
-    await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-skin', 'aero');
+    await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-skin', 'custom');
     await expect(onboarding.locator('#chatPreview')).toHaveAttribute('data-chat-theme', 'light');
-    await expect(onboarding.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
+    await expect(onboarding.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'custom');
     await expect(onboarding.locator('html')).toHaveAttribute('data-ytcq-chat-skin-theme', 'light');
     await expect(onboarding.locator('#chatPreview')).toHaveCSS(
       'background-color',
@@ -115,27 +115,21 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     );
     await expect(onboarding.locator('#chatPreview')).toHaveCSS(
       'border-top-color',
-      'rgb(64, 137, 180)'
+      'rgb(63, 63, 63)'
     );
     await expect(onboarding.locator('.preview-chat-header')).toHaveCSS(
       'border-bottom-color',
-      'rgb(6, 43, 73)'
+      'rgb(63, 63, 63)'
     );
     await expect(onboarding.locator('.preview-chat-header')).not.toHaveCSS('box-shadow', 'none');
     await expect(onboarding.locator('.preview-chat-header')).toHaveCSS('z-index', '4');
     await expect(onboarding.locator('.preview-chat-feed')).toHaveCSS('z-index', '1');
     await expect(onboarding.locator('.preview-composer')).toHaveCSS(
       'border-top-color',
-      'rgb(64, 137, 180)'
+      'rgb(63, 63, 63)'
     );
     await onboarding.locator('.preview-composer-field').hover();
-    await expect
-      .poll(() =>
-        onboarding
-          .locator('.preview-composer-field')
-          .evaluate((field) => getComputedStyle(field, '::before').borderTopColor)
-      )
-      .toBe('rgb(35, 72, 97)');
+    await expect.poll(() => onboarding.locator('.preview-composer-field').evaluate(field => getComputedStyle(field, '::before').borderTopColor)).toBe('rgb(66, 66, 66)');
     await expect
       .poll(() =>
         onboarding
@@ -153,7 +147,7 @@ export const onboardingFeaturePreviewScenario: ExtensionScenario = async ({ cont
     await expect(onboarding.locator('.preview-send button')).toHaveCSS('border-top-width', '0px');
     await expect(onboarding.locator('.preview-send button')).toHaveCSS(
       'color',
-      'rgb(181, 236, 255)'
+      'rgb(249, 254, 255)'
     );
     await expectStoredOnboardingOptions(context);
   });

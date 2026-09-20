@@ -15,7 +15,7 @@ export const compactMessageDensityScenario: BrowserScenario = async ({
   await withExtensionStorageValues(
     context,
     'sync',
-    { chatSkin: 'aero', liteModeEnabled: false, messageDensity: 'default' },
+    { chatSkin: 'custom:aero', liteModeEnabled: false, messageDensity: 'default' },
     async () => {
       const incomingChat = requireControlledChat(controlledChat);
       const messageText = 'Compact message density check';
@@ -31,7 +31,7 @@ export const compactMessageDensityScenario: BrowserScenario = async ({
       const avatar = row.locator('#author-photo');
       const message = row.locator('#message');
       await expect(row).toBeVisible({ timeout: 20_000 });
-      await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
+      await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'custom');
       await expect
         .poll(() => chat.locator('html').getAttribute('data-ytcq-message-density'))
         .toBeNull();
@@ -40,7 +40,7 @@ export const compactMessageDensityScenario: BrowserScenario = async ({
 
       await test.step('Apply maximum compaction independently of the selected theme', async () => {
         await setExtensionStorageValues(context, 'sync', { messageDensity: 'compact' });
-        await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'aero');
+        await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'custom');
         await expect(chat.locator('html')).toHaveAttribute(
           'data-ytcq-message-density',
           'compact'

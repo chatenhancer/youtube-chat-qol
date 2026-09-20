@@ -6,6 +6,7 @@
 }
 
 .header-actions,
+.theme-edit-button,
 .bookmarks-header-button,
 .bookmarks-filter input,
 .popup-reset-dialog-button,
@@ -29,6 +30,7 @@ input[type="number"] {
 }
 
 .bookmarks-count,
+.bookmarks-undo-button,
 .option-beta-badge {
   border-radius: var(--ytcq-popup-squircle-radius-badge);
 }

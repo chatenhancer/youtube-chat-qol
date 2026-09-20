@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "อัปเดตบุ๊กมาร์กไม่ได้"
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "ใช้ค่าเริ่มต้นอยู่แล้ว"
+    },
+    "themeReset": {
+      "message": "รีเซ็ต"
+    },
+    "themeResetSavedDone": {
+      "message": "คืนค่าธีมเป็นเวอร์ชันที่บันทึกไว้แล้ว คุณสามารถเลิกทำได้"
+    },
+    "themeResetDone": {
+      "message": "รีเซ็ตธีมเป็นค่าเริ่มต้นแล้ว ยังไม่ได้บันทึกและสามารถเลิกทำได้"
+    },
+    "theme_playful": {
+      "message": "ขี้เล่น"
+    },
+    "theme_pixel": {
+      "message": "พิกเซล"
+    },
+    "theme_elegant": {
+      "message": "หรูหรา"
+    },
+    "themeCustomize": {
+      "message": "ปรับแต่ง"
+    },
+    "themeSection_colors": {
+      "message": "สี"
+    },
+    "themeSection_style": {
+      "message": "สไตล์"
+    },
+    "themeSection_artwork": {
+      "message": "ภาพตกแต่ง"
+    },
+    "themeShapeDepth": {
+      "message": "รูปร่างและความลึก"
+    },
+    "themeGradientAngle": {
+      "message": "ทิศทางการไล่สี"
+    },
+    "themeImageText": {
+      "message": "ข้อความบนภาพ"
+    },
+    "themeImageTextHint": {
+      "message": "โหมดอัตโนมัติใช้ความสว่างและการมองเห็นของภาพ เลือกสว่างหรือมืดเพื่อตั้งค่าเอง"
+    },
+    "theme_auto": {
+      "message": "อัตโนมัติ"
+    },
+    "themeImagePlacement": {
+      "message": "การจัดวางภาพ"
+    },
+    "themePositionX": {
+      "message": "ตำแหน่งแนวนอน"
+    },
+    "themeSurfaceOpacity": {
+      "message": "ความทึบของพื้นผิว"
+    },
+    "themeShine": {
+      "message": "ความเข้มของประกาย"
+    },
+    "themeWorking": {
+      "message": "รอให้การดำเนินการปัจจุบันเสร็จสิ้น"
+    },
+    "themeNoChanges": {
+      "message": "เปลี่ยนแปลงบางอย่างก่อนบันทึก"
+    },
+    "themeAlreadyApplied": {
+      "message": "ใช้เวอร์ชันนี้อยู่แล้ว"
+    },
+    "themePreinstalled": {
+      "message": "ติดตั้งไว้ล่วงหน้า"
+    },
+    "themePresetNote": {
+      "message": "Aero เป็นธีมที่ติดตั้งไว้ล่วงหน้า โปรดใส่ชื่ออื่นเพื่อบันทึกธีมนี้"
+    },
+    "themePresetNameRequired": {
+      "message": "ป้อนชื่ออื่นที่ไม่ใช่ Aero เพื่อบันทึกสำเนา"
+    },
+    "themePresetLocked": {
+      "message": "ไม่สามารถลบธีมที่ติดตั้งไว้ล่วงหน้าได้"
+    },
+    "themeFinishHint_flat": {
+      "message": "พื้นผิวเรียบไม่มีแสงสะท้อน"
+    },
+    "themeFinishHint_glossy": {
+      "message": "ตัวควบคุมมันวาวและแผงทึบที่มีประกายบางเบาตามขอบบน"
+    },
+    "themeFinishHint_glass": {
+      "message": "เงาสะท้อนนุ่มนวลและแผงโปร่งแสงที่เบลอพื้นหลัง เปิดแผงเพื่อดูเอฟเฟกต์"
+    },
+    "themeShadowHint": {
+      "message": "เพิ่มมิติใต้ส่วนหัว เหนือพื้นที่ป้อนข้อความ และรอบแผง"
+    },
+    "themeZoom": {
+      "message": "ซูมภาพ"
+    },
+    "theme_stretch": {
+      "message": "ยืด"
+    },
+    "theme_banner": {
+      "message": "แบนเนอร์"
+    },
+    "themeImageHeight": {
+      "message": "ความสูงภาพ"
+    },
+    "themeAvatarShape": {
+      "message": "รูปทรงอวาตาร์"
+    },
+    "theme_round": {
+      "message": "กลม"
+    },
+    "theme_square": {
+      "message": "สี่เหลี่ยม"
+    },
+    "themeAvatarFrame": {
+      "message": "ภาพกรอบอวาตาร์"
+    },
+    "themeOpenImage": {
+      "message": "เปิดรูปภาพในแท็บใหม่"
+    },
+    "themeImagePreview": {
+      "message": "ตัวอย่างรูปภาพ"
+    },
+    "themeRemoveImage": {
+      "message": "นำภาพออก"
+    },
+    "theme_gothic": {
+      "message": "กอทิก"
+    },
+    "themeEditor": {
+      "message": "เครื่องมือแก้ไขธีม"
+    },
+    "themeSelect": {
+      "message": "เลือกธีมที่ต้องการแก้ไข"
+    },
+    "themeNew": {
+      "message": "ธีมใหม่"
+    },
+    "themeName": {
+      "message": "ชื่อธีม"
+    },
+    "themeSave": {
+      "message": "บันทึก"
+    },
+    "themeSaveApply": {
+      "message": "บันทึกและใช้"
+    },
+    "themeUndone": {
+      "message": "เลิกทำ: {change}"
+    },
+    "themeNothingToUndo": {
+      "message": "ไม่มีการเปลี่ยนแปลงให้เลิกทำ"
+    },
+    "themeDelete": {
+      "message": "ลบธีม"
+    },
+    "themeClear": {
+      "message": "ล้างธีมใหม่"
+    },
+    "themeDiscardConfirm": {
+      "message": "ทิ้งการเปลี่ยนแปลงธีมที่ยังไม่ได้บันทึกหรือไม่"
+    },
+    "themeKeepEditing": {
+      "message": "แก้ไขต่อ"
+    },
+    "themeDiscard": {
+      "message": "ทิ้งการเปลี่ยนแปลง"
+    },
+    "themeDeleteConfirm": {
+      "message": "ลบธีมนี้ไหม?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "แชทจะกลับไปใช้ธีมเริ่มต้น"
+    },
+    "themeAppearance": {
+      "message": "ตัวอย่างรูปลักษณ์"
+    },
+    "theme_light": {
+      "message": "สว่าง"
+    },
+    "theme_dark": {
+      "message": "มืด"
+    },
+    "themeArea": {
+      "message": "ปรับแต่งพื้นที่"
+    },
+    "themeArea_header": {
+      "message": "ส่วนหัว"
+    },
+    "themeArea_chat": {
+      "message": "แชท"
+    },
+    "themeArea_composer": {
+      "message": "ช่องพิมพ์"
+    },
+    "themeBackgroundColor": {
+      "message": "สีพื้นหลัง"
+    },
+    "themeMarkerColor": {
+      "message": "สีเครื่องหมาย"
+    },
+    "themeFinishStyle": {
+      "message": "รูปแบบพื้นผิว"
+    },
+    "themeBackground": {
+      "message": "พื้นหลัง"
+    },
+    "themeFill": {
+      "message": "รูปแบบพื้นหลัง"
+    },
+    "theme_solid": {
+      "message": "สีล้วน"
+    },
+    "theme_gradient": {
+      "message": "ไล่สี"
+    },
+    "theme_image": {
+      "message": "รูปภาพ"
+    },
+    "themeGradientColor": {
+      "message": "สีที่สอง"
+    },
+    "themeChooseImage": {
+      "message": "เลือกรูปภาพ"
+    },
+    "themeFit": {
+      "message": "การจัดวางรูป"
+    },
+    "theme_cover": {
+      "message": "เติมเต็ม"
+    },
+    "theme_contain": {
+      "message": "พอดี"
+    },
+    "theme_repeat": {
+      "message": "เรียงซ้ำ"
+    },
+    "themeVisibility": {
+      "message": "ความชัดของรูป"
+    },
+    "themePosition": {
+      "message": "ตำแหน่งแนวตั้ง"
+    },
+    "themeAccent": {
+      "message": "สีเน้น"
+    },
+    "theme_flat": {
+      "message": "แบน"
+    },
+    "theme_glossy": {
+      "message": "มันวาว"
+    },
+    "theme_glass": {
+      "message": "กระจก"
+    },
+    "themeCorners": {
+      "message": "รัศมีมุม"
+    },
+    "themeShadow": {
+      "message": "เงา"
+    },
+    "themeFont": {
+      "message": "แบบอักษร"
+    },
+    "theme_default": {
+      "message": "ค่าเริ่มต้น"
+    },
+    "theme_classic": {
+      "message": "คลาสสิก"
+    },
+    "theme_mono": {
+      "message": "ความกว้างคงที่"
+    },
+    "themeEditorDescription": {
+      "message": "สร้างธีมด้วยสี รูปภาพ และรายละเอียดที่คุณเลือกเอง"
+    },
+    "themeSaved": {
+      "message": "บันทึกธีมแล้ว ธีมที่ใช้อยู่ไม่เปลี่ยนแปลง"
+    },
+    "themeApplied": {
+      "message": "บันทึกและใช้ธีมแล้ว"
+    },
+    "themeSaveError": {
+      "message": "บันทึกการเปลี่ยนแปลงไม่ได้ ลองใช้รูปที่เล็กลงหรือเพิ่มพื้นที่ว่างในที่เก็บข้อมูลส่วนขยาย"
+    },
+    "themeApplyError": {
+      "message": "ใช้ธีมไม่ได้ โปรดลองอีกครั้ง"
+    },
+    "themeImageError": {
+      "message": "เลือกรูปที่เล็กลง (PNG, JPEG, WebP: ไม่เกิน 10 MB; GIF: ไม่เกิน 2 MB)"
+    },
+    "themeNameRequired": {
+      "message": "ป้อนชื่อธีม"
+    },
+    "themeCustom": {
+      "message": "ธีมของฉัน"
+    },
+    "themeResetItem": {
+      "message": "ธีมที่กำหนดเอง"
+    },
     "close": {
       "message": "ปิด"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "ให้วิดีโอและแชทอยู่ในหน้าต่างที่แสดงด้านบนเสมอขณะใช้แท็บอื่น"
+    },
+    "themeBlur": {
+      "message": "ความเบลอของแผง"
+    },
+    "themeAddMessageMark": {
+      "message": "เพิ่มเครื่องหมายข้อความ"
+    },
+    "themeSecondary": {
+      "message": "สีเน้นรอง"
+    },
+    "themePaletteHint": {
+      "message": "ปุ่มและไอคอนใช้สีเน้น ส่วนแท็กและไฮไลต์ใช้สีเน้นรอง แผง เมนู และข้อความจะปรับตามโหมดสว่างและมืดโดยอัตโนมัติ"
+    },
+    "theme_theme": {
+      "message": "สีธีม"
+    },
+    "themeDarkImage": {
+      "message": "ภาพสำหรับโหมดมืด (ไม่บังคับ)"
+    },
+    "themeSurfaceTint": {
+      "message": "โทนสีพื้นหลัง"
+    },
+    "themeSurfaceTintHint": {
+      "message": "เพิ่มสีเน้นให้พื้นหลัง ที่ 0% จะใช้สีพื้นหลังที่เป็นกลางของ YouTube"
+    },
+    "themeBorder": {
+      "message": "เส้นขอบ"
     }
   }
 }

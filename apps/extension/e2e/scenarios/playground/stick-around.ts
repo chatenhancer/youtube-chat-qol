@@ -132,7 +132,7 @@ export const playgroundStickAroundComputerOverlayScenario: BrowserScenario = asy
 
   await withExtensionStorageValues(context, 'sync', {
     ...PLAYGROUND_ENABLED_OPTIONS,
-    chatSkin: 'aero'
+    chatSkin: 'custom:aero'
   }, async () => {
     await page.evaluate(() => {
       const style = document.createElement('style');

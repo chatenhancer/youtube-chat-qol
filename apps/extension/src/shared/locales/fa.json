@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "نشانک‌ها به‌روزرسانی نشدند."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "هم‌اکنون روی پیش‌فرض است."
+    },
+    "themeReset": {
+      "message": "بازنشانی"
+    },
+    "themeResetSavedDone": {
+      "message": "نسخهٔ ذخیره‌شدهٔ پوسته بازیابی شد. می‌توانید این کار را واگرد کنید."
+    },
+    "themeResetDone": {
+      "message": "پوسته به حالت پیش‌فرض برگشت. ذخیره نشده؛ می‌توانید واگرد کنید."
+    },
+    "theme_playful": {
+      "message": "بازیگوش"
+    },
+    "theme_pixel": {
+      "message": "پیکسلی"
+    },
+    "theme_elegant": {
+      "message": "ظریف"
+    },
+    "themeCustomize": {
+      "message": "شخصی‌سازی"
+    },
+    "themeSection_colors": {
+      "message": "رنگ‌ها"
+    },
+    "themeSection_style": {
+      "message": "سبک"
+    },
+    "themeSection_artwork": {
+      "message": "تصاویر"
+    },
+    "themeShapeDepth": {
+      "message": "شکل و عمق"
+    },
+    "themeGradientAngle": {
+      "message": "جهت گرادیان"
+    },
+    "themeImageText": {
+      "message": "متن روی تصویر"
+    },
+    "themeImageTextHint": {
+      "message": "حالت خودکار از روشنایی و میزان نمایانی تصویر استفاده می‌کند. برای تنظیم دستی، روشن یا تیره را انتخاب کنید."
+    },
+    "theme_auto": {
+      "message": "خودکار"
+    },
+    "themeImagePlacement": {
+      "message": "جای‌گذاری تصویر"
+    },
+    "themePositionX": {
+      "message": "موقعیت افقی"
+    },
+    "themeSurfaceOpacity": {
+      "message": "تیرگی سطح"
+    },
+    "themeShine": {
+      "message": "شدت درخشش"
+    },
+    "themeWorking": {
+      "message": "تا پایان کار فعلی صبر کنید."
+    },
+    "themeNoChanges": {
+      "message": "پیش از ذخیره تغییری ایجاد کنید."
+    },
+    "themeAlreadyApplied": {
+      "message": "این نسخه قبلاً اعمال شده است."
+    },
+    "themePreinstalled": {
+      "message": "ازپیش‌نصب‌شده"
+    },
+    "themePresetNote": {
+      "message": "Aero یک پوستهٔ از پیش نصب‌شده است. برای ذخیرهٔ این پوسته، نام دیگری وارد کنید."
+    },
+    "themePresetNameRequired": {
+      "message": "برای ذخیره نسخه، نامی غیر از Aero وارد کنید."
+    },
+    "themePresetLocked": {
+      "message": "تم‌های ازپیش‌نصب‌شده قابل حذف نیستند."
+    },
+    "themeFinishHint_flat": {
+      "message": "سطح‌های ساده بدون بازتاب."
+    },
+    "themeFinishHint_glossy": {
+      "message": "کنترل‌های براق و پنل‌های غیرشفاف با درخششی ملایم در لبهٔ بالا."
+    },
+    "themeFinishHint_glass": {
+      "message": "بازتاب ملایم و پنل‌های نیمه‌شفاف با پس‌زمینه محو. برای دیدن اثر یک پنل باز کنید."
+    },
+    "themeShadowHint": {
+      "message": "زیر سربرگ، بالای بخش ورودی و اطراف پنل‌ها عمق ایجاد می‌کند."
+    },
+    "themeZoom": {
+      "message": "بزرگ‌نمایی تصویر"
+    },
+    "theme_stretch": {
+      "message": "کشیدن"
+    },
+    "theme_banner": {
+      "message": "نوار"
+    },
+    "themeImageHeight": {
+      "message": "ارتفاع تصویر"
+    },
+    "themeAvatarShape": {
+      "message": "شکل آواتار"
+    },
+    "theme_round": {
+      "message": "گرد"
+    },
+    "theme_square": {
+      "message": "مربع"
+    },
+    "themeAvatarFrame": {
+      "message": "تصویر قاب آواتار"
+    },
+    "themeOpenImage": {
+      "message": "باز کردن تصویر در زبانهٔ جدید"
+    },
+    "themeImagePreview": {
+      "message": "پیش‌نمایش تصویر"
+    },
+    "themeRemoveImage": {
+      "message": "حذف تصویر"
+    },
+    "theme_gothic": {
+      "message": "گوتیک"
+    },
+    "themeEditor": {
+      "message": "ویرایشگر تم"
+    },
+    "themeSelect": {
+      "message": "انتخاب تم برای ویرایش"
+    },
+    "themeNew": {
+      "message": "تم جدید"
+    },
+    "themeName": {
+      "message": "نام تم"
+    },
+    "themeSave": {
+      "message": "ذخیره"
+    },
+    "themeSaveApply": {
+      "message": "ذخیره و استفاده"
+    },
+    "themeUndone": {
+      "message": "واگرد شد: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "چیزی برای واگرد وجود ندارد."
+    },
+    "themeDelete": {
+      "message": "حذف تم"
+    },
+    "themeClear": {
+      "message": "پاک کردن تم جدید"
+    },
+    "themeDiscardConfirm": {
+      "message": "تغییرات ذخیره‌نشدهٔ تم کنار گذاشته شوند؟"
+    },
+    "themeKeepEditing": {
+      "message": "ادامهٔ ویرایش"
+    },
+    "themeDiscard": {
+      "message": "کنار گذاشتن"
+    },
+    "themeDeleteConfirm": {
+      "message": "این پوسته حذف شود؟"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "گفتگو به پوستهٔ پیش‌فرض برمی‌گردد."
+    },
+    "themeAppearance": {
+      "message": "پیش‌نمایش ظاهر"
+    },
+    "theme_light": {
+      "message": "روشن"
+    },
+    "theme_dark": {
+      "message": "تیره"
+    },
+    "themeArea": {
+      "message": "سفارشی‌سازی بخش"
+    },
+    "themeArea_header": {
+      "message": "سربرگ"
+    },
+    "themeArea_chat": {
+      "message": "چت"
+    },
+    "themeArea_composer": {
+      "message": "ورودی"
+    },
+    "themeBackgroundColor": {
+      "message": "رنگ پس‌زمینه"
+    },
+    "themeMarkerColor": {
+      "message": "رنگ نشانگر"
+    },
+    "themeFinishStyle": {
+      "message": "سبک ظاهر"
+    },
+    "themeBackground": {
+      "message": "پس‌زمینه"
+    },
+    "themeFill": {
+      "message": "سبک پس‌زمینه"
+    },
+    "theme_solid": {
+      "message": "رنگ یکدست"
+    },
+    "theme_gradient": {
+      "message": "گرادیان"
+    },
+    "theme_image": {
+      "message": "تصویر"
+    },
+    "themeGradientColor": {
+      "message": "رنگ دوم"
+    },
+    "themeChooseImage": {
+      "message": "انتخاب تصویر"
+    },
+    "themeFit": {
+      "message": "چیدمان تصویر"
+    },
+    "theme_cover": {
+      "message": "پر کردن"
+    },
+    "theme_contain": {
+      "message": "جا دادن"
+    },
+    "theme_repeat": {
+      "message": "تکرار"
+    },
+    "themeVisibility": {
+      "message": "نمایانی تصویر"
+    },
+    "themePosition": {
+      "message": "موقعیت عمودی"
+    },
+    "themeAccent": {
+      "message": "رنگ تأکیدی"
+    },
+    "theme_flat": {
+      "message": "تخت"
+    },
+    "theme_glossy": {
+      "message": "براق"
+    },
+    "theme_glass": {
+      "message": "شیشه‌ای"
+    },
+    "themeCorners": {
+      "message": "گردی گوشه‌ها"
+    },
+    "themeShadow": {
+      "message": "سایه"
+    },
+    "themeFont": {
+      "message": "قلم"
+    },
+    "theme_default": {
+      "message": "پیش‌فرض"
+    },
+    "theme_classic": {
+      "message": "کلاسیک"
+    },
+    "theme_mono": {
+      "message": "تک‌فاصله"
+    },
+    "themeEditorDescription": {
+      "message": "با رنگ‌ها، تصاویر و جزئیات دلخواه خود یک پوسته بسازید."
+    },
+    "themeSaved": {
+      "message": "تم ذخیره شد. تم اعمال‌شده تغییری نکرد."
+    },
+    "themeApplied": {
+      "message": "تم ذخیره و اعمال شد."
+    },
+    "themeSaveError": {
+      "message": "تغییرات ذخیره نشد. تصویر کوچک‌تری انتخاب کنید یا فضای ذخیره‌سازی افزونه را آزاد کنید."
+    },
+    "themeApplyError": {
+      "message": "تم اعمال نشد. دوباره تلاش کنید."
+    },
+    "themeImageError": {
+      "message": "یک تصویر کوچک‌تر انتخاب کنید (PNG، JPEG، WebP: تا ۱۰ مگابایت؛ GIF: تا ۲ مگابایت)."
+    },
+    "themeNameRequired": {
+      "message": "نام تم را وارد کنید."
+    },
+    "themeCustom": {
+      "message": "تم‌های من"
+    },
+    "themeResetItem": {
+      "message": "تم‌های سفارشی"
+    },
     "close": {
       "message": "بستن"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "هنگام استفاده از زبانه‌های دیگر، ویدیو و چت را در پنجره‌ای همیشه در جلو نگه دارید."
+    },
+    "themeBlur": {
+      "message": "تاری پنل‌ها"
+    },
+    "themeAddMessageMark": {
+      "message": "افزودن نشانگر پیام"
+    },
+    "themeSecondary": {
+      "message": "رنگ تأکیدی دوم"
+    },
+    "themePaletteHint": {
+      "message": "دکمه‌ها و نمادها از رنگ تأکیدی و برچسب‌ها و برجسته‌سازی‌ها از رنگ ثانویه استفاده می‌کنند. پنل‌ها، منوها و متن به‌طور خودکار با حالت روشن و تیره سازگار می‌شوند."
+    },
+    "theme_theme": {
+      "message": "رنگ‌های پوسته"
+    },
+    "themeDarkImage": {
+      "message": "تصویر حالت تیره (اختیاری)"
+    },
+    "themeSurfaceTint": {
+      "message": "ته‌رنگ پس‌زمینه"
+    },
+    "themeSurfaceTintHint": {
+      "message": "رنگ تأکیدی را به پس‌زمینه‌ها اضافه کنید. در ۰٪، از رنگ‌های خنثای YouTube استفاده می‌شود."
+    },
+    "themeBorder": {
+      "message": "حاشیه‌ها"
     }
   }
 }

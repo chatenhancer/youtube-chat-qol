@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title data-i18n="themeEditor">Theme editor</title>
+    <link rel="stylesheet" href="themes.css">
+  </head>
+  <body>
+    <main class="theme-page">
+      <section class="theme-controls" aria-labelledby="themeEditorTitle">
+        <header class="theme-page-heading">
+          <img class="theme-brand" src="logo.png" alt="Chat Enhancer for YouTube">
+          <h1 id="themeEditorTitle" data-i18n="themeEditor">Theme editor</h1>
+          <p data-i18n="themeEditorDescription">Create a theme with your own colors, images, and details.</p>
+        </header>
+        <div id="themeEditor"></div>
+      </section>
+      <section class="theme-preview-column" aria-labelledby="themePreviewTitle">
+        <header class="preview-heading">
+          <h2 id="themePreviewTitle" class="preview-title">
+            <img src="icons/icon-128.png" alt="">
+            <span data-i18n="onboardingChatPreview">Chat preview</span>
+          </h2>
+        </header>
+        <iframe id="themePreview" title="Chat preview" src="onboarding.html?preview=theme"></iframe>
+      </section>
+    </main>
+    <script src="themes.js" defer></script>
+  </body>
+</html>

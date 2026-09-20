@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "Yer işaretleri güncellenemedi."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "Zaten varsayılan ayarlarda."
+    },
+    "themeReset": {
+      "message": "Sıfırla"
+    },
+    "themeResetSavedDone": {
+      "message": "Temanın kaydedilmiş sürümü geri yüklendi. Bu işlemi geri alabilirsiniz."
+    },
+    "themeResetDone": {
+      "message": "Tema varsayılanlara sıfırlandı. Kaydedilmedi; geri alabilirsiniz."
+    },
+    "theme_playful": {
+      "message": "Eğlenceli"
+    },
+    "theme_pixel": {
+      "message": "Piksel"
+    },
+    "theme_elegant": {
+      "message": "Zarif"
+    },
+    "themeCustomize": {
+      "message": "Özelleştir"
+    },
+    "themeSection_colors": {
+      "message": "Renkler"
+    },
+    "themeSection_style": {
+      "message": "Stil"
+    },
+    "themeSection_artwork": {
+      "message": "Görseller"
+    },
+    "themeShapeDepth": {
+      "message": "Şekil ve derinlik"
+    },
+    "themeGradientAngle": {
+      "message": "Gradyan yönü"
+    },
+    "themeImageText": {
+      "message": "Görsel üzerindeki metin"
+    },
+    "themeImageTextHint": {
+      "message": "Otomatik, görselin parlaklığını ve görünürlüğünü kullanır. Kendiniz ayarlamak için Açık veya Koyu seçin."
+    },
+    "theme_auto": {
+      "message": "Otomatik"
+    },
+    "themeImagePlacement": {
+      "message": "Görsel yerleşimi"
+    },
+    "themePositionX": {
+      "message": "Yatay konum"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Yüzey opaklığı"
+    },
+    "themeShine": {
+      "message": "Parlaklık gücü"
+    },
+    "themeWorking": {
+      "message": "Geçerli işlemin bitmesini bekleyin."
+    },
+    "themeNoChanges": {
+      "message": "Kaydetmeden önce bir değişiklik yapın."
+    },
+    "themeAlreadyApplied": {
+      "message": "Bu sürüm zaten uygulanmış."
+    },
+    "themePreinstalled": {
+      "message": "Ön yüklü"
+    },
+    "themePresetNote": {
+      "message": "Aero önceden yüklenmiş bir temadır. Bu temayı kaydetmek için farklı bir ad girin."
+    },
+    "themePresetNameRequired": {
+      "message": "Kopyanızı kaydetmek için Aero dışında bir ad girin."
+    },
+    "themePresetLocked": {
+      "message": "Ön yüklü temalar silinemez."
+    },
+    "themeFinishHint_flat": {
+      "message": "Yansımasız sade yüzeyler."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Parlak kontroller ve üst kenarında hafif bir ışıltı olan opak paneller."
+    },
+    "themeFinishHint_glass": {
+      "message": "Yumuşak yansımalar ve yarı saydam, bulanık paneller. Etkiyi görmek için bir panel açın."
+    },
+    "themeShadowHint": {
+      "message": "Başlığın altına, giriş alanının üstüne ve panellerin çevresine derinlik katar."
+    },
+    "themeZoom": {
+      "message": "Görsel yakınlaştırma"
+    },
+    "theme_stretch": {
+      "message": "Uzat"
+    },
+    "theme_banner": {
+      "message": "Şerit"
+    },
+    "themeImageHeight": {
+      "message": "Görsel yüksekliği"
+    },
+    "themeAvatarShape": {
+      "message": "Avatar şekli"
+    },
+    "theme_round": {
+      "message": "Yuvarlak"
+    },
+    "theme_square": {
+      "message": "Kare"
+    },
+    "themeAvatarFrame": {
+      "message": "Avatar çerçevesi görseli"
+    },
+    "themeOpenImage": {
+      "message": "Görseli yeni sekmede aç"
+    },
+    "themeImagePreview": {
+      "message": "Görsel önizlemesi"
+    },
+    "themeRemoveImage": {
+      "message": "Görseli kaldır"
+    },
+    "theme_gothic": {
+      "message": "Gotik"
+    },
+    "themeEditor": {
+      "message": "Tema düzenleyici"
+    },
+    "themeSelect": {
+      "message": "Düzenlenecek temayı seç"
+    },
+    "themeNew": {
+      "message": "Yeni tema"
+    },
+    "themeName": {
+      "message": "Tema adı"
+    },
+    "themeSave": {
+      "message": "Kaydet"
+    },
+    "themeSaveApply": {
+      "message": "Kaydet ve kullan"
+    },
+    "themeUndone": {
+      "message": "Geri alındı: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "Geri alınacak değişiklik yok."
+    },
+    "themeDelete": {
+      "message": "Temayı sil"
+    },
+    "themeClear": {
+      "message": "Yeni temayı temizle"
+    },
+    "themeDiscardConfirm": {
+      "message": "Kaydedilmemiş tema değişiklikleri silinsin mi?"
+    },
+    "themeKeepEditing": {
+      "message": "Düzenlemeye devam et"
+    },
+    "themeDiscard": {
+      "message": "Vazgeç"
+    },
+    "themeDeleteConfirm": {
+      "message": "Bu tema silinsin mi?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "Sohbet varsayılan temaya dönecek."
+    },
+    "themeAppearance": {
+      "message": "Görünüm önizlemesi"
+    },
+    "theme_light": {
+      "message": "Açık"
+    },
+    "theme_dark": {
+      "message": "Koyu"
+    },
+    "themeArea": {
+      "message": "Alanı özelleştir"
+    },
+    "themeArea_header": {
+      "message": "Başlık"
+    },
+    "themeArea_chat": {
+      "message": "Sohbet"
+    },
+    "themeArea_composer": {
+      "message": "Giriş"
+    },
+    "themeBackgroundColor": {
+      "message": "Arka plan rengi"
+    },
+    "themeMarkerColor": {
+      "message": "İşaret rengi"
+    },
+    "themeFinishStyle": {
+      "message": "Yüzey stili"
+    },
+    "themeBackground": {
+      "message": "Arka plan"
+    },
+    "themeFill": {
+      "message": "Arka plan stili"
+    },
+    "theme_solid": {
+      "message": "Düz renk"
+    },
+    "theme_gradient": {
+      "message": "Renk geçişi"
+    },
+    "theme_image": {
+      "message": "Görsel"
+    },
+    "themeGradientColor": {
+      "message": "İkinci renk"
+    },
+    "themeChooseImage": {
+      "message": "Görsel seç"
+    },
+    "themeFit": {
+      "message": "Görsel yerleşimi"
+    },
+    "theme_cover": {
+      "message": "Doldur"
+    },
+    "theme_contain": {
+      "message": "Sığdır"
+    },
+    "theme_repeat": {
+      "message": "Döşe"
+    },
+    "themeVisibility": {
+      "message": "Görsel görünürlüğü"
+    },
+    "themePosition": {
+      "message": "Dikey konum"
+    },
+    "themeAccent": {
+      "message": "Vurgu"
+    },
+    "theme_flat": {
+      "message": "Düz"
+    },
+    "theme_glossy": {
+      "message": "Parlak"
+    },
+    "theme_glass": {
+      "message": "Cam"
+    },
+    "themeCorners": {
+      "message": "Köşe yarıçapı"
+    },
+    "themeShadow": {
+      "message": "Gölge"
+    },
+    "themeFont": {
+      "message": "Yazı tipi"
+    },
+    "theme_default": {
+      "message": "Varsayılan"
+    },
+    "theme_classic": {
+      "message": "Klasik"
+    },
+    "theme_mono": {
+      "message": "Eş aralıklı"
+    },
+    "themeEditorDescription": {
+      "message": "Kendi renkleriniz, görselleriniz ve ayrıntılarınızla bir tema oluşturun."
+    },
+    "themeSaved": {
+      "message": "Tema kaydedildi. Uygulanan tema değişmedi."
+    },
+    "themeApplied": {
+      "message": "Tema kaydedildi ve uygulandı."
+    },
+    "themeSaveError": {
+      "message": "Değişiklikler kaydedilemedi. Daha küçük bir görsel deneyin veya uzantı depolamasında yer açın."
+    },
+    "themeApplyError": {
+      "message": "Tema uygulanamadı. Tekrar deneyin."
+    },
+    "themeImageError": {
+      "message": "Daha küçük bir görsel seçin (PNG, JPEG, WebP: en fazla 10 MB; GIF: en fazla 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "Bir tema adı girin."
+    },
+    "themeCustom": {
+      "message": "Temalarım"
+    },
+    "themeResetItem": {
+      "message": "Özel temalar"
+    },
     "close": {
       "message": "Kapat"
     },
@@ -713,6 +1013,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Diğer sekmeleri kullanırken video ve sohbeti her zaman üstte kalan bir pencerede tutun."
+    },
+    "themeBlur": {
+      "message": "Panel bulanıklığı"
+    },
+    "themeAddMessageMark": {
+      "message": "Mesaj işareti ekle"
+    },
+    "themeSecondary": {
+      "message": "İkincil vurgu"
+    },
+    "themePaletteHint": {
+      "message": "Düğmeler ve simgeler vurgu rengini, etiketler ve vurgulamalar ikincil rengi kullanır. Paneller, menüler ve metin açık ve koyu moda otomatik uyum sağlar."
+    },
+    "theme_theme": {
+      "message": "Tema renkleri"
+    },
+    "themeDarkImage": {
+      "message": "Koyu mod görseli (isteğe bağlı)"
+    },
+    "themeSurfaceTint": {
+      "message": "Arka plan tonu"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Arka planlara vurgu rengini ekler. %0 değerinde YouTube’un nötr renkleri kullanılır."
+    },
+    "themeBorder": {
+      "message": "Kenarlıklar"
     }
   }
 }

@@ -133,7 +133,7 @@ export const onboardingProfileInfoScenario: ExtensionScenario = async ({ context
 
     // Floating cards must follow the same palette as the in-chat hints, even
     // when the system theme changes while an explanation is already open.
-    for (const skin of ['aero', 'system']) {
+    for (const skin of ['custom:aero', 'system']) {
       await onboarding.locator('#onboardingChatSkin').selectOption(skin);
       await avatars.first().click();
       await expectAnchoredInfo(card.locator('.ytcq-profile-card-channel'), info);

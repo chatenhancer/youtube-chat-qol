@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "Не удалось обновить закладки."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "Уже используются настройки по умолчанию."
+    },
+    "themeReset": {
+      "message": "Сбросить"
+    },
+    "themeResetSavedDone": {
+      "message": "Восстановлена сохранённая версия темы. Это действие можно отменить."
+    },
+    "themeResetDone": {
+      "message": "Восстановлены настройки темы по умолчанию. Не сохранено; можно отменить."
+    },
+    "theme_playful": {
+      "message": "Игривый"
+    },
+    "theme_pixel": {
+      "message": "Пиксельный"
+    },
+    "theme_elegant": {
+      "message": "Элегантный"
+    },
+    "themeCustomize": {
+      "message": "Настроить"
+    },
+    "themeSection_colors": {
+      "message": "Цвета"
+    },
+    "themeSection_style": {
+      "message": "Стиль"
+    },
+    "themeSection_artwork": {
+      "message": "Изображения"
+    },
+    "themeShapeDepth": {
+      "message": "Форма и глубина"
+    },
+    "themeGradientAngle": {
+      "message": "Направление градиента"
+    },
+    "themeImageText": {
+      "message": "Текст поверх изображения"
+    },
+    "themeImageTextHint": {
+      "message": "Автоматический режим учитывает яркость и видимость изображения. Выберите светлый или тёмный текст вручную."
+    },
+    "theme_auto": {
+      "message": "Автоматически"
+    },
+    "themeImagePlacement": {
+      "message": "Размещение изображения"
+    },
+    "themePositionX": {
+      "message": "Положение по горизонтали"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Непрозрачность поверхности"
+    },
+    "themeShine": {
+      "message": "Сила блеска"
+    },
+    "themeWorking": {
+      "message": "Дождитесь завершения текущего действия."
+    },
+    "themeNoChanges": {
+      "message": "Внесите изменение перед сохранением."
+    },
+    "themeAlreadyApplied": {
+      "message": "Эта версия уже применена."
+    },
+    "themePreinstalled": {
+      "message": "Предустановлено"
+    },
+    "themePresetNote": {
+      "message": "Aero — предустановленная тема. Введите другое имя, чтобы сохранить эту тему."
+    },
+    "themePresetNameRequired": {
+      "message": "Укажите имя, отличное от Aero, чтобы сохранить копию."
+    },
+    "themePresetLocked": {
+      "message": "Предустановленные темы нельзя удалить."
+    },
+    "themeFinishHint_flat": {
+      "message": "Простые поверхности без отражений."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Глянцевые элементы управления и непрозрачные панели с лёгким бликом сверху."
+    },
+    "themeFinishHint_glass": {
+      "message": "Мягкие отражения и полупрозрачные панели с размытием. Откройте панель, чтобы увидеть эффект."
+    },
+    "themeShadowHint": {
+      "message": "Добавляет глубину под заголовком, над областью ввода и вокруг панелей."
+    },
+    "themeZoom": {
+      "message": "Масштаб изображения"
+    },
+    "theme_stretch": {
+      "message": "Растянуть"
+    },
+    "theme_banner": {
+      "message": "Полоса"
+    },
+    "themeImageHeight": {
+      "message": "Высота изображения"
+    },
+    "themeAvatarShape": {
+      "message": "Форма аватара"
+    },
+    "theme_round": {
+      "message": "Круглая"
+    },
+    "theme_square": {
+      "message": "Квадратная"
+    },
+    "themeAvatarFrame": {
+      "message": "Изображение рамки аватара"
+    },
+    "themeOpenImage": {
+      "message": "Открыть изображение в новой вкладке"
+    },
+    "themeImagePreview": {
+      "message": "Предпросмотр изображения"
+    },
+    "themeRemoveImage": {
+      "message": "Удалить изображение"
+    },
+    "theme_gothic": {
+      "message": "Готический"
+    },
+    "themeEditor": {
+      "message": "Редактор тем"
+    },
+    "themeSelect": {
+      "message": "Выберите тему для редактирования"
+    },
+    "themeNew": {
+      "message": "Новая тема"
+    },
+    "themeName": {
+      "message": "Название темы"
+    },
+    "themeSave": {
+      "message": "Сохранить"
+    },
+    "themeSaveApply": {
+      "message": "Сохранить и использовать"
+    },
+    "themeUndone": {
+      "message": "Отменено: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "Нет изменений для отмены."
+    },
+    "themeDelete": {
+      "message": "Удалить тему"
+    },
+    "themeClear": {
+      "message": "Очистить новую тему"
+    },
+    "themeDiscardConfirm": {
+      "message": "Отменить несохранённые изменения темы?"
+    },
+    "themeKeepEditing": {
+      "message": "Продолжить редактирование"
+    },
+    "themeDiscard": {
+      "message": "Отменить изменения"
+    },
+    "themeDeleteConfirm": {
+      "message": "Удалить эту тему?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "Чат вернётся к теме по умолчанию."
+    },
+    "themeAppearance": {
+      "message": "Предпросмотр оформления"
+    },
+    "theme_light": {
+      "message": "Светлая"
+    },
+    "theme_dark": {
+      "message": "Тёмная"
+    },
+    "themeArea": {
+      "message": "Настроить область"
+    },
+    "themeArea_header": {
+      "message": "Шапка"
+    },
+    "themeArea_chat": {
+      "message": "Чат"
+    },
+    "themeArea_composer": {
+      "message": "Ввод"
+    },
+    "themeBackgroundColor": {
+      "message": "Цвет фона"
+    },
+    "themeMarkerColor": {
+      "message": "Цвет маркера"
+    },
+    "themeFinishStyle": {
+      "message": "Стиль оформления"
+    },
+    "themeBackground": {
+      "message": "Фон"
+    },
+    "themeFill": {
+      "message": "Стиль фона"
+    },
+    "theme_solid": {
+      "message": "Сплошной цвет"
+    },
+    "theme_gradient": {
+      "message": "Градиент"
+    },
+    "theme_image": {
+      "message": "Изображение"
+    },
+    "themeGradientColor": {
+      "message": "Второй цвет"
+    },
+    "themeChooseImage": {
+      "message": "Выбрать изображение"
+    },
+    "themeFit": {
+      "message": "Размещение изображения"
+    },
+    "theme_cover": {
+      "message": "Заполнить"
+    },
+    "theme_contain": {
+      "message": "Вписать"
+    },
+    "theme_repeat": {
+      "message": "Замостить"
+    },
+    "themeVisibility": {
+      "message": "Видимость изображения"
+    },
+    "themePosition": {
+      "message": "Положение по вертикали"
+    },
+    "themeAccent": {
+      "message": "Акцент"
+    },
+    "theme_flat": {
+      "message": "Плоская"
+    },
+    "theme_glossy": {
+      "message": "Глянцевая"
+    },
+    "theme_glass": {
+      "message": "Стекло"
+    },
+    "themeCorners": {
+      "message": "Радиус углов"
+    },
+    "themeShadow": {
+      "message": "Тень"
+    },
+    "themeFont": {
+      "message": "Шрифт"
+    },
+    "theme_default": {
+      "message": "По умолчанию"
+    },
+    "theme_classic": {
+      "message": "Классический"
+    },
+    "theme_mono": {
+      "message": "Моноширинный"
+    },
+    "themeEditorDescription": {
+      "message": "Создайте тему со своими цветами, изображениями и деталями."
+    },
+    "themeSaved": {
+      "message": "Тема сохранена. Применённая тема не изменилась."
+    },
+    "themeApplied": {
+      "message": "Тема сохранена и применена."
+    },
+    "themeSaveError": {
+      "message": "Не удалось сохранить изменения. Выберите изображение поменьше или освободите хранилище расширения."
+    },
+    "themeApplyError": {
+      "message": "Не удалось применить тему. Попробуйте ещё раз."
+    },
+    "themeImageError": {
+      "message": "Выберите изображение поменьше (PNG, JPEG, WebP: до 10 МБ; GIF: до 2 МБ)."
+    },
+    "themeNameRequired": {
+      "message": "Введите название темы."
+    },
+    "themeCustom": {
+      "message": "Мои темы"
+    },
+    "themeResetItem": {
+      "message": "Пользовательские темы"
+    },
     "close": {
       "message": "Закрыть"
     },
@@ -713,6 +1013,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Держите видео и чат в окне поверх остальных, пока пользуетесь другими вкладками."
+    },
+    "themeBlur": {
+      "message": "Размытие панелей"
+    },
+    "themeAddMessageMark": {
+      "message": "Добавить маркер сообщения"
+    },
+    "themeSecondary": {
+      "message": "Вторичный акцент"
+    },
+    "themePaletteHint": {
+      "message": "Кнопки и значки используют основной акцент, метки и выделения — дополнительный. Панели, меню и текст автоматически адаптируются к светлому и тёмному режиму."
+    },
+    "theme_theme": {
+      "message": "Цвета темы"
+    },
+    "themeDarkImage": {
+      "message": "Изображение для тёмного режима (необязательно)"
+    },
+    "themeSurfaceTint": {
+      "message": "Оттенок фона"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Добавляет акцентный цвет к фону. При 0% используются нейтральные цвета YouTube."
+    },
+    "themeBorder": {
+      "message": "Границы"
     }
   }
 }

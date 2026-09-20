@@ -335,15 +335,15 @@
   padding: 0 8px;
   border: 0;
   border-radius: 12px;
-  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
-  background: rgba(128, 128, 128, 0.18);
+  color: var(--ytcq-theme-button-text, var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1)));
+  background: var(--ytcq-theme-button-background, rgba(128, 128, 128, 0.18));
   font: 500 11px/14px Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 
 .ytcq-games-small-action-busy {
-  color: var(--yt-spec-call-to-action, #3ea6ff);
-  background: rgba(62, 166, 255, 0.14);
+  color: var(--ytcq-theme-button-text, var(--yt-spec-call-to-action, #3ea6ff));
+  background: var(--ytcq-theme-button-active, var(--ytcq-accent-soft, rgba(62, 166, 255, 0.14)));
 }
 
 .ytcq-games-small-action:disabled,
@@ -355,16 +355,16 @@
 
 .ytcq-games-small-action:hover,
 .ytcq-games-small-action:focus {
-  color: var(--yt-spec-call-to-action, #3ea6ff);
-  background: rgba(62, 166, 255, 0.18);
+  color: var(--ytcq-theme-button-text, var(--yt-spec-call-to-action, #3ea6ff));
+  background: var(--ytcq-theme-button-hover, rgba(62, 166, 255, 0.18));
   outline: none;
 }
 
 .ytcq-games-small-action-busy:disabled,
 .ytcq-games-small-action-busy:disabled:hover,
 .ytcq-games-small-action-busy:disabled:focus {
-  color: var(--yt-spec-call-to-action, #3ea6ff);
-  background: rgba(62, 166, 255, 0.14);
+  color: var(--ytcq-theme-button-text, var(--yt-spec-call-to-action, #3ea6ff));
+  background: var(--ytcq-theme-button-active, var(--ytcq-accent-soft, rgba(62, 166, 255, 0.14)));
 }
 
 .ytcq-loading-spinner {

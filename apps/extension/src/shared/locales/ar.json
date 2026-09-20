@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "تعذّر تحديث الإشارات المرجعية."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "الإعدادات الافتراضية مستخدمة بالفعل."
+    },
+    "themeReset": {
+      "message": "إعادة ضبط"
+    },
+    "themeResetSavedDone": {
+      "message": "تمت استعادة النسخة المحفوظة من السمة. يمكنك التراجع عن ذلك."
+    },
+    "themeResetDone": {
+      "message": "أُعيدت الإعدادات الافتراضية للسمة دون حفظ. يمكنك التراجع."
+    },
+    "theme_playful": {
+      "message": "مرح"
+    },
+    "theme_pixel": {
+      "message": "بكسلي"
+    },
+    "theme_elegant": {
+      "message": "أنيق"
+    },
+    "themeCustomize": {
+      "message": "تخصيص"
+    },
+    "themeSection_colors": {
+      "message": "الألوان"
+    },
+    "themeSection_style": {
+      "message": "النمط"
+    },
+    "themeSection_artwork": {
+      "message": "الصور"
+    },
+    "themeShapeDepth": {
+      "message": "الشكل والعمق"
+    },
+    "themeGradientAngle": {
+      "message": "اتجاه التدرج"
+    },
+    "themeImageText": {
+      "message": "النص فوق الصورة"
+    },
+    "themeImageTextHint": {
+      "message": "يعتمد الوضع التلقائي على سطوع الصورة ووضوحها. اختر فاتحًا أو داكنًا لضبط لون النص يدويًا."
+    },
+    "theme_auto": {
+      "message": "تلقائي"
+    },
+    "themeImagePlacement": {
+      "message": "موضع الصورة"
+    },
+    "themePositionX": {
+      "message": "الموضع الأفقي"
+    },
+    "themeSurfaceOpacity": {
+      "message": "عتامة السطح"
+    },
+    "themeShine": {
+      "message": "شدة اللمعان"
+    },
+    "themeWorking": {
+      "message": "انتظر حتى تنتهي العملية الحالية."
+    },
+    "themeNoChanges": {
+      "message": "أجرِ تغييرًا قبل الحفظ."
+    },
+    "themeAlreadyApplied": {
+      "message": "هذا الإصدار مطبق بالفعل."
+    },
+    "themePreinstalled": {
+      "message": "مثبت مسبقًا"
+    },
+    "themePresetNote": {
+      "message": "Aero سمة مثبتة مسبقًا. أدخل اسمًا مختلفًا لحفظ هذه السمة."
+    },
+    "themePresetNameRequired": {
+      "message": "أدخل اسمًا غير Aero لحفظ نسختك."
+    },
+    "themePresetLocked": {
+      "message": "لا يمكن حذف السمات المثبتة مسبقًا."
+    },
+    "themeFinishHint_flat": {
+      "message": "أسطح بسيطة بلا انعكاسات."
+    },
+    "themeFinishHint_glossy": {
+      "message": "عناصر تحكم لامعة ولوحات معتمة مع لمعة خفيفة في أعلاها."
+    },
+    "themeFinishHint_glass": {
+      "message": "انعكاسات ناعمة ولوحات شبه شفافة بخلفية ضبابية. افتح لوحة لرؤية التأثير."
+    },
+    "themeShadowHint": {
+      "message": "يضيف عمقًا أسفل الرأس وفوق منطقة الإدخال وحول اللوحات."
+    },
+    "themeZoom": {
+      "message": "تكبير الصورة"
+    },
+    "theme_stretch": {
+      "message": "تمديد"
+    },
+    "theme_banner": {
+      "message": "شريط"
+    },
+    "themeImageHeight": {
+      "message": "ارتفاع الصورة"
+    },
+    "themeAvatarShape": {
+      "message": "شكل الصورة الرمزية"
+    },
+    "theme_round": {
+      "message": "دائري"
+    },
+    "theme_square": {
+      "message": "مربع"
+    },
+    "themeAvatarFrame": {
+      "message": "صورة إطار الصورة الرمزية"
+    },
+    "themeOpenImage": {
+      "message": "افتح الصورة في علامة تبويب جديدة"
+    },
+    "themeImagePreview": {
+      "message": "معاينة الصورة"
+    },
+    "themeRemoveImage": {
+      "message": "إزالة الصورة"
+    },
+    "theme_gothic": {
+      "message": "قوطي"
+    },
+    "themeEditor": {
+      "message": "محرر السمات"
+    },
+    "themeSelect": {
+      "message": "اختر سمة لتعديلها"
+    },
+    "themeNew": {
+      "message": "سمة جديدة"
+    },
+    "themeName": {
+      "message": "اسم السمة"
+    },
+    "themeSave": {
+      "message": "حفظ"
+    },
+    "themeSaveApply": {
+      "message": "حفظ واستخدام"
+    },
+    "themeUndone": {
+      "message": "تم التراجع عن: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "لا يوجد ما يمكن التراجع عنه."
+    },
+    "themeDelete": {
+      "message": "حذف السمة"
+    },
+    "themeClear": {
+      "message": "مسح السمة الجديدة"
+    },
+    "themeDiscardConfirm": {
+      "message": "هل تريد تجاهل تغييرات السمة غير المحفوظة؟"
+    },
+    "themeKeepEditing": {
+      "message": "متابعة التعديل"
+    },
+    "themeDiscard": {
+      "message": "تجاهل"
+    },
+    "themeDeleteConfirm": {
+      "message": "هل تريد حذف هذا المظهر؟"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "ستعود الدردشة إلى المظهر الافتراضي."
+    },
+    "themeAppearance": {
+      "message": "معاينة المظهر"
+    },
+    "theme_light": {
+      "message": "فاتح"
+    },
+    "theme_dark": {
+      "message": "داكن"
+    },
+    "themeArea": {
+      "message": "تخصيص المنطقة"
+    },
+    "themeArea_header": {
+      "message": "الترويسة"
+    },
+    "themeArea_chat": {
+      "message": "الدردشة"
+    },
+    "themeArea_composer": {
+      "message": "الإدخال"
+    },
+    "themeBackgroundColor": {
+      "message": "لون الخلفية"
+    },
+    "themeMarkerColor": {
+      "message": "لون العلامة"
+    },
+    "themeFinishStyle": {
+      "message": "نمط المظهر"
+    },
+    "themeBackground": {
+      "message": "الخلفية"
+    },
+    "themeFill": {
+      "message": "نمط الخلفية"
+    },
+    "theme_solid": {
+      "message": "لون موحد"
+    },
+    "theme_gradient": {
+      "message": "تدرج لوني"
+    },
+    "theme_image": {
+      "message": "صورة"
+    },
+    "themeGradientColor": {
+      "message": "اللون الثاني"
+    },
+    "themeChooseImage": {
+      "message": "اختيار صورة"
+    },
+    "themeFit": {
+      "message": "ملاءمة الصورة"
+    },
+    "theme_cover": {
+      "message": "ملء"
+    },
+    "theme_contain": {
+      "message": "احتواء"
+    },
+    "theme_repeat": {
+      "message": "تكرار"
+    },
+    "themeVisibility": {
+      "message": "وضوح الصورة"
+    },
+    "themePosition": {
+      "message": "الموضع الرأسي"
+    },
+    "themeAccent": {
+      "message": "لون التمييز"
+    },
+    "theme_flat": {
+      "message": "مسطح"
+    },
+    "theme_glossy": {
+      "message": "لامع"
+    },
+    "theme_glass": {
+      "message": "زجاجي"
+    },
+    "themeCorners": {
+      "message": "استدارة الزوايا"
+    },
+    "themeShadow": {
+      "message": "الظل"
+    },
+    "themeFont": {
+      "message": "الخط"
+    },
+    "theme_default": {
+      "message": "افتراضي"
+    },
+    "theme_classic": {
+      "message": "كلاسيكي"
+    },
+    "theme_mono": {
+      "message": "أحادي المسافة"
+    },
+    "themeEditorDescription": {
+      "message": "أنشئ مظهرًا بألوانك وصورك وتفاصيلك الخاصة."
+    },
+    "themeSaved": {
+      "message": "تم حفظ السمة. لم تتغير السمة المطبقة."
+    },
+    "themeApplied": {
+      "message": "تم حفظ السمة وتطبيقها."
+    },
+    "themeSaveError": {
+      "message": "تعذر حفظ التغييرات. جرّب صورة أصغر أو حرّر بعض مساحة تخزين الإضافة."
+    },
+    "themeApplyError": {
+      "message": "تعذر تطبيق السمة. حاول مجددًا."
+    },
+    "themeImageError": {
+      "message": "اختر صورة أصغر (PNG أو JPEG أو WebP: حتى 10 ميغابايت؛ GIF: حتى 2 ميغابايت)."
+    },
+    "themeNameRequired": {
+      "message": "أدخل اسمًا للسمة."
+    },
+    "themeCustom": {
+      "message": "سماتي"
+    },
+    "themeResetItem": {
+      "message": "السمات المخصصة"
+    },
     "close": {
       "message": "إغلاق"
     },
@@ -713,6 +1013,33 @@
     },
     "onboardingPipTooltip": {
       "message": "أبقِ الفيديو والدردشة في نافذة تظهر دائمًا في المقدمة أثناء استخدام علامات تبويب أخرى."
+    },
+    "themeBlur": {
+      "message": "تمويه اللوحات"
+    },
+    "themeAddMessageMark": {
+      "message": "إضافة علامة للرسالة"
+    },
+    "themeSecondary": {
+      "message": "لون تمييز ثانوي"
+    },
+    "themePaletteHint": {
+      "message": "تتبع الأزرار والأيقونات اللون المميز، وتستخدم الوسوم والتظليلات اللون الثانوي. تتكيف اللوحات والقوائم والنصوص تلقائيًا مع الوضعين الفاتح والداكن."
+    },
+    "theme_theme": {
+      "message": "ألوان السمة"
+    },
+    "themeDarkImage": {
+      "message": "صورة الوضع الداكن (اختياري)"
+    },
+    "themeSurfaceTint": {
+      "message": "صبغة الخلفية"
+    },
+    "themeSurfaceTintHint": {
+      "message": "أضف لون التمييز إلى الخلفيات. عند 0%، تُستخدم ألوان YouTube المحايدة."
+    },
+    "themeBorder": {
+      "message": "الحدود"
     }
   }
 }

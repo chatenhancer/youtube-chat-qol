@@ -11,7 +11,6 @@
   --ytcq-density-items-block-padding: 4px;
   --ytcq-density-menu-top: -2px;
   --ytcq-density-row-block-padding: 2px;
-  --ytcq-density-aero-frame-size: 31px;
 }
 
 :root[data-ytcq-message-density="compact"] :where(
@@ -95,14 +94,4 @@
   height: var(--ytcq-density-avatar-size);
   min-height: var(--ytcq-density-avatar-size);
   max-height: var(--ytcq-density-avatar-size);
-}
-
-/* Keep Aero's decorative frame proportional to the compact avatar. */
-:root[data-ytcq-chat-skin="aero"][data-ytcq-message-density="compact"] :where(
-  yt-live-chat-text-message-renderer,
-  yt-live-chat-membership-item-renderer,
-  yt-live-chat-placeholder-item-renderer
-) > #author-photo,
-:root[data-ytcq-chat-skin="aero"][data-ytcq-message-density="compact"] .ytcq-lite-author-photo {
-  --ytcq-aero-avatar-frame-size: var(--ytcq-density-aero-frame-size);
 }

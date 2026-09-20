@@ -55,7 +55,7 @@ export async function expectStoredOnboardingOptions(context: BrowserContext): Pr
       ]);
     })
     .toEqual({
-      chatSkin: 'aero',
+      chatSkin: 'custom:aero',
       lastTranslationTarget: 'ja',
       liteModeEnabled: true,
       playgroundEnabled: true,

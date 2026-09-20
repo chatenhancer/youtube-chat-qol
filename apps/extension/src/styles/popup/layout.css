@@ -7,7 +7,8 @@ body {
   margin: 0;
   overflow: hidden;
   color: var(--ytcq-popup-text);
-  font-family: "Inter", Arial, sans-serif;
+  /* Chrome injects an unlayered body font into extension pages. */
+  font-family: "Inter", Arial, sans-serif !important;
   background: var(--ytcq-popup-card-bg);
 }
 
@@ -128,106 +129,6 @@ main {
   box-shadow: inset 0 0 0 2px var(--ytcq-popup-action);
 }
 
-.popup-reset-dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: grid;
-  place-items: center;
-  padding: 14px;
-  background: var(--ytcq-popup-modal-backdrop);
-}
-
-.popup-reset-dialog {
-  display: grid;
-  gap: 8px;
-  width: min(286px, 100%);
-  padding: 14px;
-  border-radius: 8px;
-  color: var(--ytcq-popup-text);
-  background: var(--ytcq-popup-card-bg);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
-}
-
-.popup-reset-dialog-message,
-.popup-reset-dialog-list-label,
-.popup-reset-dialog-list {
-  margin: 0;
-  color: var(--ytcq-popup-secondary-text);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 17px;
-}
-
-.popup-reset-dialog-message {
-  white-space: pre-line;
-}
-
-.popup-reset-dialog-list-label {
-  margin-top: 2px;
-}
-
-.popup-reset-dialog-list {
-  margin: -2px 0 2px 18px;
-  padding: 0;
-}
-
-.popup-reset-dialog-list li {
-  margin: 1px 0;
-}
-
-.popup-reset-dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.popup-reset-dialog-button {
-  appearance: none;
-  min-width: 70px;
-  min-height: 28px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: 6px;
-  color: var(--ytcq-popup-text);
-  background: transparent;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.popup-reset-dialog-button:hover {
-  background: var(--ytcq-popup-row-hover-bg);
-}
-
-.popup-reset-dialog-button:focus {
-  outline: none;
-}
-
-.popup-reset-dialog-button:focus-visible {
-  outline: 2px solid var(--ytcq-popup-action);
-  outline-offset: 1px;
-}
-
-.popup-reset-dialog-button:active {
-  background: color-mix(in srgb, var(--ytcq-popup-text) 14%, transparent);
-}
-
-.popup-reset-dialog-confirm {
-  color: #fff;
-  background: var(--ytcq-popup-logo-red);
-}
-
-.popup-reset-dialog-confirm:hover {
-  background: color-mix(in srgb, var(--ytcq-popup-logo-red) 78%, black);
-}
-
-.popup-reset-dialog-confirm:active {
-  background: color-mix(in srgb, var(--ytcq-popup-logo-red) 64%, black);
-}
-
 .extension-status {
   display: grid;
   grid-template-columns: 6px minmax(0, auto);
@@ -278,74 +179,6 @@ main {
   line-height: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.popup-tabs {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  gap: 4px;
-  margin: 0 0 5px;
-  padding: 3px;
-  border-radius: var(--ytcq-popup-squircle-radius-tab-container);
-  background: var(--ytcq-popup-row-bg);
-  isolation: isolate;
-}
-
-.popup-tabs::before {
-  position: absolute;
-  z-index: 0;
-  top: 50%;
-  left: 0;
-  width: var(--ytcq-popup-tab-highlight-width, 0);
-  height: var(--ytcq-popup-tab-highlight-height, 24px);
-  border-radius: var(--ytcq-popup-squircle-radius-tab);
-  background: var(--ytcq-popup-row-hover-bg);
-  content: "";
-  opacity: var(--ytcq-popup-tab-highlight-opacity, 0);
-  pointer-events: none;
-  transform: translate3d(var(--ytcq-popup-tab-highlight-x, 0), -50%, 0);
-}
-
-.popup-tabs.popup-tab-highlight-animated::before {
-  transition:
-    transform 190ms ease,
-    width 190ms ease,
-    height 190ms ease,
-    opacity 130ms ease;
-}
-
-.popup-tab {
-  position: relative;
-  z-index: 1;
-  min-height: 24px;
-  padding: 3px 8px;
-  border: 0;
-  border-radius: var(--ytcq-popup-squircle-radius-tab);
-  color: var(--ytcq-popup-secondary-text);
-  background: transparent;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 14px;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: color 150ms ease;
-}
-
-.popup-tab:hover,
-.popup-tab:focus {
-  color: var(--ytcq-popup-text);
-  background: transparent;
-  outline: none;
-}
-
-.popup-tab:focus-visible {
-  outline: 2px solid var(--ytcq-popup-action);
-  outline-offset: 1px;
-}
-
-.popup-tab-active {
-  color: var(--ytcq-popup-action);
 }
 
 .popup-tab-with-count {
@@ -570,9 +403,6 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .popup-tabs.popup-tab-highlight-animated::before,
-  .popup-tabs::before,
-  .popup-tab,
   .popup-scrollbar,
   .popup-scrollbar-thumb,
   #playgroundGamesSection,

@@ -1,5 +1,6 @@
 import { LANGUAGE_OPTIONS } from '../shared/languages';
-import { CHAT_SKIN_OPTIONS, DEFAULT_CHAT_SKIN } from '../shared/chat-skins';
+import { CHAT_SKIN_OPTIONS, DEFAULT_CHAT_SKIN, isCustomChatSkin } from '../shared/chat-skins';
+import { initThemePicker } from './themes';
 import { DEFAULT_MESSAGE_DENSITY, MESSAGE_DENSITY_OPTIONS } from '../shared/message-density';
 import { createSplitTranslateIcon } from '../shared/icons';
 import {
@@ -113,7 +114,7 @@ export function initSettingsControls(popupLocale: string): void {
   chatSkin.addEventListener('change', () => {
     const nextSkin = chatSkin.value as Options['chatSkin'];
     if (nextSkin !== DEFAULT_CHAT_SKIN) animatePopupChatSkinIcon();
-    save({ chatSkin: nextSkin });
+    if (!isCustomChatSkin(nextSkin)) save({ chatSkin: nextSkin });
   });
 
   messageDensity.addEventListener('change', () => {
@@ -195,6 +196,7 @@ export function initSettingsControls(popupLocale: string): void {
     const expanded = playgroundProfileToggle.getAttribute('aria-expanded') === 'true';
     setPlaygroundProfileDetailsExpanded(!expanded);
   });
+  initThemePicker(chatSkin);
 }
 
 export function applyOptionsToControls(options: Partial<Options>): void {

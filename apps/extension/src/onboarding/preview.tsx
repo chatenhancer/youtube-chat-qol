@@ -1,4 +1,14 @@
-import type { ChatSkin, ChatSkinTheme } from '../shared/chat-skins';
+import { type ChatSkin, type ChatSkinTheme } from '../shared/chat-skins';
+import {
+  APPLIED_CUSTOM_THEME_KEY,
+  normalizeCustomTheme,
+  loadCustomThemes,
+  isPreinstalledTheme,
+  selectedTheme,
+  type CustomTheme
+} from '../shared/custom-themes';
+import { createThemeStyleCache, customThemeFontFace } from '../features/custom-themes/styles';
+import { jsx, el } from '../shared/jsx-dom';
 import type { TranslationDisplay } from '../shared/options';
 import { getExtensionMessage } from '../shared/extension-page-i18n';
 
@@ -63,6 +73,11 @@ export function createOnboardingPreview(
   if (!elements) return null;
 
   const colorScheme = window.matchMedia(DARK_COLOR_SCHEME_QUERY);
+  let appliedTheme: CustomTheme | null = null;
+  let preset: CustomTheme | null = null;
+  const themeStyle = el<HTMLStyleElement>(<style />);
+  const themeStyles = createThemeStyleCache(() => render());
+  root.append(themeStyle);
   let translationRequestToken = 0;
   const state: PreviewState = {
     chatSkin: 'system',
@@ -77,12 +92,25 @@ export function createOnboardingPreview(
 
   const render = (): void => {
     const chatSkinTheme: ChatSkinTheme = colorScheme.matches ? 'dark' : 'light';
-    root.dataset.chatSkin = state.chatSkin;
+    const customTheme = selectedTheme(state.chatSkin, appliedTheme, preset);
+    const skin = customTheme ? 'custom' : 'system';
+    if (customTheme)
+      root.ownerDocument.documentElement.setAttribute('data-ytcq-theme-finish', customTheme.finish);
+    else root.ownerDocument.documentElement.removeAttribute('data-ytcq-theme-finish');
+    root.dataset.chatSkin = skin;
+    root.ownerDocument.documentElement.toggleAttribute(
+      'data-ytcq-preview-default-font',
+      skin === 'system'
+    );
+    const css = customTheme
+      ? `${customThemeFontFace(customTheme)}:root{${themeStyles(customTheme, chatSkinTheme)}}`
+      : '';
+    if (themeStyle.textContent !== css) themeStyle.textContent = css;
     root.dataset.chatTheme = chatSkinTheme;
     root.dataset.liteModeEnabled = String(state.liteModeEnabled);
     root.dataset.playgroundEnabled = String(state.playgroundEnabled);
     root.dataset.translationState = state.status;
-    applyChatSkinTheme(root, state.chatSkin, chatSkinTheme);
+    applyChatSkinTheme(root, skin, chatSkinTheme);
     setPreviewElementVisible(elements.gamesIcon, state.playgroundEnabled);
     elements.featuredMessage.classList.toggle(
       'ytcq-translation-replaced',
@@ -140,6 +168,22 @@ export function createOnboardingPreview(
   colorScheme.addEventListener('change', render);
   render();
 
+  chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY, (stored) => {
+    appliedTheme = normalizeCustomTheme(stored[APPLIED_CUSTOM_THEME_KEY]);
+    render();
+  });
+  void loadCustomThemes()
+    .then((themes) => {
+      preset = themes.find(isPreinstalledTheme) || null;
+      render();
+    })
+    .catch(() => {});
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local' || !changes[APPLIED_CUSTOM_THEME_KEY]) return;
+    appliedTheme = normalizeCustomTheme(changes[APPLIED_CUSTOM_THEME_KEY].newValue);
+    render();
+  });
+
   const setTargetLanguage = (targetLanguage: string): void => {
     state.targetLanguage = targetLanguage;
     state.source = getPreviewSourceMessage(uiLocale, targetLanguage);
@@ -196,13 +240,18 @@ export function createOnboardingPreview(
   };
 }
 
-export function getPreviewSourceMessage(uiLocale: string, targetLanguage: string): PreviewSourceMessage {
+export function getPreviewSourceMessage(
+  uiLocale: string,
+  targetLanguage: string
+): PreviewSourceMessage {
   const uiLanguage = getBaseLanguage(uiLocale);
   const target = getBaseLanguage(targetLanguage);
-  return PREVIEW_SOURCE_MESSAGES.find(({ language }) => {
-    const source = getBaseLanguage(language);
-    return source !== uiLanguage && source !== target;
-  }) || PREVIEW_SOURCE_MESSAGES[0];
+  return (
+    PREVIEW_SOURCE_MESSAGES.find(({ language }) => {
+      const source = getBaseLanguage(language);
+      return source !== uiLanguage && source !== target;
+    }) || PREVIEW_SOURCE_MESSAGES[0]
+  );
 }
 
 export function translatePreviewText(text: string, targetLanguage: string): Promise<string> {
@@ -282,11 +331,11 @@ function setPreviewPrimaryText(elements: PreviewElements, text: string): void {
 
 function applyChatSkinTheme(
   root: HTMLElement,
-  chatSkin: ChatSkin,
+  chatSkin: ChatSkin | 'custom',
   chatSkinTheme: ChatSkinTheme
 ): void {
   const pageRoot = root.ownerDocument.documentElement;
-  if (chatSkin === 'aero') {
+  if (chatSkin === 'custom') {
     pageRoot.setAttribute('data-ytcq-chat-skin', chatSkin);
     pageRoot.setAttribute('data-ytcq-chat-skin-theme', chatSkinTheme);
     return;

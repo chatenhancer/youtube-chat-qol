@@ -121,7 +121,15 @@
               <span id="chatSkinLabel" data-i18n="chatSkin">Theme</span>
             </span>
             <span class="option-helper" data-i18n="chatSkinHelper">Apply a custom theme to YouTube chat.</span>
-            <select id="chatSkin" aria-labelledby="chatSkinLabel" title="Choose a custom theme for YouTube chat." data-i18n-title="chatSkinTitle"></select>
+            <span class="theme-picker-control">
+              <select id="chatSkin" aria-labelledby="chatSkinLabel" title="Choose a custom theme for YouTube chat." data-i18n-title="chatSkinTitle"></select>
+              <button id="editThemes" class="theme-edit-button" type="button" title="Theme editor" aria-label="Theme editor" data-i18n-title="themeEditor" data-i18n-aria-label="themeEditor">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 3a9 9 0 1 0 0 18h1a2.5 2.5 0 0 0 1.8-4.2.9.9 0 0 1 .7-1.5H17a4 4 0 0 0 4-4C21 6.7 17 3 12 3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <g fill="currentColor"><circle cx="7" cy="10" r="1.2"></circle><circle cx="11" cy="7" r="1.2"></circle><circle cx="16" cy="8.5" r="1.2"></circle></g>
+                </svg>
+              </button>
+            </span>
           </div>
 
           <div class="option option-control" title="Choose how closely messages are spaced in YouTube chat." data-i18n-title="messageDensityTitle">

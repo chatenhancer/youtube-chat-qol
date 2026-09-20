@@ -1,5 +1,8 @@
 import { DEFAULT_OPTIONS } from '../shared/options';
-import { jsx, el } from '../shared/jsx-dom';
+import {
+  closeExtensionDialog as closeResetDialog,
+  showExtensionDialog as showResetDialog
+} from '../shared/extension-dialog';
 import { controls } from './controls';
 import { getExtensionMessage } from './i18n';
 import { applyOptionsToControls } from './settings';
@@ -13,7 +16,8 @@ const RESET_CONFIRM_ITEM_KEYS = [
   'popupResetItemBookmarks',
   'popupResetItemRememberedUsers',
   'popupResetItemPlaygroundIdentity',
-  'popupResetItemGamePreferences'
+  'popupResetItemGamePreferences',
+  'themeResetItem'
 ];
 
 export function initResetControl(): void {
@@ -90,58 +94,4 @@ function broadcastPageReset(callback: () => void): void {
       });
     });
   });
-}
-
-function showResetDialog({
-  actions,
-  items = [],
-  listLabel,
-  message
-}: {
-  actions: Array<{ className: string; label: string; onClick: () => void }>;
-  items?: string[];
-  listLabel?: string;
-  message: string;
-}): void {
-  closeResetDialog();
-
-  const overlay = el<HTMLDivElement>(
-    <div
-      class="popup-reset-dialog-backdrop"
-      onClick={(event: MouseEvent) => {
-        if (event.target === event.currentTarget) closeResetDialog();
-      }}
-    >
-      <section class="popup-reset-dialog" aria-modal="true" role="dialog">
-        <p class="popup-reset-dialog-message">{message}</p>
-        {items.length && listLabel ? (
-          <p class="popup-reset-dialog-list-label">{listLabel}</p>
-        ) : null}
-        {items.length ? (
-          <ul class="popup-reset-dialog-list">
-            {items.map((item) => (
-              <li>{item}</li>
-            ))}
-          </ul>
-        ) : null}
-        <div class="popup-reset-dialog-actions">
-          {actions.map((action) => (
-            <button
-              type="button"
-              class={`popup-reset-dialog-button ${action.className}`}
-              onClick={action.onClick}
-            >
-              {action.label}
-            </button>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-
-  document.body.append(overlay);
-}
-
-function closeResetDialog(): void {
-  document.querySelector('.popup-reset-dialog-backdrop')?.remove();
 }

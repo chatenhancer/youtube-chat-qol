@@ -216,12 +216,9 @@ ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle
 /* Compact tiles; their contents never determine the native menu width. */
 .ytcq-settings-grid {
   --ytcq-grid-background: rgba(0, 0, 0, 0.045);
-  --ytcq-grid-hover: rgba(0, 0, 0, 0.075);
-  --ytcq-grid-active: rgba(6, 95, 212, 0.11);
-  --ytcq-grid-active-hover: rgba(6, 95, 212, 0.17);
-  --ytcq-grid-accent: #065fd4;
+  --ytcq-grid-active: rgba(62, 166, 255, 0.14);
+  --ytcq-grid-accent: #3ea6ff;
   display: grid;
-  contain: inline-size;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-rows: 1fr;
   gap: 4px;
@@ -232,9 +229,7 @@ ytd-menu-popup-renderer .ytcq-toggle-item[aria-checked="true"] .ytcq-menu-toggle
 :root:is([dark], [data-ytcq-chat-skin-theme="dark"]) .ytcq-settings-grid,
 .chat-preview[data-chat-theme="dark"] .ytcq-settings-grid {
   --ytcq-grid-background: rgba(255, 255, 255, 0.055);
-  --ytcq-grid-hover: rgba(255, 255, 255, 0.09);
   --ytcq-grid-active: rgba(62, 166, 255, 0.18);
-  --ytcq-grid-active-hover: rgba(62, 166, 255, 0.25);
   --ytcq-grid-accent: #70bbff;
 }
 
@@ -267,17 +262,13 @@ ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-paper-item {
   }
 }
 
-ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item:not([aria-disabled="true"]):is(:hover, :focus-visible) .ytcq-paper-item {
-  background: var(--ytcq-grid-hover);
+ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item:not([aria-disabled="true"]):not([aria-checked="true"]):is(:hover, :focus-visible) .ytcq-paper-item {
+  background: var(--ytcq-menu-hover-background);
 }
 
 ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item[aria-checked="true"] .ytcq-paper-item {
   color: var(--ytcq-grid-accent);
   background: var(--ytcq-grid-active);
-}
-
-ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item[aria-checked="true"]:is(:hover, :focus-visible) .ytcq-paper-item {
-  background: var(--ytcq-grid-active-hover);
 }
 
 ytd-menu-popup-renderer .ytcq-settings-grid .ytcq-settings-item:focus-visible .ytcq-paper-item {

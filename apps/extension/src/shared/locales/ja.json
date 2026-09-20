@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "ブックマークを更新できませんでした。"
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "すでに既定値です。"
+    },
+    "themeReset": {
+      "message": "リセット"
+    },
+    "themeResetSavedDone": {
+      "message": "このテーマの保存済みバージョンを復元しました。元に戻すことができます。"
+    },
+    "themeResetDone": {
+      "message": "テーマを既定値に戻しました。未保存です。元に戻すことができます。"
+    },
+    "theme_playful": {
+      "message": "ポップ"
+    },
+    "theme_pixel": {
+      "message": "ピクセル"
+    },
+    "theme_elegant": {
+      "message": "エレガント"
+    },
+    "themeCustomize": {
+      "message": "カスタマイズ"
+    },
+    "themeSection_colors": {
+      "message": "色"
+    },
+    "themeSection_style": {
+      "message": "スタイル"
+    },
+    "themeSection_artwork": {
+      "message": "装飾画像"
+    },
+    "themeShapeDepth": {
+      "message": "形と奥行き"
+    },
+    "themeGradientAngle": {
+      "message": "グラデーションの方向"
+    },
+    "themeImageText": {
+      "message": "画像上の文字"
+    },
+    "themeImageTextHint": {
+      "message": "自動では画像の明るさと表示の濃さに合わせます。手動で設定するには「ライト」か「ダーク」を選んでください。"
+    },
+    "theme_auto": {
+      "message": "自動"
+    },
+    "themeImagePlacement": {
+      "message": "画像の配置"
+    },
+    "themePositionX": {
+      "message": "横の位置"
+    },
+    "themeSurfaceOpacity": {
+      "message": "表面の不透明度"
+    },
+    "themeShine": {
+      "message": "光沢の強さ"
+    },
+    "themeWorking": {
+      "message": "現在の操作が完了するまでお待ちください。"
+    },
+    "themeNoChanges": {
+      "message": "変更を加えてから保存してください。"
+    },
+    "themeAlreadyApplied": {
+      "message": "このバージョンは適用済みです。"
+    },
+    "themePreinstalled": {
+      "message": "プリインストール"
+    },
+    "themePresetNote": {
+      "message": "Aeroはプリインストールされたテーマです。このテーマを保存するには別の名前を入力してください。"
+    },
+    "themePresetNameRequired": {
+      "message": "コピーを保存するにはAero以外の名前を入力してください。"
+    },
+    "themePresetLocked": {
+      "message": "プリインストールされたテーマは削除できません。"
+    },
+    "themeFinishHint_flat": {
+      "message": "反射のないシンプルな表面です。"
+    },
+    "themeFinishHint_glossy": {
+      "message": "光沢のある操作ボタンと、上端に控えめなハイライトを加えた不透明なパネル。"
+    },
+    "themeFinishHint_glass": {
+      "message": "柔らかな反射と、背景をぼかす半透明のパネル。パネルを開くと効果を確認できます。"
+    },
+    "themeShadowHint": {
+      "message": "ヘッダーの下、入力欄の上、パネルの周囲に影を加えます。"
+    },
+    "themeZoom": {
+      "message": "画像のズーム"
+    },
+    "theme_stretch": {
+      "message": "引き伸ばす"
+    },
+    "theme_banner": {
+      "message": "バナー"
+    },
+    "themeImageHeight": {
+      "message": "画像の高さ"
+    },
+    "themeAvatarShape": {
+      "message": "アバターの形"
+    },
+    "theme_round": {
+      "message": "丸"
+    },
+    "theme_square": {
+      "message": "四角"
+    },
+    "themeAvatarFrame": {
+      "message": "アバター枠の画像"
+    },
+    "themeOpenImage": {
+      "message": "画像を新しいタブで開く"
+    },
+    "themeImagePreview": {
+      "message": "画像プレビュー"
+    },
+    "themeRemoveImage": {
+      "message": "画像を削除"
+    },
+    "theme_gothic": {
+      "message": "ブラックレター"
+    },
+    "themeEditor": {
+      "message": "テーマエディター"
+    },
+    "themeSelect": {
+      "message": "編集するテーマを選択"
+    },
+    "themeNew": {
+      "message": "新しいテーマ"
+    },
+    "themeName": {
+      "message": "テーマ名"
+    },
+    "themeSave": {
+      "message": "保存"
+    },
+    "themeSaveApply": {
+      "message": "保存して使う"
+    },
+    "themeUndone": {
+      "message": "{change}を元に戻しました。"
+    },
+    "themeNothingToUndo": {
+      "message": "元に戻す変更はありません。"
+    },
+    "themeDelete": {
+      "message": "テーマを削除"
+    },
+    "themeClear": {
+      "message": "新しいテーマをクリア"
+    },
+    "themeDiscardConfirm": {
+      "message": "テーマの未保存の変更を破棄しますか？"
+    },
+    "themeKeepEditing": {
+      "message": "編集を続ける"
+    },
+    "themeDiscard": {
+      "message": "破棄"
+    },
+    "themeDeleteConfirm": {
+      "message": "このテーマを削除しますか？"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "チャットはデフォルトに戻ります。"
+    },
+    "themeAppearance": {
+      "message": "外観のプレビュー"
+    },
+    "theme_light": {
+      "message": "ライト"
+    },
+    "theme_dark": {
+      "message": "ダーク"
+    },
+    "themeArea": {
+      "message": "エリアをカスタマイズ"
+    },
+    "themeArea_header": {
+      "message": "ヘッダー"
+    },
+    "themeArea_chat": {
+      "message": "チャット"
+    },
+    "themeArea_composer": {
+      "message": "入力欄"
+    },
+    "themeBackgroundColor": {
+      "message": "背景色"
+    },
+    "themeMarkerColor": {
+      "message": "マーカーの色"
+    },
+    "themeFinishStyle": {
+      "message": "仕上げのスタイル"
+    },
+    "themeBackground": {
+      "message": "背景"
+    },
+    "themeFill": {
+      "message": "背景のスタイル"
+    },
+    "theme_solid": {
+      "message": "単色"
+    },
+    "theme_gradient": {
+      "message": "グラデーション"
+    },
+    "theme_image": {
+      "message": "画像"
+    },
+    "themeGradientColor": {
+      "message": "2つ目の色"
+    },
+    "themeChooseImage": {
+      "message": "画像を選択"
+    },
+    "themeFit": {
+      "message": "画像の配置"
+    },
+    "theme_cover": {
+      "message": "埋める"
+    },
+    "theme_contain": {
+      "message": "収める"
+    },
+    "theme_repeat": {
+      "message": "タイル"
+    },
+    "themeVisibility": {
+      "message": "画像の表示濃度"
+    },
+    "themePosition": {
+      "message": "縦位置"
+    },
+    "themeAccent": {
+      "message": "アクセント"
+    },
+    "theme_flat": {
+      "message": "フラット"
+    },
+    "theme_glossy": {
+      "message": "光沢"
+    },
+    "theme_glass": {
+      "message": "ガラス"
+    },
+    "themeCorners": {
+      "message": "角の丸み"
+    },
+    "themeShadow": {
+      "message": "影"
+    },
+    "themeFont": {
+      "message": "フォント"
+    },
+    "theme_default": {
+      "message": "標準"
+    },
+    "theme_classic": {
+      "message": "クラシック"
+    },
+    "theme_mono": {
+      "message": "等幅"
+    },
+    "themeEditorDescription": {
+      "message": "好きな色や画像、細かな設定でテーマを作成できます。"
+    },
+    "themeSaved": {
+      "message": "テーマを保存しました。適用中のテーマは変わりません。"
+    },
+    "themeApplied": {
+      "message": "テーマを保存して適用しました。"
+    },
+    "themeSaveError": {
+      "message": "変更を保存できませんでした。小さい画像を試すか、拡張機能の保存領域を空けてください。"
+    },
+    "themeApplyError": {
+      "message": "テーマを適用できませんでした。もう一度お試しください。"
+    },
+    "themeImageError": {
+      "message": "小さい画像を選んでください（PNG、JPEG、WebP：10 MBまで、GIF：2 MBまで）。"
+    },
+    "themeNameRequired": {
+      "message": "テーマ名を入力してください。"
+    },
+    "themeCustom": {
+      "message": "マイテーマ"
+    },
+    "themeResetItem": {
+      "message": "カスタムテーマ"
+    },
     "close": {
       "message": "閉じる"
     },
@@ -713,6 +1013,33 @@
     },
     "onboardingPipTooltip": {
       "message": "ほかのタブを使っている間も、動画とチャットを常に最前面のウィンドウに表示します。"
+    },
+    "themeBlur": {
+      "message": "パネルのぼかし"
+    },
+    "themeAddMessageMark": {
+      "message": "メッセージマーカーを追加"
+    },
+    "themeSecondary": {
+      "message": "セカンダリアクセント"
+    },
+    "themePaletteHint": {
+      "message": "ボタンとアイコンはアクセント色、タグとハイライトは第2アクセント色を使います。パネル、メニュー、テキストはライト・ダークモードに自動で適応します。"
+    },
+    "theme_theme": {
+      "message": "テーマの色"
+    },
+    "themeDarkImage": {
+      "message": "ダークモードの画像（任意）"
+    },
+    "themeSurfaceTint": {
+      "message": "背景の色合い"
+    },
+    "themeSurfaceTintHint": {
+      "message": "背景にアクセントカラーを加えます。0%ではYouTubeのニュートラルな色を使用します。"
+    },
+    "themeBorder": {
+      "message": "枠線"
     }
   }
 }

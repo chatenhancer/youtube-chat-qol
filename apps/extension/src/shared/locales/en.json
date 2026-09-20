@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "Could not update Bookmarks."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "Already at the defaults."
+    },
+    "themeReset": {
+      "message": "Reset"
+    },
+    "themeResetSavedDone": {
+      "message": "Restored the saved version of this theme. You can undo this."
+    },
+    "themeResetDone": {
+      "message": "Theme reset to defaults. Not saved; you can undo this."
+    },
+    "theme_playful": {
+      "message": "Playful"
+    },
+    "theme_pixel": {
+      "message": "Pixel"
+    },
+    "theme_elegant": {
+      "message": "Elegant"
+    },
+    "themeCustomize": {
+      "message": "Customize"
+    },
+    "themeSection_colors": {
+      "message": "Colors"
+    },
+    "themeSection_style": {
+      "message": "Style"
+    },
+    "themeSection_artwork": {
+      "message": "Artwork"
+    },
+    "themeShapeDepth": {
+      "message": "Shape and depth"
+    },
+    "themeGradientAngle": {
+      "message": "Gradient direction"
+    },
+    "themeImageText": {
+      "message": "Text over image"
+    },
+    "themeImageTextHint": {
+      "message": "Automatic uses image brightness and visibility. Choose Light or Dark to set it yourself."
+    },
+    "theme_auto": {
+      "message": "Automatic"
+    },
+    "themeImagePlacement": {
+      "message": "Image placement"
+    },
+    "themePositionX": {
+      "message": "Horizontal position"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Surface opacity"
+    },
+    "themeShine": {
+      "message": "Shine strength"
+    },
+    "themeWorking": {
+      "message": "Please wait until the current action finishes."
+    },
+    "themeNoChanges": {
+      "message": "Make a change before saving."
+    },
+    "themeAlreadyApplied": {
+      "message": "This version is already applied."
+    },
+    "themePreinstalled": {
+      "message": "Preinstalled"
+    },
+    "themePresetNote": {
+      "message": "Aero is a preinstalled theme. Enter a different name to save this theme."
+    },
+    "themePresetNameRequired": {
+      "message": "Enter a name other than Aero to save your copy."
+    },
+    "themePresetLocked": {
+      "message": "Preinstalled themes cannot be deleted."
+    },
+    "themeFinishHint_flat": {
+      "message": "Plain surfaces without reflections."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Shiny controls and opaque panels with a subtle top highlight."
+    },
+    "themeFinishHint_glass": {
+      "message": "Soft reflections and translucent, blurred panels. Open a panel to see through it."
+    },
+    "themeShadowHint": {
+      "message": "Adds depth beneath the header, above the input area, and around panels."
+    },
+    "themeZoom": {
+      "message": "Image zoom"
+    },
+    "theme_stretch": {
+      "message": "Stretch"
+    },
+    "theme_banner": {
+      "message": "Banner"
+    },
+    "themeImageHeight": {
+      "message": "Image height"
+    },
+    "themeAvatarShape": {
+      "message": "Avatar shape"
+    },
+    "theme_round": {
+      "message": "Round"
+    },
+    "theme_square": {
+      "message": "Square"
+    },
+    "themeAvatarFrame": {
+      "message": "Avatar frame image"
+    },
+    "themeOpenImage": {
+      "message": "Open image in new tab"
+    },
+    "themeImagePreview": {
+      "message": "Image preview"
+    },
+    "themeRemoveImage": {
+      "message": "Remove image"
+    },
+    "theme_gothic": {
+      "message": "Gothic"
+    },
+    "themeEditor": {
+      "message": "Theme editor"
+    },
+    "themeSelect": {
+      "message": "Select a theme to edit"
+    },
+    "themeNew": {
+      "message": "New theme"
+    },
+    "themeName": {
+      "message": "Theme name"
+    },
+    "themeSave": {
+      "message": "Save"
+    },
+    "themeSaveApply": {
+      "message": "Save and use"
+    },
+    "themeUndone": {
+      "message": "Undid: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "Nothing to undo."
+    },
+    "themeDelete": {
+      "message": "Delete theme"
+    },
+    "themeClear": {
+      "message": "Clear new theme"
+    },
+    "themeDiscardConfirm": {
+      "message": "Discard your unsaved theme changes?"
+    },
+    "themeKeepEditing": {
+      "message": "Keep editing"
+    },
+    "themeDiscard": {
+      "message": "Discard"
+    },
+    "themeDeleteConfirm": {
+      "message": "Delete this theme?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "Chat will return to Default."
+    },
+    "themeAppearance": {
+      "message": "Appearance preview"
+    },
+    "theme_light": {
+      "message": "Light"
+    },
+    "theme_dark": {
+      "message": "Dark"
+    },
+    "themeArea": {
+      "message": "Customize area"
+    },
+    "themeArea_header": {
+      "message": "Header"
+    },
+    "themeArea_chat": {
+      "message": "Chat"
+    },
+    "themeArea_composer": {
+      "message": "Input"
+    },
+    "themeBackgroundColor": {
+      "message": "Background color"
+    },
+    "themeMarkerColor": {
+      "message": "Marker color"
+    },
+    "themeFinishStyle": {
+      "message": "Finish style"
+    },
+    "themeBackground": {
+      "message": "Background"
+    },
+    "themeFill": {
+      "message": "Background style"
+    },
+    "theme_solid": {
+      "message": "Solid color"
+    },
+    "theme_gradient": {
+      "message": "Gradient"
+    },
+    "theme_image": {
+      "message": "Image"
+    },
+    "themeGradientColor": {
+      "message": "Second color"
+    },
+    "themeChooseImage": {
+      "message": "Choose image"
+    },
+    "themeFit": {
+      "message": "Image fit"
+    },
+    "theme_cover": {
+      "message": "Fill"
+    },
+    "theme_contain": {
+      "message": "Fit"
+    },
+    "theme_repeat": {
+      "message": "Tile"
+    },
+    "themeVisibility": {
+      "message": "Image visibility"
+    },
+    "themePosition": {
+      "message": "Vertical position"
+    },
+    "themeAccent": {
+      "message": "Accent"
+    },
+    "theme_flat": {
+      "message": "Flat"
+    },
+    "theme_glossy": {
+      "message": "Glossy"
+    },
+    "theme_glass": {
+      "message": "Glass"
+    },
+    "themeCorners": {
+      "message": "Corner radius"
+    },
+    "themeShadow": {
+      "message": "Shadow"
+    },
+    "themeFont": {
+      "message": "Font"
+    },
+    "theme_default": {
+      "message": "Default"
+    },
+    "theme_classic": {
+      "message": "Classic"
+    },
+    "theme_mono": {
+      "message": "Monospace"
+    },
+    "themeEditorDescription": {
+      "message": "Create a theme with your own colors, images, and details."
+    },
+    "themeSaved": {
+      "message": "Theme saved. The applied theme is unchanged."
+    },
+    "themeApplied": {
+      "message": "Theme saved and applied."
+    },
+    "themeSaveError": {
+      "message": "Could not save your changes. Try a smaller image or free some extension storage."
+    },
+    "themeApplyError": {
+      "message": "Could not apply the theme. Please try again."
+    },
+    "themeImageError": {
+      "message": "Choose a smaller image (PNG, JPEG, WebP: up to 10 MB; GIF: up to 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "Enter a theme name."
+    },
+    "themeCustom": {
+      "message": "My themes"
+    },
+    "themeResetItem": {
+      "message": "Custom themes"
+    },
     "close": {
       "message": "Close"
     },
@@ -713,6 +1013,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Keep the video and chat in an always-on-top window while you use other tabs."
+    },
+    "themeBlur": {
+      "message": "Panel blur"
+    },
+    "themeAddMessageMark": {
+      "message": "Add message marker"
+    },
+    "themeSecondary": {
+      "message": "Secondary accent"
+    },
+    "themePaletteHint": {
+      "message": "Buttons and icons follow the accent; tags and highlights use the secondary accent. Panels, menus, and text adapt automatically to light and dark mode."
+    },
+    "theme_theme": {
+      "message": "Theme colors"
+    },
+    "themeDarkImage": {
+      "message": "Dark-mode image (optional)"
+    },
+    "themeSurfaceTint": {
+      "message": "Background tint"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Add the accent color to backgrounds. At 0%, they use YouTube’s neutral colors."
+    },
+    "themeBorder": {
+      "message": "Borders"
     }
   }
 }

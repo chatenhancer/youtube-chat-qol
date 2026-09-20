@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "Bladwijzers konden niet worden bijgewerkt."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "De standaardwaarden zijn al ingesteld."
+    },
+    "themeReset": {
+      "message": "Herstellen"
+    },
+    "themeResetSavedDone": {
+      "message": "De opgeslagen versie van dit thema is hersteld. Je kunt dit ongedaan maken."
+    },
+    "themeResetDone": {
+      "message": "Thema teruggezet naar de standaardwaarden. Niet opgeslagen; je kunt dit ongedaan maken."
+    },
+    "theme_playful": {
+      "message": "Speels"
+    },
+    "theme_pixel": {
+      "message": "Pixel"
+    },
+    "theme_elegant": {
+      "message": "Elegant"
+    },
+    "themeCustomize": {
+      "message": "Aanpassen"
+    },
+    "themeSection_colors": {
+      "message": "Kleuren"
+    },
+    "themeSection_style": {
+      "message": "Stijl"
+    },
+    "themeSection_artwork": {
+      "message": "Afbeeldingen"
+    },
+    "themeShapeDepth": {
+      "message": "Vorm en diepte"
+    },
+    "themeGradientAngle": {
+      "message": "Verlooprichting"
+    },
+    "themeImageText": {
+      "message": "Tekst op afbeelding"
+    },
+    "themeImageTextHint": {
+      "message": "Automatisch houdt rekening met de helderheid en zichtbaarheid van de afbeelding. Kies Licht of Donker om dit zelf in te stellen."
+    },
+    "theme_auto": {
+      "message": "Automatisch"
+    },
+    "themeImagePlacement": {
+      "message": "Afbeeldingsplaatsing"
+    },
+    "themePositionX": {
+      "message": "Horizontale positie"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Dekking oppervlak"
+    },
+    "themeShine": {
+      "message": "Glanssterkte"
+    },
+    "themeWorking": {
+      "message": "Wacht tot de huidige actie klaar is."
+    },
+    "themeNoChanges": {
+      "message": "Breng een wijziging aan voordat je opslaat."
+    },
+    "themeAlreadyApplied": {
+      "message": "Deze versie is al toegepast."
+    },
+    "themePreinstalled": {
+      "message": "Vooraf geïnstalleerd"
+    },
+    "themePresetNote": {
+      "message": "Aero is een vooraf geïnstalleerd thema. Voer een andere naam in om dit thema op te slaan."
+    },
+    "themePresetNameRequired": {
+      "message": "Kies een andere naam dan Aero om je kopie op te slaan."
+    },
+    "themePresetLocked": {
+      "message": "Vooraf geïnstalleerde thema’s kunnen niet worden verwijderd."
+    },
+    "themeFinishHint_flat": {
+      "message": "Effen oppervlakken zonder reflecties."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Glanzende bedieningselementen en ondoorzichtige panelen met een subtiele glans bovenaan."
+    },
+    "themeFinishHint_glass": {
+      "message": "Zachte reflecties en doorschijnende, vervaagde panelen. Open een paneel om erdoorheen te kijken."
+    },
+    "themeShadowHint": {
+      "message": "Voegt diepte toe onder de kop, boven de invoer en rond panelen."
+    },
+    "themeZoom": {
+      "message": "Afbeeldingszoom"
+    },
+    "theme_stretch": {
+      "message": "Uitrekken"
+    },
+    "theme_banner": {
+      "message": "Banner"
+    },
+    "themeImageHeight": {
+      "message": "Afbeeldingshoogte"
+    },
+    "themeAvatarShape": {
+      "message": "Avatarvorm"
+    },
+    "theme_round": {
+      "message": "Rond"
+    },
+    "theme_square": {
+      "message": "Vierkant"
+    },
+    "themeAvatarFrame": {
+      "message": "Afbeelding voor avatarrand"
+    },
+    "themeOpenImage": {
+      "message": "Afbeelding openen in nieuw tabblad"
+    },
+    "themeImagePreview": {
+      "message": "Afbeeldingsvoorbeeld"
+    },
+    "themeRemoveImage": {
+      "message": "Afbeelding verwijderen"
+    },
+    "theme_gothic": {
+      "message": "Gotisch"
+    },
+    "themeEditor": {
+      "message": "Thema-editor"
+    },
+    "themeSelect": {
+      "message": "Kies een thema om te bewerken"
+    },
+    "themeNew": {
+      "message": "Nieuw thema"
+    },
+    "themeName": {
+      "message": "Themanaam"
+    },
+    "themeSave": {
+      "message": "Opslaan"
+    },
+    "themeSaveApply": {
+      "message": "Opslaan en gebruiken"
+    },
+    "themeUndone": {
+      "message": "Ongedaan gemaakt: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "Er is niets om ongedaan te maken."
+    },
+    "themeDelete": {
+      "message": "Thema verwijderen"
+    },
+    "themeClear": {
+      "message": "Nieuw thema wissen"
+    },
+    "themeDiscardConfirm": {
+      "message": "Niet-opgeslagen themawijzigingen weggooien?"
+    },
+    "themeKeepEditing": {
+      "message": "Verder bewerken"
+    },
+    "themeDiscard": {
+      "message": "Weggooien"
+    },
+    "themeDeleteConfirm": {
+      "message": "Dit thema verwijderen?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "De chat keert terug naar Standaard."
+    },
+    "themeAppearance": {
+      "message": "Weergavevoorbeeld"
+    },
+    "theme_light": {
+      "message": "Licht"
+    },
+    "theme_dark": {
+      "message": "Donker"
+    },
+    "themeArea": {
+      "message": "Onderdeel aanpassen"
+    },
+    "themeArea_header": {
+      "message": "Kop"
+    },
+    "themeArea_chat": {
+      "message": "Chat"
+    },
+    "themeArea_composer": {
+      "message": "Invoer"
+    },
+    "themeBackgroundColor": {
+      "message": "Achtergrondkleur"
+    },
+    "themeMarkerColor": {
+      "message": "Markeringskleur"
+    },
+    "themeFinishStyle": {
+      "message": "Afwerkingsstijl"
+    },
+    "themeBackground": {
+      "message": "Achtergrond"
+    },
+    "themeFill": {
+      "message": "Achtergrondstijl"
+    },
+    "theme_solid": {
+      "message": "Effen kleur"
+    },
+    "theme_gradient": {
+      "message": "Kleurverloop"
+    },
+    "theme_image": {
+      "message": "Afbeelding"
+    },
+    "themeGradientColor": {
+      "message": "Tweede kleur"
+    },
+    "themeChooseImage": {
+      "message": "Afbeelding kiezen"
+    },
+    "themeFit": {
+      "message": "Afbeelding passend maken"
+    },
+    "theme_cover": {
+      "message": "Vullen"
+    },
+    "theme_contain": {
+      "message": "Passend"
+    },
+    "theme_repeat": {
+      "message": "Tegelen"
+    },
+    "themeVisibility": {
+      "message": "Zichtbaarheid afbeelding"
+    },
+    "themePosition": {
+      "message": "Verticale positie"
+    },
+    "themeAccent": {
+      "message": "Accent"
+    },
+    "theme_flat": {
+      "message": "Vlak"
+    },
+    "theme_glossy": {
+      "message": "Glanzend"
+    },
+    "theme_glass": {
+      "message": "Glas"
+    },
+    "themeCorners": {
+      "message": "Hoekradius"
+    },
+    "themeShadow": {
+      "message": "Schaduw"
+    },
+    "themeFont": {
+      "message": "Lettertype"
+    },
+    "theme_default": {
+      "message": "Standaard"
+    },
+    "theme_classic": {
+      "message": "Klassiek"
+    },
+    "theme_mono": {
+      "message": "Monospace"
+    },
+    "themeEditorDescription": {
+      "message": "Maak een thema met je eigen kleuren, afbeeldingen en details."
+    },
+    "themeSaved": {
+      "message": "Thema opgeslagen. Het actieve thema is ongewijzigd."
+    },
+    "themeApplied": {
+      "message": "Thema opgeslagen en toegepast."
+    },
+    "themeSaveError": {
+      "message": "Opslaan mislukt. Probeer een kleinere afbeelding of maak extensieopslag vrij."
+    },
+    "themeApplyError": {
+      "message": "Toepassen van het thema mislukt. Probeer het opnieuw."
+    },
+    "themeImageError": {
+      "message": "Kies een kleinere afbeelding (PNG, JPEG, WebP: maximaal 10 MB; GIF: maximaal 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "Voer een themanaam in."
+    },
+    "themeCustom": {
+      "message": "Mijn thema’s"
+    },
+    "themeResetItem": {
+      "message": "Aangepaste thema’s"
+    },
     "close": {
       "message": "Sluiten"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Houd video en chat in een venster dat altijd bovenaan blijft terwijl je andere tabbladen gebruikt."
+    },
+    "themeBlur": {
+      "message": "Paneelvervaging"
+    },
+    "themeAddMessageMark": {
+      "message": "Berichtmarkering toevoegen"
+    },
+    "themeSecondary": {
+      "message": "Secundaire accentkleur"
+    },
+    "themePaletteHint": {
+      "message": "Knoppen en pictogrammen volgen het accent; tags en markeringen gebruiken het tweede accent. Panelen, menu’s en tekst passen zich automatisch aan de lichte en donkere modus aan."
+    },
+    "theme_theme": {
+      "message": "Themakleuren"
+    },
+    "themeDarkImage": {
+      "message": "Afbeelding voor donkere modus (optioneel)"
+    },
+    "themeSurfaceTint": {
+      "message": "Achtergrondtint"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Voeg de accentkleur toe aan achtergronden. Bij 0% gebruiken ze de neutrale kleuren van YouTube."
+    },
+    "themeBorder": {
+      "message": "Randen"
     }
   }
 }

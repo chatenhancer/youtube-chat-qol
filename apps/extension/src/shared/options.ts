@@ -7,7 +7,7 @@
  */
 import {
   DEFAULT_CHAT_SKIN,
-  isChatSkin,
+  normalizeChatSkin,
   type ChatSkin
 } from './chat-skins';
 import {
@@ -55,9 +55,7 @@ const TRANSLATION_DISPLAY_OPTIONS: readonly (readonly [TranslationDisplay, strin
 
 export function normalizeOptions(value: Partial<Options> | Record<string, unknown>): Options {
   const candidate = value as Record<string, unknown>;
-  const chatSkin = isChatSkin(candidate.chatSkin)
-    ? candidate.chatSkin
-    : DEFAULT_OPTIONS.chatSkin;
+  const chatSkin = normalizeChatSkin(candidate.chatSkin);
   const composerTranslateLanguage = getStringOption(candidate.composerTranslateLanguage);
   const targetLanguage = getStringOption(candidate.targetLanguage);
   const lastTranslationTarget = getStringOption(candidate.lastTranslationTarget) || targetLanguage || DEFAULT_TRANSLATION_TARGET;

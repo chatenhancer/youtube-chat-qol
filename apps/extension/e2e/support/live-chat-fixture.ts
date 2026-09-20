@@ -105,7 +105,7 @@ export function createLiveChatFixtureHtml({
       }
 
       #author-name {
-        color: #aaa;
+        color: var(--yt-live-chat-secondary-text-color, #aaa);
         font-weight: 600;
         margin-right: 6px;
       }
@@ -127,9 +127,13 @@ export function createLiveChatFixtureHtml({
         cursor: pointer;
       }
 
+      #panel-pages.yt-live-chat-renderer {
+        border-top: 1px solid #333;
+        display: block;
+      }
+
       yt-live-chat-message-input-renderer {
         align-items: center;
-        border-top: 1px solid #333;
         display: flex;
         gap: 8px;
         min-height: 64px;
@@ -153,14 +157,59 @@ export function createLiveChatFixtureHtml({
       }
 
       yt-emoji-picker-renderer {
+        --yt-emoji-picker-category-background-color: rgba(247, 247, 247, .8);
+        --yt-emoji-picker-search-background-color: #f9f9f9;
         background: #212121;
         border-top: 1px solid #333;
         display: block;
         padding: 8px 12px;
       }
 
+      html[dark] yt-emoji-picker-renderer {
+        --yt-emoji-picker-category-background-color: rgba(40, 40, 40, .8);
+        --yt-emoji-picker-search-background-color: #444;
+      }
+
+      yt-emoji-picker-renderer #search-panel {
+        background: var(--yt-emoji-picker-search-background-color);
+        border-radius: 4px;
+        display: flex;
+        padding: 4px 8px;
+      }
+
+      yt-emoji-picker-renderer #search {
+        display: block;
+        flex: 1;
+        min-width: 0;
+      }
+
+      yt-emoji-picker-renderer #search input {
+        appearance: none;
+        background: transparent;
+        border: 0;
+        box-sizing: border-box;
+        color: inherit;
+        display: block;
+        font: 13px/24px Roboto, Arial, sans-serif;
+        height: 24px;
+        width: 100%;
+      }
+
+      yt-emoji-picker-renderer :is(tp-yt-paper-input-container, tp-yt-iron-input) {
+        display: block;
+      }
+
       yt-emoji-picker-renderer #categories {
         display: block;
+      }
+
+      yt-emoji-picker-category-renderer #title {
+        background: var(--yt-emoji-picker-category-background-color);
+        color: var(--yt-emoji-picker-category-color, #aaa);
+        display: block;
+        padding: 2px;
+        position: sticky;
+        top: 0;
       }
 
       yt-emoji-picker-renderer [role="option"] {
@@ -187,11 +236,14 @@ export function createLiveChatFixtureHtml({
         z-index: 1000;
       }
 
+      tp-yt-paper-listbox,
+      ytd-menu-service-item-renderer,
       yt-live-chat-toggle-renderer {
         display: block;
       }
 
-      yt-live-chat-toggle-renderer tp-yt-paper-item {
+      yt-live-chat-toggle-renderer tp-yt-paper-item,
+      ytd-menu-service-item-renderer tp-yt-paper-item {
         align-items: center;
         box-sizing: border-box;
         cursor: pointer;
@@ -286,16 +338,20 @@ export function createLiveChatFixtureHtml({
         </yt-live-chat-item-list-renderer>
 
         ${loggedIn && !replay ? `
-          <yt-live-chat-message-input-renderer>
-            <span id="author-name">@CurrentViewer</span>
-            <div id="input" contenteditable="true" aria-label="Chat input"></div>
-            <div id="emoji-picker-button">
-              <yt-live-chat-icon-toggle-button-renderer id="emoji" class="style-scope yt-live-chat-message-input-renderer">
-                <button type="button" aria-label="Add emotes">🙂</button>
-              </yt-live-chat-icon-toggle-button-renderer>
+          <tp-yt-iron-pages id="panel-pages" class="style-scope yt-live-chat-renderer">
+            <div id="input-panel" class="style-scope yt-live-chat-renderer iron-selected">
+              <yt-live-chat-message-input-renderer>
+                <span id="author-name">@CurrentViewer</span>
+                <div id="input" contenteditable="true" aria-label="Chat input"></div>
+                <div id="emoji-picker-button">
+                  <yt-live-chat-icon-toggle-button-renderer id="emoji" class="style-scope yt-live-chat-message-input-renderer">
+                    <button type="button" aria-label="Add emotes">🙂</button>
+                  </yt-live-chat-icon-toggle-button-renderer>
+                </div>
+                <button id="send-button" type="button">Send</button>
+              </yt-live-chat-message-input-renderer>
             </div>
-            <button id="send-button" type="button">Send</button>
-          </yt-live-chat-message-input-renderer>
+          </tp-yt-iron-pages>
         ` : ''}
       </yt-live-chat-renderer>
     </yt-live-chat-app>
@@ -502,8 +558,21 @@ export function createLiveChatFixtureHtml({
         removeEmojiPicker();
         const picker = document.createElement('yt-emoji-picker-renderer');
         picker.innerHTML = \`
+          <div id="search-panel">
+            <tp-yt-paper-input id="search">
+              <tp-yt-paper-input-container>
+                <div class="input-wrapper">
+                  <div id="labelAndInputContainer">
+                    <tp-yt-iron-input><input type="text" aria-label="Search emoji" placeholder="Search emotes"></tp-yt-iron-input>
+                  </div>
+                </div>
+                <div class="underline"></div>
+              </tp-yt-paper-input-container>
+            </tp-yt-paper-input>
+          </div>
           <div id="categories">
             <yt-emoji-picker-category-renderer>
+              <yt-formatted-string id="title">People</yt-formatted-string>
               <button type="button" role="option" aria-label="check mark button">✅</button>
               <button type="button" role="option" aria-label="grinning face">😀</button>
               <button type="button" role="option" aria-label="party popper">🎉</button>
@@ -551,7 +620,8 @@ export function createLiveChatFixtureHtml({
       const addSettingsMenu = () => {
         removeOpenMenus();
         const menu = document.createElement('ytd-menu-popup-renderer');
-        menu.innerHTML = '<div id="items"><yt-live-chat-toggle-renderer data-ytcq-native-setting="timestamps" tabindex="-1" aria-selected="false"><tp-yt-paper-item role="option" tabindex="0"><yt-icon aria-hidden="true">◷</yt-icon><span class="native-setting-label">Timestamps</span><tp-yt-paper-toggle-button role="button" aria-pressed="false" tabindex="0" toggles aria-label="Timestamps"><div class="toggle-container"><div id="toggleBar" class="toggle-bar"></div><div id="toggleButton" class="toggle-button"></div></div></tp-yt-paper-toggle-button></tp-yt-paper-item></yt-live-chat-toggle-renderer></div>';
+        menu.className = 'style-scope yt-live-chat-app';
+        menu.innerHTML = '<tp-yt-paper-listbox id="items"><yt-live-chat-toggle-renderer data-ytcq-native-setting="timestamps" tabindex="-1" aria-selected="false"><tp-yt-paper-item role="option" tabindex="0"><yt-icon aria-hidden="true">◷</yt-icon><span class="native-setting-label">Timestamps</span><tp-yt-paper-toggle-button role="button" aria-pressed="false" tabindex="0" toggles aria-label="Timestamps"><div class="toggle-container"><div id="toggleBar" class="toggle-bar"></div><div id="toggleButton" class="toggle-button"></div></div></tp-yt-paper-toggle-button></tp-yt-paper-item></yt-live-chat-toggle-renderer></tp-yt-paper-listbox>';
         document.body.append(menu);
         updateTimestampToggle(menu);
         menu
@@ -563,7 +633,8 @@ export function createLiveChatFixtureHtml({
         removeOpenMenus();
         activeContextMenuRenderer = renderer;
         const menu = document.createElement('ytd-menu-popup-renderer');
-        menu.innerHTML = '<div id="items"><ytd-menu-service-item-renderer><tp-yt-paper-item>Native item</tp-yt-paper-item></ytd-menu-service-item-renderer></div>';
+        menu.className = 'style-scope yt-live-chat-app';
+        menu.innerHTML = '<tp-yt-paper-listbox id="items"><ytd-menu-service-item-renderer><tp-yt-paper-item>Native item</tp-yt-paper-item></ytd-menu-service-item-renderer></tp-yt-paper-listbox>';
         document.body.append(menu);
         renderer?.dispatchEvent(new CustomEvent('yt-live-chat-context-menu-opened'));
       };

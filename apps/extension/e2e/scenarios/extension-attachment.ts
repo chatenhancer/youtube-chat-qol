@@ -22,7 +22,7 @@ export const reconnectEnabledExtensionScenario: BrowserScenario = async ({ page,
 export const reconnectEnabledExtensionLiteScenario: BrowserScenario = async ({ page, context }) => {
   await withExtensionStorageValues(context, 'sync', {
     liteModeEnabled: true,
-    chatSkin: 'aero',
+    chatSkin: 'custom:aero',
     messageDensity: 'compact'
   }, async () => {
     await runAttachmentScenario({ page, context }, { lite: true, reconnect: true });

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { APPLIED_CUSTOM_THEME_KEY, createCustomTheme } from '../shared/custom-themes';
 
 const preview = vi.hoisted(() => ({
   applyOptions: vi.fn(),
@@ -29,6 +30,7 @@ describe('onboarding settings', () => {
     document.write(onboardingHtml);
     document.close();
     await chrome.storage.sync.clear();
+    await chrome.storage.local.clear();
     vi.mocked(chrome.storage.sync.get).mockClear();
     vi.mocked(chrome.storage.sync.set).mockClear();
     Object.values(preview).forEach((mock) => mock.mockClear());
@@ -46,6 +48,18 @@ describe('onboarding settings', () => {
     );
 
     expect(learnMoreLink?.href).toBe('https://playground.chatenhancer.com/');
+  });
+
+  it('keeps the applied custom theme selected when revisiting onboarding', async () => {
+    const theme = { ...createCustomTheme(), name: 'Ocean' };
+    const chatSkin = `custom:${theme.id}`;
+    await chrome.storage.local.set({ [APPLIED_CUSTOM_THEME_KEY]: theme });
+    await chrome.storage.sync.set({ chatSkin });
+    await import('./index');
+    const picker = document.querySelector<HTMLSelectElement>('#onboardingChatSkin')!;
+    expect(picker.value).toBe(chatSkin);
+    expect(picker.selectedOptions[0].textContent).toBe('Ocean');
+    expect(preview.applyOptions).toHaveBeenCalledWith(expect.objectContaining({ chatSkin }));
   });
 
   it('shows translation appearance only while translation is enabled', async () => {
@@ -117,7 +131,7 @@ describe('onboarding settings', () => {
     translationDisplay.dispatchEvent(new Event('change', { bubbles: true }));
 
     const chatSkin = document.querySelector<HTMLSelectElement>('#onboardingChatSkin')!;
-    chatSkin.value = 'aero';
+    chatSkin.value = 'custom:aero';
     chatSkin.dispatchEvent(new Event('change', { bubbles: true }));
 
     const playgroundEnabled = document.querySelector<HTMLInputElement>(

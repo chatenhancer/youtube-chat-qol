@@ -18,7 +18,7 @@ yt-emoji-picker-renderer .ytcq-frequent-emoji-label {
   padding: 2px;
   color: var(--yt-emoji-picker-category-color, var(--yt-live-chat-secondary-text-color, var(--yt-spec-text-secondary, currentColor)));
   background-color: var(--yt-emoji-picker-category-background-color, transparent);
-  font-family: Roboto, Arial, sans-serif;
+  font-family: var(--ytcq-theme-font, Roboto, Arial, sans-serif);
   font-size: var(--yt-emoji-picker-category-title-font-size, 13px);
   font-weight: var(--yt-emoji-picker-category-title-font-weight, 500);
   line-height: var(--yt-emoji-picker-category-title-line-height, 16px);

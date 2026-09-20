@@ -179,7 +179,11 @@ export const playgroundIncomingInviteIgnoreScenario: BrowserScenario = async ({ 
   });
 };
 
-export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ chat, context, page }) => {
+export const playgroundActiveGameControlsScenario: BrowserScenario = async ({
+  chat,
+  context,
+  page
+}) => {
   const activeGame = createBrowserChessGame({ gameId: 'active-chess-game' });
   const secondaryGame = createBrowserReplayTriviaGame();
   const backend = await installMockPlaygroundBackend(context, {
@@ -226,39 +230,27 @@ export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ ch
     await expect(previousControl).toHaveCSS('box-shadow', 'none');
 
     const root = chat.locator('html');
-    const originalSkin = await root.getAttribute('data-ytcq-chat-skin');
-    const originalTheme = await root.getAttribute('data-ytcq-chat-skin-theme');
-    await root.evaluate((element) => {
-      element.setAttribute('data-ytcq-chat-skin', 'aero');
-      element.setAttribute('data-ytcq-chat-skin-theme', 'light');
-    });
-    const headerControl = card.locator('.ytcq-profile-card-header-button').first();
-    await headerControl.hover();
-    const headerHoverTreatment = await readButtonTreatment(headerControl);
-    await nextControl.hover();
-    await expect(nextControl).toHaveCSS('color', headerHoverTreatment.color);
-    const cycleHoverTreatment = await readButtonTreatment(nextControl);
-    expect(cycleHoverTreatment.backgroundImage).toBe(headerHoverTreatment.backgroundImage);
-    expect(cycleHoverTreatment.backgroundImage).not.toBe('none');
-    const nextControlBox = await nextControl.boundingBox();
-    if (!nextControlBox) throw new Error('Expected the active-game next button to be visible.');
-    await page.mouse.move(
-      nextControlBox.x + nextControlBox.width / 2,
-      nextControlBox.y + nextControlBox.height / 2
-    );
-    await page.mouse.down();
-    expect(await readButtonTreatment(nextControl)).toEqual(cycleHoverTreatment);
-    await page.mouse.up();
-    await expect(card.locator('.ytcq-games-active-row')).toContainText('HELP-A-FRIEND! Trivia');
-    await expect(activeDots.nth(1)).toHaveClass(/ytcq-games-active-dot-current/);
-    await root.evaluate((element, attributes) => {
-      for (const [name, value] of Object.entries(attributes)) {
-        if (value === null) element.removeAttribute(name);
-        else element.setAttribute(name, value);
-      }
-    }, {
-      'data-ytcq-chat-skin': originalSkin,
-      'data-ytcq-chat-skin-theme': originalTheme
+    await withExtensionStorageValues(context, 'sync', { chatSkin: 'custom:aero' }, async () => {
+      await expect(root).toHaveAttribute('data-ytcq-theme-finish', 'glass');
+      const headerControl = card.locator('.ytcq-profile-card-header-button').first();
+      await headerControl.hover();
+      const headerHoverTreatment = await readButtonTreatment(headerControl);
+      await nextControl.hover();
+      await expect(nextControl).toHaveCSS('color', headerHoverTreatment.color);
+      const cycleHoverTreatment = await readButtonTreatment(nextControl);
+      expect(cycleHoverTreatment.backgroundImage).toBe(headerHoverTreatment.backgroundImage);
+      expect(cycleHoverTreatment.backgroundImage).not.toBe('none');
+      const nextControlBox = await nextControl.boundingBox();
+      if (!nextControlBox) throw new Error('Expected the active-game next button to be visible.');
+      await page.mouse.move(
+        nextControlBox.x + nextControlBox.width / 2,
+        nextControlBox.y + nextControlBox.height / 2
+      );
+      await page.mouse.down();
+      expect(await readButtonTreatment(nextControl)).toEqual(cycleHoverTreatment);
+      await page.mouse.up();
+      await expect(card.locator('.ytcq-games-active-row')).toContainText('HELP-A-FRIEND! Trivia');
+      await expect(activeDots.nth(1)).toHaveClass(/ytcq-games-active-dot-current/);
     });
     await activeControls.locator('.ytcq-games-cycle-action-previous').click();
     await expect(card.locator('.ytcq-games-active-row')).toContainText('Chess');
@@ -270,7 +262,9 @@ export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ ch
     await chat.locator('.ytcq-games-button').click();
     const resumedCard = chat.locator('.ytcq-games-card');
     await expect(resumedCard).toBeVisible();
-    const resumedActiveRow = resumedCard.locator('.ytcq-games-active-row').filter({ hasText: 'Chess' });
+    const resumedActiveRow = resumedCard
+      .locator('.ytcq-games-active-row')
+      .filter({ hasText: 'Chess' });
     await expect(resumedActiveRow.getByRole('button', { name: 'Hide' })).toBeVisible();
 
     await resumedActiveRow.getByRole('button', { name: 'Hide' }).click();
@@ -287,8 +281,10 @@ export const playgroundActiveGameControlsScenario: BrowserScenario = async ({ ch
     await leaveActiveRow.getByRole('button', { name: 'Leave' }).click();
     await expect(chat.locator('.ytcq-chess-game-panel')).toHaveCount(0);
 
-    const leave = await waitForGameAction(backend, 'leave', (message) =>
-      message.gameId === 'active-chess-game'
+    const leave = await waitForGameAction(
+      backend,
+      'leave',
+      (message) => message.gameId === 'active-chess-game'
     );
     expect(leave).toMatchObject({
       action: 'leave',
@@ -344,68 +340,72 @@ export const playgroundVersionMismatchScenario: BrowserScenario = async ({ chat,
     })
   });
 
-  await withExtensionStorageValues(context, 'sync', PLAYGROUND_ENABLED_OPTIONS, async () => {
-    const card = await openGamesCard(chat, backend);
-    const bountyCard = getGameCard(card, 'The Wild Wild Chat');
-    await chat.locator('html').evaluate((element) => {
-      element.setAttribute('data-ytcq-chat-skin', 'aero');
-      element.setAttribute('data-ytcq-chat-skin-theme', 'dark');
-    });
+  await withExtensionStorageValues(
+    context,
+    'sync',
+    { ...PLAYGROUND_ENABLED_OPTIONS, chatSkin: 'custom:aero' },
+    async () => {
+      const card = await openGamesCard(chat, backend);
+      const bountyCard = getGameCard(card, 'The Wild Wild Chat');
+      await chat.locator('html').evaluate((element) => {
+        element.setAttribute('dark', '');
+      });
 
-    await expect(bountyCard).toHaveAttribute('aria-disabled', 'true');
-    await expect(bountyCard).toHaveAttribute(
-      'title',
-      'The Wild Wild Chat is temporarily unavailable because Chat Enhancer and Playground versions do not match. Try again when the versions match.'
-    );
-    const updateBadge = bountyCard.locator('.ytcq-games-version-badge');
-    await expect(updateBadge).toHaveText('Update required');
-    await expect(card.locator('.ytcq-games-version-notice')).toHaveCount(0);
-    await expect(getGameCard(card, 'Chess')).toHaveAttribute('aria-disabled', 'false');
+      await expect(bountyCard).toHaveAttribute('aria-disabled', 'true');
+      await expect(bountyCard).toHaveAttribute(
+        'title',
+        'The Wild Wild Chat is temporarily unavailable because Chat Enhancer and Playground versions do not match. Try again when the versions match.'
+      );
+      const updateBadge = bountyCard.locator('.ytcq-games-version-badge');
+      await expect(updateBadge).toHaveText('Update required');
+      await expect(card.locator('.ytcq-games-version-notice')).toHaveCount(0);
+      await expect(getGameCard(card, 'Chess')).toHaveAttribute('aria-disabled', 'false');
 
-    const activeRow = card.locator('.ytcq-games-incompatible-active-row');
-    await expect(activeRow).toContainText('The Wild Wild Chat');
-    await expect(activeRow).toContainText(
-      'Update required. Chat Enhancer and Playground versions do not match.'
-    );
-    await expect(activeRow.getByRole('button')).toHaveCount(1);
-    await expect(activeRow.getByRole('button', { name: 'Leave' })).toBeVisible();
-    await expect(chat.locator('.ytcq-bounty-hunting-game-panel')).toHaveCount(0);
-    await expect(chat.locator('.ytcq-bounty-hunting-canvas')).toHaveCount(0);
+      const activeRow = card.locator('.ytcq-games-incompatible-active-row');
+      await expect(activeRow).toContainText('The Wild Wild Chat');
+      await expect(activeRow).toContainText(
+        'Update required. Chat Enhancer and Playground versions do not match.'
+      );
+      await expect(activeRow.getByRole('button')).toHaveCount(1);
+      await expect(activeRow.getByRole('button', { name: 'Leave' })).toBeVisible();
+      await expect(chat.locator('.ytcq-bounty-hunting-game-panel')).toHaveCount(0);
+      await expect(chat.locator('.ytcq-bounty-hunting-canvas')).toHaveCount(0);
 
-    await activeRow.getByRole('button', { name: 'Leave' }).click();
-    const leave = await backend.waitForClientMessage('gameAction');
-    expect(leave).toMatchObject({
-      action: 'leave',
-      gameId: 'incompatible-bounty-game'
-    });
-    await backend.sendServerMessage({
-      gameId: 'incompatible-bounty-game',
-      reason: 'playerLeft',
-      type: 'gameEnded',
-      userId: 'browser-user'
-    });
-    await expect(card.locator('.ytcq-games-incompatible-active-row')).toHaveCount(0);
+      await activeRow.getByRole('button', { name: 'Leave' }).click();
+      const leave = await backend.waitForClientMessage('gameAction');
+      expect(leave).toMatchObject({
+        action: 'leave',
+        gameId: 'incompatible-bounty-game'
+      });
+      await backend.sendServerMessage({
+        gameId: 'incompatible-bounty-game',
+        reason: 'playerLeft',
+        type: 'gameEnded',
+        userId: 'browser-user'
+      });
+      await expect(card.locator('.ytcq-games-incompatible-active-row')).toHaveCount(0);
 
-    await backend.sendServerMessage({
-      code: 'game_version',
-      message: 'Chat Enhancer and Playground versions do not match for this game.',
-      type: 'error'
-    });
-    await expect(chat.locator('.ytcq-toast')).toHaveCount(0);
+      await backend.sendServerMessage({
+        code: 'game_version',
+        message: 'Chat Enhancer and Playground versions do not match for this game.',
+        type: 'error'
+      });
+      await expect(chat.locator('.ytcq-toast')).toHaveCount(0);
 
-    await backend.sendServerMessage({
-      code: 'bad_action',
-      message: 'That action is no longer available.',
-      type: 'error'
-    });
-    await expect(chat.locator('.ytcq-toast')).toContainText(
-      'That action is no longer available.'
-    );
-    await expect(card.locator('.ytcq-games-action-error')).toHaveCount(0);
+      await backend.sendServerMessage({
+        code: 'bad_action',
+        message: 'That action is no longer available.',
+        type: 'error'
+      });
+      await expect(chat.locator('.ytcq-toast')).toContainText(
+        'That action is no longer available.'
+      );
+      await expect(card.locator('.ytcq-games-action-error')).toHaveCount(0);
 
-    await openGamePlayerList(card, 'Chess');
-    await expect(card.locator('.ytcq-games-player-row')).not.toHaveCount(0);
-  });
+      await openGamePlayerList(card, 'Chess');
+      await expect(card.locator('.ytcq-games-player-row')).not.toHaveCount(0);
+    }
+  );
 };
 
 export const playgroundInviteCancelScenario: BrowserScenario = async ({ chat, context }) => {

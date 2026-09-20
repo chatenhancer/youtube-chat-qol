@@ -29,7 +29,7 @@ describe('shared option helpers', () => {
 
   it('preserves explicit false booleans and valid display modes', () => {
     expect(normalizeOptions({
-      chatSkin: 'aero',
+      chatSkin: 'custom:aero',
       liteModeEnabled: true,
       messageDensity: 'compact',
       sound: false,
@@ -40,7 +40,7 @@ describe('shared option helpers', () => {
     })).toMatchObject({
       sound: false,
       startupEffect: false,
-      chatSkin: 'aero',
+      chatSkin: 'custom:aero',
       liteModeEnabled: true,
       messageDensity: 'compact',
       playgroundEnabled: true,

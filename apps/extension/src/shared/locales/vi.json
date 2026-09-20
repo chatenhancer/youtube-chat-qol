@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "Không thể cập nhật dấu trang."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "Đã dùng các giá trị mặc định."
+    },
+    "themeReset": {
+      "message": "Đặt lại"
+    },
+    "themeResetSavedDone": {
+      "message": "Đã khôi phục phiên bản đã lưu của giao diện. Bạn có thể hoàn tác thao tác này."
+    },
+    "themeResetDone": {
+      "message": "Đã đặt lại giao diện về mặc định. Chưa lưu; bạn có thể hoàn tác."
+    },
+    "theme_playful": {
+      "message": "Vui nhộn"
+    },
+    "theme_pixel": {
+      "message": "Điểm ảnh"
+    },
+    "theme_elegant": {
+      "message": "Thanh lịch"
+    },
+    "themeCustomize": {
+      "message": "Tùy chỉnh"
+    },
+    "themeSection_colors": {
+      "message": "Màu sắc"
+    },
+    "themeSection_style": {
+      "message": "Kiểu"
+    },
+    "themeSection_artwork": {
+      "message": "Hình ảnh"
+    },
+    "themeShapeDepth": {
+      "message": "Hình dạng và độ sâu"
+    },
+    "themeGradientAngle": {
+      "message": "Hướng chuyển màu"
+    },
+    "themeImageText": {
+      "message": "Chữ trên ảnh"
+    },
+    "themeImageTextHint": {
+      "message": "Tự động dựa trên độ sáng và độ hiển thị của ảnh. Chọn Sáng hoặc Tối để tự điều chỉnh."
+    },
+    "theme_auto": {
+      "message": "Tự động"
+    },
+    "themeImagePlacement": {
+      "message": "Vị trí hình ảnh"
+    },
+    "themePositionX": {
+      "message": "Vị trí ngang"
+    },
+    "themeSurfaceOpacity": {
+      "message": "Độ đục bề mặt"
+    },
+    "themeShine": {
+      "message": "Độ bóng"
+    },
+    "themeWorking": {
+      "message": "Chờ thao tác hiện tại hoàn tất."
+    },
+    "themeNoChanges": {
+      "message": "Thay đổi nội dung trước khi lưu."
+    },
+    "themeAlreadyApplied": {
+      "message": "Phiên bản này đã được áp dụng."
+    },
+    "themePreinstalled": {
+      "message": "Cài sẵn"
+    },
+    "themePresetNote": {
+      "message": "Aero là giao diện được cài sẵn. Nhập tên khác để lưu giao diện này."
+    },
+    "themePresetNameRequired": {
+      "message": "Nhập tên khác Aero để lưu bản sao."
+    },
+    "themePresetLocked": {
+      "message": "Không thể xóa giao diện cài sẵn."
+    },
+    "themeFinishHint_flat": {
+      "message": "Bề mặt đơn giản không phản chiếu."
+    },
+    "themeFinishHint_glossy": {
+      "message": "Các nút điều khiển bóng và bảng không trong suốt với ánh sáng nhẹ ở mép trên."
+    },
+    "themeFinishHint_glass": {
+      "message": "Phản chiếu nhẹ và các bảng trong mờ có làm mờ nền. Mở một bảng để thấy hiệu ứng."
+    },
+    "themeShadowHint": {
+      "message": "Tạo chiều sâu dưới tiêu đề, trên vùng nhập và quanh các bảng."
+    },
+    "themeZoom": {
+      "message": "Thu phóng ảnh"
+    },
+    "theme_stretch": {
+      "message": "Kéo giãn"
+    },
+    "theme_banner": {
+      "message": "Dải ảnh"
+    },
+    "themeImageHeight": {
+      "message": "Chiều cao ảnh"
+    },
+    "themeAvatarShape": {
+      "message": "Hình dạng ảnh đại diện"
+    },
+    "theme_round": {
+      "message": "Tròn"
+    },
+    "theme_square": {
+      "message": "Vuông"
+    },
+    "themeAvatarFrame": {
+      "message": "Ảnh khung đại diện"
+    },
+    "themeOpenImage": {
+      "message": "Mở hình ảnh trong thẻ mới"
+    },
+    "themeImagePreview": {
+      "message": "Xem trước hình ảnh"
+    },
+    "themeRemoveImage": {
+      "message": "Xóa ảnh"
+    },
+    "theme_gothic": {
+      "message": "Gothic"
+    },
+    "themeEditor": {
+      "message": "Trình chỉnh sửa giao diện"
+    },
+    "themeSelect": {
+      "message": "Chọn giao diện để chỉnh sửa"
+    },
+    "themeNew": {
+      "message": "Giao diện mới"
+    },
+    "themeName": {
+      "message": "Tên giao diện"
+    },
+    "themeSave": {
+      "message": "Lưu"
+    },
+    "themeSaveApply": {
+      "message": "Lưu và sử dụng"
+    },
+    "themeUndone": {
+      "message": "Đã hoàn tác: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "Không có thay đổi nào để hoàn tác."
+    },
+    "themeDelete": {
+      "message": "Xóa giao diện"
+    },
+    "themeClear": {
+      "message": "Xóa nội dung giao diện mới"
+    },
+    "themeDiscardConfirm": {
+      "message": "Bỏ các thay đổi giao diện chưa lưu?"
+    },
+    "themeKeepEditing": {
+      "message": "Tiếp tục chỉnh sửa"
+    },
+    "themeDiscard": {
+      "message": "Bỏ thay đổi"
+    },
+    "themeDeleteConfirm": {
+      "message": "Xóa giao diện này?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "Cuộc trò chuyện sẽ trở về giao diện Mặc định."
+    },
+    "themeAppearance": {
+      "message": "Xem trước diện mạo"
+    },
+    "theme_light": {
+      "message": "Sáng"
+    },
+    "theme_dark": {
+      "message": "Tối"
+    },
+    "themeArea": {
+      "message": "Tùy chỉnh khu vực"
+    },
+    "themeArea_header": {
+      "message": "Đầu trang"
+    },
+    "themeArea_chat": {
+      "message": "Chat"
+    },
+    "themeArea_composer": {
+      "message": "Nhập liệu"
+    },
+    "themeBackgroundColor": {
+      "message": "Màu nền"
+    },
+    "themeMarkerColor": {
+      "message": "Màu dấu"
+    },
+    "themeFinishStyle": {
+      "message": "Kiểu bề mặt"
+    },
+    "themeBackground": {
+      "message": "Nền"
+    },
+    "themeFill": {
+      "message": "Kiểu nền"
+    },
+    "theme_solid": {
+      "message": "Màu đơn"
+    },
+    "theme_gradient": {
+      "message": "Chuyển màu"
+    },
+    "theme_image": {
+      "message": "Hình ảnh"
+    },
+    "themeGradientColor": {
+      "message": "Màu thứ hai"
+    },
+    "themeChooseImage": {
+      "message": "Chọn hình ảnh"
+    },
+    "themeFit": {
+      "message": "Cách đặt ảnh"
+    },
+    "theme_cover": {
+      "message": "Lấp đầy"
+    },
+    "theme_contain": {
+      "message": "Vừa khung"
+    },
+    "theme_repeat": {
+      "message": "Lặp lại"
+    },
+    "themeVisibility": {
+      "message": "Độ hiển thị ảnh"
+    },
+    "themePosition": {
+      "message": "Vị trí dọc"
+    },
+    "themeAccent": {
+      "message": "Màu nhấn"
+    },
+    "theme_flat": {
+      "message": "Phẳng"
+    },
+    "theme_glossy": {
+      "message": "Bóng"
+    },
+    "theme_glass": {
+      "message": "Kính"
+    },
+    "themeCorners": {
+      "message": "Bán kính góc"
+    },
+    "themeShadow": {
+      "message": "Bóng đổ"
+    },
+    "themeFont": {
+      "message": "Phông chữ"
+    },
+    "theme_default": {
+      "message": "Mặc định"
+    },
+    "theme_classic": {
+      "message": "Cổ điển"
+    },
+    "theme_mono": {
+      "message": "Đơn cách"
+    },
+    "themeEditorDescription": {
+      "message": "Tạo giao diện với màu sắc, hình ảnh và chi tiết của riêng bạn."
+    },
+    "themeSaved": {
+      "message": "Đã lưu giao diện. Giao diện đang áp dụng không đổi."
+    },
+    "themeApplied": {
+      "message": "Đã lưu và áp dụng giao diện."
+    },
+    "themeSaveError": {
+      "message": "Không thể lưu thay đổi. Hãy thử ảnh nhỏ hơn hoặc giải phóng bộ nhớ tiện ích."
+    },
+    "themeApplyError": {
+      "message": "Không thể áp dụng giao diện. Hãy thử lại."
+    },
+    "themeImageError": {
+      "message": "Chọn ảnh nhỏ hơn (PNG, JPEG, WebP: tối đa 10 MB; GIF: tối đa 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "Nhập tên giao diện."
+    },
+    "themeCustom": {
+      "message": "Giao diện của tôi"
+    },
+    "themeResetItem": {
+      "message": "Giao diện tùy chỉnh"
+    },
     "close": {
       "message": "Đóng"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "Giữ video và trò chuyện trong cửa sổ luôn ở trên cùng khi bạn sử dụng các thẻ khác."
+    },
+    "themeBlur": {
+      "message": "Độ mờ bảng"
+    },
+    "themeAddMessageMark": {
+      "message": "Thêm dấu tin nhắn"
+    },
+    "themeSecondary": {
+      "message": "Màu nhấn phụ"
+    },
+    "themePaletteHint": {
+      "message": "Nút và biểu tượng dùng màu nhấn; thẻ và phần tô sáng dùng màu nhấn phụ. Bảng, menu và văn bản tự động thích ứng với chế độ sáng và tối."
+    },
+    "theme_theme": {
+      "message": "Màu giao diện"
+    },
+    "themeDarkImage": {
+      "message": "Ảnh cho chế độ tối (không bắt buộc)"
+    },
+    "themeSurfaceTint": {
+      "message": "Sắc độ nền"
+    },
+    "themeSurfaceTintHint": {
+      "message": "Thêm màu nhấn vào nền. Ở mức 0%, nền sử dụng các màu trung tính của YouTube."
+    },
+    "themeBorder": {
+      "message": "Đường viền"
     }
   }
 }

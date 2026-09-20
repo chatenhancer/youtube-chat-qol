@@ -10,7 +10,7 @@ import type { Options } from '../shared/options';
 export async function initMenuPreview(
   root: HTMLElement,
   controls: { liteModeEnabled: HTMLInputElement; targetLanguage: HTMLSelectElement },
-  toggleTranslation: () => void
+  { readSavedSound = true }: { readSavedSound?: boolean } = {}
 ): Promise<void> {
   const trigger = root.querySelector<HTMLButtonElement>('#previewMenuButton');
   if (!trigger) return;
@@ -19,27 +19,22 @@ export async function initMenuPreview(
   trigger.setAttribute('aria-label', getExtensionMessage('onboardingChatMenuTooltip'));
   const translate = createMenuToggleItem({
     setting: 'targetLanguage', label: t('translateChat'), checked: Boolean(controls.targetLanguage.value),
-    iconPath: TRANSLATE_ICON_PATH, onClick: toggleTranslation
+    iconPath: TRANSLATE_ICON_PATH, onClick: () => {}
   });
   const sound = createMenuToggleItem({
     setting: 'sound', label: t('alertSounds'), checked: true,
     iconPath: SOUND_BELL_ICON_PATH,
-    onClick: () => {
-      const enabled = sound.getAttribute('aria-checked') !== 'true';
-      setSettingsToggleChecked(sound, enabled);
-      chrome.storage.sync.set({ sound: enabled });
-    }
+    onClick: () => {}
   });
-  chrome.storage.sync.get({ sound: true }, (options: Pick<Options, 'sound'>) => {
-    setSettingsToggleChecked(sound, options.sound);
-  });
+  if (readSavedSound) {
+    chrome.storage.sync.get({ sound: true }, (options: Pick<Options, 'sound'>) => {
+      setSettingsToggleChecked(sound, options.sound);
+    });
+  }
   const lite = createMenuToggleItem({
     setting: 'liteModeEnabled', label: t('liteMode'), checked: controls.liteModeEnabled.checked,
     iconPath: LITE_MODE_ICON_PATH,
-    onClick: () => {
-      controls.liteModeEnabled.checked = !controls.liteModeEnabled.checked;
-      controls.liteModeEnabled.dispatchEvent(new Event('change'));
-    }
+    onClick: () => {}
   });
   controls.liteModeEnabled.addEventListener('change', () => {
     setSettingsToggleChecked(lite, controls.liteModeEnabled.checked);

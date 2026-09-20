@@ -318,6 +318,306 @@
     "couldNotSaveBookmark": "북마크를 업데이트할 수 없습니다."
   },
   "extension": {
+    "themeAtDefaults": {
+      "message": "이미 기본값입니다."
+    },
+    "themeReset": {
+      "message": "초기화"
+    },
+    "themeResetSavedDone": {
+      "message": "테마의 저장된 버전을 복원했습니다. 실행 취소할 수 있습니다."
+    },
+    "themeResetDone": {
+      "message": "테마를 기본값으로 초기화했습니다. 저장되지 않았으며 실행 취소할 수 있습니다."
+    },
+    "theme_playful": {
+      "message": "발랄한"
+    },
+    "theme_pixel": {
+      "message": "픽셀"
+    },
+    "theme_elegant": {
+      "message": "우아한"
+    },
+    "themeCustomize": {
+      "message": "맞춤 설정"
+    },
+    "themeSection_colors": {
+      "message": "색상"
+    },
+    "themeSection_style": {
+      "message": "스타일"
+    },
+    "themeSection_artwork": {
+      "message": "장식 이미지"
+    },
+    "themeShapeDepth": {
+      "message": "모양과 깊이"
+    },
+    "themeGradientAngle": {
+      "message": "그라데이션 방향"
+    },
+    "themeImageText": {
+      "message": "이미지 위 텍스트"
+    },
+    "themeImageTextHint": {
+      "message": "자동은 이미지의 밝기와 표시 정도를 반영합니다. 직접 설정하려면 밝게 또는 어둡게를 선택하세요."
+    },
+    "theme_auto": {
+      "message": "자동"
+    },
+    "themeImagePlacement": {
+      "message": "이미지 배치"
+    },
+    "themePositionX": {
+      "message": "가로 위치"
+    },
+    "themeSurfaceOpacity": {
+      "message": "표면 불투명도"
+    },
+    "themeShine": {
+      "message": "광택 강도"
+    },
+    "themeWorking": {
+      "message": "현재 작업이 끝날 때까지 기다려 주세요."
+    },
+    "themeNoChanges": {
+      "message": "저장하기 전에 변경 사항을 만드세요."
+    },
+    "themeAlreadyApplied": {
+      "message": "이 버전은 이미 적용되어 있습니다."
+    },
+    "themePreinstalled": {
+      "message": "사전 설치"
+    },
+    "themePresetNote": {
+      "message": "Aero는 사전 설치된 테마입니다. 이 테마를 저장하려면 다른 이름을 입력하세요."
+    },
+    "themePresetNameRequired": {
+      "message": "사본을 저장하려면 Aero가 아닌 이름을 입력하세요."
+    },
+    "themePresetLocked": {
+      "message": "사전 설치된 테마는 삭제할 수 없습니다."
+    },
+    "themeFinishHint_flat": {
+      "message": "반사가 없는 단순한 표면입니다."
+    },
+    "themeFinishHint_glossy": {
+      "message": "광택 있는 컨트롤과 위쪽 가장자리에 은은한 빛을 더한 불투명 패널."
+    },
+    "themeFinishHint_glass": {
+      "message": "부드러운 반사와 배경이 흐려지는 반투명 패널입니다. 패널을 열어 효과를 확인하세요."
+    },
+    "themeShadowHint": {
+      "message": "헤더 아래, 입력 영역 위, 패널 주위에 깊이감을 더합니다."
+    },
+    "themeZoom": {
+      "message": "이미지 확대"
+    },
+    "theme_stretch": {
+      "message": "늘이기"
+    },
+    "theme_banner": {
+      "message": "배너"
+    },
+    "themeImageHeight": {
+      "message": "이미지 높이"
+    },
+    "themeAvatarShape": {
+      "message": "아바타 모양"
+    },
+    "theme_round": {
+      "message": "원형"
+    },
+    "theme_square": {
+      "message": "사각형"
+    },
+    "themeAvatarFrame": {
+      "message": "아바타 테두리 이미지"
+    },
+    "themeOpenImage": {
+      "message": "새 탭에서 이미지 열기"
+    },
+    "themeImagePreview": {
+      "message": "이미지 미리보기"
+    },
+    "themeRemoveImage": {
+      "message": "이미지 제거"
+    },
+    "theme_gothic": {
+      "message": "블랙레터"
+    },
+    "themeEditor": {
+      "message": "테마 편집기"
+    },
+    "themeSelect": {
+      "message": "편집할 테마 선택"
+    },
+    "themeNew": {
+      "message": "새 테마"
+    },
+    "themeName": {
+      "message": "테마 이름"
+    },
+    "themeSave": {
+      "message": "저장"
+    },
+    "themeSaveApply": {
+      "message": "저장하고 사용"
+    },
+    "themeUndone": {
+      "message": "실행 취소: {change}."
+    },
+    "themeNothingToUndo": {
+      "message": "실행 취소할 변경 사항이 없습니다."
+    },
+    "themeDelete": {
+      "message": "테마 삭제"
+    },
+    "themeClear": {
+      "message": "새 테마 초기화"
+    },
+    "themeDiscardConfirm": {
+      "message": "저장하지 않은 테마 변경 사항을 버릴까요?"
+    },
+    "themeKeepEditing": {
+      "message": "계속 편집"
+    },
+    "themeDiscard": {
+      "message": "버리기"
+    },
+    "themeDeleteConfirm": {
+      "message": "이 테마를 삭제할까요?"
+    },
+    "themeDeleteAppliedNote": {
+      "message": "채팅이 기본 테마로 돌아갑니다."
+    },
+    "themeAppearance": {
+      "message": "모양 미리보기"
+    },
+    "theme_light": {
+      "message": "라이트"
+    },
+    "theme_dark": {
+      "message": "다크"
+    },
+    "themeArea": {
+      "message": "영역 꾸미기"
+    },
+    "themeArea_header": {
+      "message": "헤더"
+    },
+    "themeArea_chat": {
+      "message": "채팅"
+    },
+    "themeArea_composer": {
+      "message": "입력"
+    },
+    "themeBackgroundColor": {
+      "message": "배경 색상"
+    },
+    "themeMarkerColor": {
+      "message": "표시 색상"
+    },
+    "themeFinishStyle": {
+      "message": "마감 스타일"
+    },
+    "themeBackground": {
+      "message": "배경"
+    },
+    "themeFill": {
+      "message": "배경 스타일"
+    },
+    "theme_solid": {
+      "message": "단색"
+    },
+    "theme_gradient": {
+      "message": "그라데이션"
+    },
+    "theme_image": {
+      "message": "이미지"
+    },
+    "themeGradientColor": {
+      "message": "두 번째 색상"
+    },
+    "themeChooseImage": {
+      "message": "이미지 선택"
+    },
+    "themeFit": {
+      "message": "이미지 맞춤"
+    },
+    "theme_cover": {
+      "message": "채우기"
+    },
+    "theme_contain": {
+      "message": "맞추기"
+    },
+    "theme_repeat": {
+      "message": "반복"
+    },
+    "themeVisibility": {
+      "message": "이미지 표시 강도"
+    },
+    "themePosition": {
+      "message": "세로 위치"
+    },
+    "themeAccent": {
+      "message": "강조색"
+    },
+    "theme_flat": {
+      "message": "평면"
+    },
+    "theme_glossy": {
+      "message": "광택"
+    },
+    "theme_glass": {
+      "message": "유리"
+    },
+    "themeCorners": {
+      "message": "모서리 반경"
+    },
+    "themeShadow": {
+      "message": "그림자"
+    },
+    "themeFont": {
+      "message": "글꼴"
+    },
+    "theme_default": {
+      "message": "기본"
+    },
+    "theme_classic": {
+      "message": "클래식"
+    },
+    "theme_mono": {
+      "message": "고정폭"
+    },
+    "themeEditorDescription": {
+      "message": "원하는 색상, 이미지, 세부 설정으로 테마를 만드세요."
+    },
+    "themeSaved": {
+      "message": "테마를 저장했습니다. 적용 중인 테마는 바뀌지 않습니다."
+    },
+    "themeApplied": {
+      "message": "테마를 저장하고 적용했습니다."
+    },
+    "themeSaveError": {
+      "message": "변경 사항을 저장하지 못했습니다. 더 작은 이미지를 사용하거나 확장 프로그램 저장 공간을 비우세요."
+    },
+    "themeApplyError": {
+      "message": "테마를 적용하지 못했습니다. 다시 시도하세요."
+    },
+    "themeImageError": {
+      "message": "더 작은 이미지를 선택하세요(PNG, JPEG, WebP: 최대 10 MB; GIF: 최대 2 MB)."
+    },
+    "themeNameRequired": {
+      "message": "테마 이름을 입력하세요."
+    },
+    "themeCustom": {
+      "message": "내 테마"
+    },
+    "themeResetItem": {
+      "message": "사용자 테마"
+    },
     "close": {
       "message": "닫기"
     },
@@ -710,6 +1010,33 @@
     },
     "onboardingPipTooltip": {
       "message": "다른 탭을 사용하는 동안 동영상과 채팅을 항상 위에 표시되는 창에 유지하세요."
+    },
+    "themeBlur": {
+      "message": "패널 흐림"
+    },
+    "themeAddMessageMark": {
+      "message": "메시지 표시 추가"
+    },
+    "themeSecondary": {
+      "message": "보조 강조색"
+    },
+    "themePaletteHint": {
+      "message": "버튼과 아이콘은 강조색을, 태그와 하이라이트는 보조 강조색을 사용합니다. 패널, 메뉴, 텍스트는 라이트 및 다크 모드에 자동으로 맞춰집니다."
+    },
+    "theme_theme": {
+      "message": "테마 색상"
+    },
+    "themeDarkImage": {
+      "message": "다크 모드 이미지 (선택 사항)"
+    },
+    "themeSurfaceTint": {
+      "message": "배경 색조"
+    },
+    "themeSurfaceTintHint": {
+      "message": "배경에 강조색을 더합니다. 0%에서는 YouTube의 중립적인 색상을 사용합니다."
+    },
+    "themeBorder": {
+      "message": "테두리"
     }
   }
 }

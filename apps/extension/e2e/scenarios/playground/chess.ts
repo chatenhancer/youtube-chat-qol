@@ -27,7 +27,7 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
 
   await withExtensionStorageValues(context, 'sync', {
     ...PLAYGROUND_ENABLED_OPTIONS,
-    chatSkin: 'aero'
+    chatSkin: 'custom:aero'
   }, async () => {
     const card = await openGamesCard(chat, backend);
     await expect(card.locator('.ytcq-profile-card-title')).toHaveText('Games');
@@ -77,10 +77,9 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
     const root = chat.locator('html');
     for (const theme of ['light', 'dark'] as const) {
       await root.evaluate((element, value) => {
-        element.setAttribute('data-ytcq-chat-skin', 'aero');
-        element.setAttribute('data-ytcq-chat-skin-theme', value);
+        element.toggleAttribute('dark', value === 'dark');
       }, theme);
-      await expect(root).toHaveAttribute('data-ytcq-chat-skin', 'aero');
+      await expect(root).toHaveAttribute('data-ytcq-chat-skin', 'custom');
       await expect(root).toHaveAttribute('data-ytcq-chat-skin-theme', theme);
       await card.locator('.ytcq-games-section-title').hover();
       expect(await readButtonTreatment(detailCancel)).toEqual(
@@ -92,7 +91,7 @@ export const playgroundChessInviteAndMoveScenario: BrowserScenario = async ({ ch
       expect(await readButtonTreatment(detailCancel)).toEqual(inviteHoverTreatment);
     }
     await root.evaluate((element) => {
-      element.setAttribute('data-ytcq-chat-skin-theme', 'light');
+      element.removeAttribute('dark');
     });
 
     await invitePlayer(card, 'Luna Chat');

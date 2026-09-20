@@ -1,0 +1,101 @@
+.popup-reset-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  background: var(--ytcq-popup-modal-backdrop);
+}
+
+.popup-reset-dialog {
+  display: grid;
+  gap: 8px;
+  width: min(286px, 100%);
+  padding: 14px;
+  border-radius: 8px;
+  color: var(--ytcq-popup-text);
+  background: var(--ytcq-popup-card-bg);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
+}
+
+.popup-reset-dialog-message,
+.popup-reset-dialog-list-label,
+.popup-reset-dialog-list {
+  margin: 0;
+  color: var(--ytcq-popup-secondary-text);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 17px;
+}
+
+.popup-reset-dialog-message {
+  white-space: pre-line;
+}
+
+.popup-reset-dialog-list-label {
+  margin-top: 2px;
+}
+
+.popup-reset-dialog-list {
+  margin: -2px 0 2px;
+  margin-inline-start: 18px;
+  padding: 0;
+}
+
+.popup-reset-dialog-list li {
+  margin: 1px 0;
+}
+
+.popup-reset-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.popup-reset-dialog-button {
+  appearance: none;
+  min-width: 70px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ytcq-popup-text);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.popup-reset-dialog-button:enabled:hover {
+  background: var(--ytcq-popup-row-hover-bg);
+}
+
+.popup-reset-dialog-button:focus {
+  outline: none;
+}
+
+.popup-reset-dialog-button:focus-visible {
+  outline: 2px solid var(--ytcq-popup-action);
+  outline-offset: 1px;
+}
+
+.popup-reset-dialog-button:enabled:active {
+  background: color-mix(in srgb, var(--ytcq-popup-text) 14%, transparent);
+}
+
+.popup-reset-dialog-confirm {
+  color: #fff;
+  background: var(--ytcq-popup-logo-red);
+}
+
+.popup-reset-dialog-confirm:enabled:hover {
+  background: color-mix(in srgb, var(--ytcq-popup-logo-red) 78%, black);
+}
+
+.popup-reset-dialog-confirm:enabled:active {
+  background: color-mix(in srgb, var(--ytcq-popup-logo-red) 64%, black);
+}

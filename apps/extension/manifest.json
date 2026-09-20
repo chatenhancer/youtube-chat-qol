@@ -75,6 +75,10 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "fonts/manufacturing-consent-regular.ttf",
+        "fonts/dongle-regular.ttf",
+        "fonts/pixelify-sans-variable.ttf",
+        "fonts/instrument-serif-regular.ttf",
         "games/*/*.mp3",
         "games/*/*.json",
         "games/*/*.otf",

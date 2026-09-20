@@ -140,15 +140,15 @@
   padding: 0 8px;
   border: 0;
   border-radius: 12px;
-  color: var(--yt-spec-call-to-action, #3ea6ff);
-  background: transparent;
+  color: var(--ytcq-theme-button-text, var(--yt-spec-call-to-action, #3ea6ff));
+  background: var(--ytcq-theme-button-background, transparent);
   font: 500 11px/14px Roboto, Arial, sans-serif;
   cursor: pointer;
 }
 
 .ytcq-focus-open:hover,
 .ytcq-focus-open:focus {
-  background: var(--ytcq-hover-background);
+  background: var(--ytcq-theme-button-hover, var(--ytcq-hover-background));
   outline: none;
 }
 
@@ -162,8 +162,8 @@
   border: 0;
   border-radius: 50%;
   fill: currentColor;
-  color: var(--yt-spec-text-secondary, var(--yt-live-chat-secondary-text-color, #aaa));
-  background: transparent;
+  color: var(--ytcq-theme-button-text, var(--yt-spec-text-secondary, var(--yt-live-chat-secondary-text-color, #aaa)));
+  background: var(--ytcq-theme-button-background, transparent);
   cursor: pointer;
 }
 
@@ -181,8 +181,8 @@
 
 .ytcq-focus-close:hover,
 .ytcq-focus-close:focus {
-  color: var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1));
-  background: var(--ytcq-hover-background);
+  color: var(--ytcq-theme-button-text, var(--yt-spec-text-primary, var(--yt-live-chat-primary-text-color, #f1f1f1)));
+  background: var(--ytcq-theme-button-hover, var(--ytcq-hover-background));
   outline: none;
 }
 
@@ -288,7 +288,7 @@
 
 .ytcq-focus-message-us .ytcq-focus-bubble {
   background:
-    linear-gradient(rgba(62, 166, 255, 0.14), rgba(62, 166, 255, 0.14)),
+    linear-gradient(var(--ytcq-accent-soft, rgba(62, 166, 255, 0.14)), var(--ytcq-accent-soft, rgba(62, 166, 255, 0.14))),
     var(--yt-live-chat-background-color, var(--yt-spec-base-background, transparent));
 }
 
