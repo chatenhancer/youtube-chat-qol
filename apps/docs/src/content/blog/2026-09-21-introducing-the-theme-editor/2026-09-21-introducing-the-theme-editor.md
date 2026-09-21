@@ -65,6 +65,6 @@ Open the extension popup, go to **Settings**, and click the **palette button bes
 
 You can also start from the preinstalled **Aero** theme and save your version under a new name.
 
-![The Theme dropdown in the extension popup, with the palette button immediately to its right.](./theme-editor-button.webp)
+![The Theme dropdown in the extension popup, with the palette button immediately to its right.](./theme-editor-button.webp){size=small;align=center}
 
 A favorite color is enough to get started. The rest can come together in the preview.

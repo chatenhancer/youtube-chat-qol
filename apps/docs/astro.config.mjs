@@ -156,8 +156,8 @@ function createImageBlockNodes(node, { wrapperTag = 'figure' } = {}) {
   const classNames = ['blog-image'];
   const styles = [];
 
-  if (attributes.size === 'large') {
-    classNames.push('blog-image-large');
+  if (attributes.size === 'small' || attributes.size === 'large') {
+    classNames.push(`blog-image-${attributes.size}`);
   }
   if (isImageShadowEnabled(attributes.shadow)) {
     classNames.push('blog-image-shadow');

@@ -65,6 +65,6 @@ Wenn du den Namen eines gespeicherten Themes änderst, entsteht ein neues Theme.
 
 Du kannst auch das vorinstallierte Theme **Aero** als Ausgangspunkt verwenden und deine Version unter einem neuen Namen speichern.
 
-![Die Auswahlliste Design im Erweiterungs-Popup mit dem Palettenbutton direkt rechts daneben.](./theme-editor-button.webp)
+![Die Auswahlliste Design im Erweiterungs-Popup mit dem Palettenbutton direkt rechts daneben.](./theme-editor-button.webp){size=small;align=center}
 
 Eine Lieblingsfarbe reicht für den Anfang. Den Rest kannst du in der Vorschau gestalten.

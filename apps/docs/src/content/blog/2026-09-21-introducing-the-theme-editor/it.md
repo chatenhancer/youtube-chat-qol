@@ -65,6 +65,6 @@ Apri il popup dell’estensione, vai su **Impostazioni** e fai clic sul **pulsan
 
 Puoi anche partire dal tema preinstallato **Aero** e salvare la tua versione con un altro nome.
 
-![Il menu Tema nel popup dell’estensione, con il pulsante della tavolozza subito a destra.](./theme-editor-button.webp)
+![Il menu Tema nel popup dell’estensione, con il pulsante della tavolozza subito a destra.](./theme-editor-button.webp){size=small;align=center}
 
 Un colore che ti piace basta per iniziare. Il resto può prendere forma nell’anteprima.

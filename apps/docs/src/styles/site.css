@@ -3141,6 +3141,10 @@ html[dir="rtl"] .forward-link-icon {
   transform-origin: center;
 }
 
+.blog-image-small {
+  max-width: min(100%, 400px);
+}
+
 .blog-image img {
   display: block;
   width: 100%;

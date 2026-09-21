@@ -65,6 +65,6 @@ Otwórz okno rozszerzenia, przejdź do **Ustawień** i kliknij **przycisk palety
 
 Możesz też zacząć od preinstalowanego motywu **Aero** i zapisać własną wersję pod nową nazwą.
 
-![Lista Motyw w oknie rozszerzenia z przyciskiem palety bezpośrednio po prawej stronie.](./theme-editor-button.webp)
+![Lista Motyw w oknie rozszerzenia z przyciskiem palety bezpośrednio po prawej stronie.](./theme-editor-button.webp){size=small;align=center}
 
 Ulubiony kolor wystarczy, by zacząć. Resztę dopracujesz w podglądzie.

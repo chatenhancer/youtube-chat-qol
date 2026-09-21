@@ -65,6 +65,6 @@ Abre la ventana emergente de la extensión, entra en **Configuración** y pulsa 
 
 También puedes partir del tema preinstalado **Aero** y guardar tu versión con otro nombre.
 
-![El desplegable Tema en la ventana emergente de la extensión, con el botón de la paleta justo a su derecha.](./theme-editor-button.webp)
+![El desplegable Tema en la ventana emergente de la extensión, con el botón de la paleta justo a su derecha.](./theme-editor-button.webp){size=small;align=center}
 
 Un color que te guste basta para empezar. El resto puede ir tomando forma en la vista previa.

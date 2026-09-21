@@ -65,6 +65,6 @@ Aero 为 YouTube 聊天带来了不一样的观感。全新的**主题编辑器*
 
 你也可以从预装的 **Aero** 主题开始，再以新名称保存自己的版本。
 
-![扩展弹出窗口中的主题下拉列表，右侧紧邻调色板按钮。](./theme-editor-button.webp)
+![扩展弹出窗口中的主题下拉列表，右侧紧邻调色板按钮。](./theme-editor-button.webp){size=small;align=center}
 
 有一个喜欢的颜色，就可以开始了。其余细节可以在预览中慢慢搭配。

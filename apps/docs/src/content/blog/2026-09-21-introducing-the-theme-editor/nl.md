@@ -65,6 +65,6 @@ Open het extensievenster, ga naar **Instellingen** en klik op de **paletknop naa
 
 Je kunt ook het vooraf geïnstalleerde thema **Aero** als uitgangspunt nemen en jouw versie onder een nieuwe naam opslaan.
 
-![De keuzelijst Thema in het extensievenster, met de paletknop direct rechts ernaast.](./theme-editor-button.webp)
+![De keuzelijst Thema in het extensievenster, met de paletknop direct rechts ernaast.](./theme-editor-button.webp){size=small;align=center}
 
 Een favoriete kleur is genoeg om te beginnen. De rest kan vorm krijgen in het voorbeeld.

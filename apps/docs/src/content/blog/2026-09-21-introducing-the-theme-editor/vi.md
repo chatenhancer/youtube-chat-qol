@@ -65,6 +65,6 @@ Mở cửa sổ bật lên của tiện ích, vào **Cài đặt** và nhấp v�
 
 Bạn cũng có thể bắt đầu từ chủ đề **Aero** được cài sẵn và lưu phiên bản của mình bằng tên mới.
 
-![Danh sách Chủ đề trong cửa sổ tiện ích, với nút bảng màu ngay bên phải.](./theme-editor-button.webp)
+![Danh sách Chủ đề trong cửa sổ tiện ích, với nút bảng màu ngay bên phải.](./theme-editor-button.webp){size=small;align=center}
 
 Chỉ cần một màu yêu thích là đủ để bắt đầu. Bạn có thể hoàn thiện phần còn lại trong bản xem trước.

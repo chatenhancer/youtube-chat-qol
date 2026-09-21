@@ -65,6 +65,6 @@ Uzantı penceresini açın, **Ayarlar** bölümüne gidin ve **Tema açılır li
 
 Önceden yüklenmiş **Aero** temasını başlangıç olarak kullanıp kendi sürümünüzü yeni bir adla da kaydedebilirsiniz.
 
-![Uzantı penceresindeki Tema açılır listesi ve hemen sağındaki palet düğmesi.](./theme-editor-button.webp)
+![Uzantı penceresindeki Tema açılır listesi ve hemen sağındaki palet düğmesi.](./theme-editor-button.webp){size=small;align=center}
 
 Başlamak için sevdiğiniz bir renk yeterli. Geri kalanını önizlemede şekillendirebilirsiniz.

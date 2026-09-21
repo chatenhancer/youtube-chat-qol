@@ -65,6 +65,6 @@ Buka popup ekstensi, masuk ke **Setelan**, lalu klik **tombol palet di samping d
 
 Anda juga bisa mulai dari tema **Aero** yang sudah terpasang dan menyimpan versi Anda dengan nama baru.
 
-![Dropdown Tema pada popup ekstensi, dengan tombol palet tepat di sebelah kanannya.](./theme-editor-button.webp)
+![Dropdown Tema pada popup ekstensi, dengan tombol palet tepat di sebelah kanannya.](./theme-editor-button.webp){size=small;align=center}
 
 Satu warna favorit sudah cukup untuk memulai. Sisanya bisa Anda susun di pratinjau.

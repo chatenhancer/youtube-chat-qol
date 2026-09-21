@@ -65,6 +65,6 @@ Ouvrez la fenêtre de l’extension, allez dans **Paramètres** et cliquez sur l
 
 Vous pouvez aussi partir du thème préinstallé **Aero** et enregistrer votre version sous un autre nom.
 
-![La liste Thème dans la fenêtre de l’extension, avec le bouton en forme de palette juste à droite.](./theme-editor-button.webp)
+![La liste Thème dans la fenêtre de l’extension, avec le bouton en forme de palette juste à droite.](./theme-editor-button.webp){size=small;align=center}
 
 Une couleur que vous aimez suffit pour commencer. Le reste peut prendre forme dans l’aperçu.
