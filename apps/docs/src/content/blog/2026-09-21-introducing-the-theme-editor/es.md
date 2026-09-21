@@ -24,11 +24,11 @@ Con **Tinte de fondo** decides cuánto se refleja el color de acento en los fond
 
 ![El Editor de temas, con los controles de apariencia a la izquierda y una vista previa interactiva del chat a la derecha.](./editor-overview.webp)
 
-## Elige un acabado
-
 :::media-left
 
 ![El panel de la bandeja de entrada con un tema personalizado.](./inbox-theme.webp){size=large}
+
+## Elige un acabado
 
 El acabado cambia el aspecto de las superficies:
 

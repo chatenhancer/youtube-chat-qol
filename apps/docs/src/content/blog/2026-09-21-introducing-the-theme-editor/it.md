@@ -24,11 +24,11 @@ Con **Tonalità degli sfondi** decidi quanto il colore principale si riflette ne
 
 ![L’Editor dei temi, con i controlli dell’aspetto a sinistra e un’anteprima interattiva della chat a destra.](./editor-overview.webp)
 
-## Scegli una finitura
-
 :::media-left
 
 ![Il pannello della posta in arrivo con un tema personalizzato.](./inbox-theme.webp){size=large}
+
+## Scegli una finitura
 
 La finitura cambia l’aspetto delle superfici:
 

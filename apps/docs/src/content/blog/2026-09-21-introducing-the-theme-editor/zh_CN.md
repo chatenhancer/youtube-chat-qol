@@ -24,11 +24,11 @@ Aero 为 YouTube 聊天带来了不一样的观感。全新的**主题编辑器*
 
 ![主题编辑器，左侧是外观设置，右侧是交互式聊天预览。](./editor-overview.webp)
 
-## 选择材质效果
-
 :::media-left
 
 ![应用了自定义主题的收件箱面板。](./inbox-theme.webp){size=large}
+
+## 选择材质效果
 
 材质效果会改变界面表面的质感：
 

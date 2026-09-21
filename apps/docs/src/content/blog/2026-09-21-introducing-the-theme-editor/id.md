@@ -24,11 +24,11 @@ Gunakan **Rona latar belakang** untuk mengatur seberapa kuat warna aksen terliha
 
 ![Editor Tema dengan kontrol tampilan di kiri dan pratinjau chat interaktif di kanan.](./editor-overview.webp)
 
-## Pilih gaya permukaan
-
 :::media-left
 
 ![Panel Kotak Masuk dengan tema khusus.](./inbox-theme.webp){size=large}
+
+## Pilih gaya permukaan
 
 Gaya permukaan mengubah nuansa antarmuka:
 

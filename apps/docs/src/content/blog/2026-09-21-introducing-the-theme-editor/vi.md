@@ -24,11 +24,11 @@ Dùng **Sắc độ nền** để điều chỉnh mức độ xuất hiện củ
 
 ![Trình chỉnh sửa giao diện với các tùy chọn ở bên trái và bản xem trước trò chuyện tương tác ở bên phải.](./editor-overview.webp)
 
-## Chọn kiểu bề mặt
-
 :::media-left
 
 ![Bảng Hộp thư đến với chủ đề tùy chỉnh.](./inbox-theme.webp){size=large}
+
+## Chọn kiểu bề mặt
 
 Kiểu bề mặt thay đổi cảm giác của giao diện:
 

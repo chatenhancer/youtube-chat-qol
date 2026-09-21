@@ -24,11 +24,11 @@ Use **Tonalidade dos fundos** para decidir quanto da cor de destaque aparece nos
 
 ![O Editor de temas, com os controles de aparência à esquerda e uma prévia interativa do chat à direita.](./editor-overview.webp)
 
-## Escolha um acabamento
-
 :::media-left
 
 ![O painel da caixa de entrada com um tema personalizado.](./inbox-theme.webp){size=large}
+
+## Escolha um acabamento
 
 O acabamento muda a aparência das superfícies:
 

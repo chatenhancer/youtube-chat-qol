@@ -24,11 +24,11 @@ Use **Background tint** to decide how much of your accent comes through in the b
 
 ![The Theme Editor, with appearance controls on the left and an interactive chat preview on the right.](./editor-overview.webp)
 
-## Give it a finish
-
 :::media-left
 
 ![The Inbox panel with a custom theme applied.](./inbox-theme.webp){size=large}
+
+## Give it a finish
 
 The finish changes the feel of the surfaces:
 

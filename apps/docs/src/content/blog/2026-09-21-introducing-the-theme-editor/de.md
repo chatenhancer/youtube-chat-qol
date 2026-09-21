@@ -24,11 +24,11 @@ Mit **Hintergrundtönung** bestimmst du, wie stark die Akzentfarbe in den Hinter
 
 ![Der Theme-Editor mit den Gestaltungseinstellungen links und einer interaktiven Chatvorschau rechts.](./editor-overview.webp)
 
-## Wähle eine Oberfläche
-
 :::media-left
 
 ![Das Posteingangspanel mit einem eigenen Theme.](./inbox-theme.webp){size=large}
+
+## Wähle eine Oberfläche
 
 Die Oberfläche verändert den Eindruck der Flächen:
 

@@ -24,11 +24,11 @@ Opcja **Zabarwienie tła** określa, jak mocno kolor akcentu wpływa na tła. Ni
 
 ![Edytor motywów z ustawieniami wyglądu po lewej i interaktywnym podglądem czatu po prawej.](./editor-overview.webp)
 
-## Wybierz wykończenie
-
 :::media-left
 
 ![Panel skrzynki odbiorczej z zastosowanym własnym motywem.](./inbox-theme.webp){size=large}
+
+## Wybierz wykończenie
 
 Wykończenie zmienia wygląd powierzchni:
 

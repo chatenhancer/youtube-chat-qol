@@ -24,11 +24,11 @@ Met **Achtergrondtint** bepaal je hoeveel van de accentkleur in de achtergronden
 
 ![De Thema-editor met vormgevingsopties links en een interactief chatvoorbeeld rechts.](./editor-overview.webp)
 
-## Kies een afwerking
-
 :::media-left
 
 ![Het inboxpaneel met een aangepast thema.](./inbox-theme.webp){size=large}
+
+## Kies een afwerking
 
 De afwerking verandert de uitstraling van de oppervlakken:
 

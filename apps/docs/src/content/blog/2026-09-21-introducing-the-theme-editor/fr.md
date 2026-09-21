@@ -24,11 +24,11 @@ Le réglage **Teinte des arrière-plans** détermine la présence de votre coule
 
 ![L’Éditeur de thèmes, avec les réglages d’apparence à gauche et un aperçu interactif du chat à droite.](./editor-overview.webp)
 
-## Choisissez une finition
-
 :::media-left
 
 ![Le panneau de réception avec un thème personnalisé.](./inbox-theme.webp){size=large}
+
+## Choisissez une finition
 
 La finition change l’apparence des surfaces :
 

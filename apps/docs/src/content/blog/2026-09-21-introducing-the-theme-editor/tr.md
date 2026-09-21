@@ -24,11 +24,11 @@ Her düğme ve simge için ayrı bir renk seçmeniz gerekmez. Bir **vurgu rengi*
 
 ![Solda görünüm ayarları, sağda etkileşimli sohbet önizlemesi bulunan Tema Düzenleyici.](./editor-overview.webp)
 
-## Bir yüzey stili seçin
-
 :::media-left
 
 ![Özel tema uygulanmış Gelen Kutusu paneli.](./inbox-theme.webp){size=large}
+
+## Bir yüzey stili seçin
 
 Yüzey stili, arayüzün görünümünü değiştirir:
 
