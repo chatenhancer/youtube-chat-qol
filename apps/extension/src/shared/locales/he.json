@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "סגנון"
     },
-    "themeSection_artwork": {
-      "message": "תמונות"
+    "themeSection_details": {
+      "message": "פרטים"
     },
     "themeShapeDepth": {
       "message": "צורה ועומק"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "שמירה ושימוש"
     },
+    "themeUse": {
+      "message": "שימוש בערכת הנושא"
+    },
     "themeUndone": {
       "message": "בוטל: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "צ'אט"
     },
     "themeArea_composer": {
-      "message": "קלט"
+      "message": "חלק תחתון"
     },
     "themeBackgroundColor": {
       "message": "צבע רקע"
@@ -1018,7 +1021,7 @@
       "message": "הוספת סמן הודעה"
     },
     "themeSecondary": {
-      "message": "צבע הדגשה משני"
+      "message": "צבע משני"
     },
     "themePaletteHint": {
       "message": "כפתורים וסמלים משתמשים בצבע ההדגשה; תגיות וסימונים משתמשים בצבע המשני. לוחות, תפריטים וטקסט מותאמים אוטומטית למצב בהיר וכהה."

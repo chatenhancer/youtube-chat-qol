@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Estilo"
     },
-    "themeSection_artwork": {
-      "message": "Imágenes"
+    "themeSection_details": {
+      "message": "Detalles"
     },
     "themeShapeDepth": {
       "message": "Forma y profundidad"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Guardar y usar"
     },
+    "themeUse": {
+      "message": "Usar tema"
+    },
     "themeUndone": {
       "message": "Deshecho: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Chat"
     },
     "themeArea_composer": {
-      "message": "Entrada"
+      "message": "Parte inferior"
     },
     "themeBackgroundColor": {
       "message": "Color de fondo"
@@ -1018,10 +1021,10 @@
       "message": "Añadir marcador de mensaje"
     },
     "themeSecondary": {
-      "message": "Acento secundario"
+      "message": "Color secundario"
     },
     "themePaletteHint": {
-      "message": "Los botones e iconos siguen el acento; las etiquetas y los resaltados usan el acento secundario. Los paneles, menús y textos se adaptan automáticamente al modo claro y oscuro."
+      "message": "Los botones e iconos siguen el acento; las etiquetas y los resaltados usan el color secundario. Los paneles, menús y textos se adaptan automáticamente al modo claro y oscuro."
     },
     "theme_theme": {
       "message": "Colores del tema"

@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Estilo"
     },
-    "themeSection_artwork": {
-      "message": "Imagens"
+    "themeSection_details": {
+      "message": "Detalhes"
     },
     "themeShapeDepth": {
       "message": "Forma e profundidade"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Salvar e usar"
     },
+    "themeUse": {
+      "message": "Usar tema"
+    },
     "themeUndone": {
       "message": "Desfeito: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Chat"
     },
     "themeArea_composer": {
-      "message": "Entrada"
+      "message": "Parte inferior"
     },
     "themeBackgroundColor": {
       "message": "Cor de fundo"
@@ -1021,7 +1024,7 @@
       "message": "Adicionar marcador de mensagem"
     },
     "themeSecondary": {
-      "message": "Destaque secundário"
+      "message": "Cor secundária"
     },
     "themePaletteHint": {
       "message": "Botões e ícones seguem a cor de destaque; etiquetas e realces usam a cor secundária. Painéis, menus e textos se adaptam automaticamente aos modos claro e escuro."

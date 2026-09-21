@@ -149,6 +149,7 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       }
       const fontPicker = editor!.locator('[data-theme-field="font"]');
 
+      await editor!.getByRole('tab', { name: 'Style', exact: true }).click();
       await fontPicker.selectOption('mono');
       await expect(preview.locator('.preview-message-featured #message')).toHaveCSS('font-family', /Consolas/);
       await fontPicker.selectOption('default');
@@ -156,6 +157,7 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       await expect(preview.locator('.preview-message-featured #message')).toHaveCSS('font-family', font);
       await expect(editor!.locator('.preview-title img')).toBeVisible();
       await expect(editor!.locator('.preview-hover-hint')).toHaveCount(0);
+      await editor!.getByRole('tab', { name: 'Background', exact: true }).click();
       for (const selector of ['.theme-modes', '.theme-areas']) {
         const group = editor!.locator(selector);
         const start = await group.evaluate(element => element.style.getPropertyValue('--ytcq-popup-tab-highlight-x'));
@@ -171,6 +173,7 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
     });
 
     await test.step('Save actions require a nonempty theme name', async () => {
+      await editor!.getByRole('tab', { name: 'Colors', exact: true }).click();
       await editor!.locator('[data-theme-field="accent"]').fill('#334455');
       await expect(editor!.locator('#themeSave')).toBeDisabled();
       await expect(editor!.locator('#themeSaveApply')).toBeDisabled();
@@ -193,14 +196,18 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       await editor!.locator('#themeName').fill('Ocean');
       await expect(editor!.locator('#themeSave')).toBeEnabled();
       await expect(editor!.locator('#themeSaveApply')).toBeEnabled();
+      await expect(editor!.locator('#themeSaveApply')).toHaveText('Save and use');
+      await editor!.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor!.locator('[data-theme-field="fill"]').selectOption('solid');
       await editor!.locator('[data-theme-field="color"]').fill('#126688');
 
+      await editor!.getByRole('tab', { name: 'Colors', exact: true }).click();
       await editor!.locator('[data-theme-field="accent"]').fill('#bb2255');
       await editor!.locator('[data-theme-field="border"]').fill('#556677');
       await expect(preview.locator('.chat-preview')).toHaveCSS('border-color', 'rgb(85, 102, 119)');
       lightBorder = await preview.locator('.chat-preview').evaluate(element => getComputedStyle(element).borderColor);
 
+      await editor!.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor!.locator('[data-theme-area="header"]').click();
       await editor!.locator('[data-theme-mode="dark"]').click();
 
@@ -217,6 +224,8 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       await expect(editor!.locator('.theme-status')).toHaveText('Theme saved. The applied theme is unchanged.');
       await expect(editor!.locator('#themeSave')).toBeDisabled();
       await expect(editor!.locator('#themeSaveApply')).toBeEnabled();
+      await expect(editor!.locator('#themeSaveApply')).toHaveText('Use theme');
+      await expect(editor!.locator('#themeSaveApply').locator('..')).toHaveAttribute('aria-label', 'Use theme');
       await expect(chat.locator('html')).toHaveAttribute('data-ytcq-chat-skin', 'custom');
       await expect(outerFrame).toHaveCSS('border-color', 'rgb(197, 197, 197)');
       await expect(popup.locator('#chatSkin option')).toContainText(['Default', 'Aero', 'Ocean']);
@@ -225,7 +234,7 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       await editor!.locator('.popup-reset-dialog').getByRole('button', { name: 'Close', exact: true }).click();
     });
 
-    await editor.locator('#themeSaveApply').click();
+    await editor.getByRole('button', { name: 'Use theme', exact: true }).click();
     await expect(editor.locator('.theme-status')).toHaveText('Theme saved and applied.');
     await expect(editor.locator('#themeSave')).toBeDisabled();
     await expect(editor.locator('#themeSaveApply')).toBeDisabled();
@@ -262,7 +271,9 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
         await editor!.locator(`[data-theme-mode="${mode}"]`).click();
         await page.locator('html').evaluate((element, value) => element.toggleAttribute('dark', value === 'dark'), mode);
         await chat.locator('html').evaluate((element, value) => element.toggleAttribute('dark', value === 'dark'), mode);
+        await editor!.getByRole('tab', { name: 'Colors', exact: true }).click();
         await editor!.locator('[data-theme-field="accent"]').fill(accent);
+        await editor!.getByRole('tab', { name: 'Style', exact: true }).click();
         for (const finish of ['flat', 'glossy']) {
           await editor!.locator('[data-theme-field="finish"]').selectOption(finish);
           await editor!.locator('#themeSaveApply').click();
@@ -301,7 +312,9 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       }
       await clearChatComposer(chat);
       await preview.locator('#previewDraft').fill('');
+      await editor!.getByRole('tab', { name: 'Colors', exact: true }).click();
       await editor!.locator('[data-theme-field="accent"]').fill('#bb2255');
+      await editor!.getByRole('tab', { name: 'Style', exact: true }).click();
       await editor!.locator('[data-theme-field="finish"]').selectOption('flat');
       await editor!.locator('#themeSaveApply').click();
       await expect(editor!.locator('.theme-status')).toHaveText('Theme saved and applied.');
@@ -360,6 +373,7 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       await expect(chat.locator('#panel-pages')).toHaveCSS('border-top', '1px solid rgb(51, 51, 51)');
       await expect(editor!.locator('#themeSave')).toBeDisabled();
       await expect(editor!.locator('#themeSaveApply')).toBeEnabled();
+      await expect(editor!.locator('#themeSaveApply')).toHaveText('Use theme');
       await popup.locator('#chatSkin').selectOption({ label: 'Ocean' });
       await expect(editor!.locator('#themeSaveApply')).toBeDisabled();
       await expect(outerFrame).toHaveCSS('border-color', lightBorder);
@@ -367,15 +381,18 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
 
     await test.step('Editing and saving an applied theme retains its applied appearance', async () => {
       await editor!.locator('[data-theme-mode="light"]').click();
+      await editor!.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor!.locator('[data-theme-field="color"]').fill('#662244');
       await expect(editor!.locator('#themeSave')).toBeEnabled();
       await expect(editor!.locator('#themeSaveApply')).toBeEnabled();
+      await expect(editor!.locator('#themeSaveApply')).toHaveText('Save and use');
       await editor!.locator('[data-theme-field="color"]').fill('#126688');
       await expect(editor!.locator('#themeSave')).toBeDisabled();
       await expect(editor!.locator('#themeSaveApply')).toBeDisabled();
       await editor!.locator('[data-theme-field="color"]').fill('#662244');
       await expect(header).toHaveCSS('background-color', 'rgb(102, 34, 68)');
 
+      await editor!.getByRole('tab', { name: 'Colors', exact: true }).click();
       await editor!.locator('[data-theme-field="border"]').fill('#ff7700');
       await expect(preview.locator('.chat-preview')).not.toHaveCSS('border-color', lightBorder);
       await expect(outerFrame).toHaveCSS('border-color', lightBorder);
@@ -389,11 +406,13 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       await editor!.locator('[data-theme-mode="light"]').click();
       await expect(editor!.locator('#themeSave')).toBeDisabled();
       await expect(editor!.locator('#themeSaveApply')).toBeEnabled();
+      await expect(editor!.locator('#themeSaveApply')).toHaveText('Use theme');
       await expect(header).toHaveCSS('background-color', 'rgb(102, 34, 68)');
       await expect(chat.locator('yt-live-chat-header-renderer')).toHaveCSS('background-color', 'rgb(18, 102, 136)');
     });
 
     await editor.locator('#themeName').fill('Unsaved name');
+    await expect(editor.locator('#themeSaveApply')).toHaveText('Save and use');
     await editor.locator('#themeEditorPicker').selectOption('');
     await editor.getByRole('button', { name: 'Keep editing', exact: true }).click();
     await expect(editor.locator('#themeName')).toHaveValue('Unsaved name');
@@ -403,6 +422,7 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
 
     await test.step('Image backgrounds and clearing a new theme stay local to the preview', async () => {
       await editor!.locator('#themeName').fill('Temporary');
+      await editor!.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor!.locator('[data-theme-field="fill"]').selectOption('gradient');
       await expect(header).toHaveCSS('background-image', /linear-gradient/);
       await editor!.locator('[data-theme-field="fill"]').selectOption('image');
@@ -410,7 +430,7 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       await expectPageFits(editor!);
       await editor!.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
       await expectPageFits(editor!);
-      await expect(editor!.locator('[data-theme-details="artwork"]')).toBeInViewport({ ratio: 1 });
+      await expect(editor!.getByRole('tabpanel', { name: 'Background' })).toBeVisible();
       await test.info().attach('themes-page-scrolled', { body: await editor!.screenshot(), contentType: 'image/png' });
       await editor!.setViewportSize({ width: 1280, height: 960 });
       const imagePicker = editor!.locator('[data-theme-field="image"]');
@@ -442,8 +462,10 @@ export const customThemesScenario: BrowserScenario = async ({ page, context }) =
       await preview.locator('#previewInboxIcon').click();
       await expect(preview.locator('.ytcq-inbox-card')).toBeVisible();
       await expect(preview.locator('.ytcq-inbox-message-body')).toHaveCSS('font-family', 'Inter, Arial, sans-serif');
+      await editor!.getByRole('tab', { name: 'Colors', exact: true }).click();
       await editor!.locator('[data-theme-field="accent"]').fill('#bbccdd');
 
+      await editor!.getByRole('tab', { name: 'Style', exact: true }).click();
       await editor!.locator('[data-theme-field="finish"]').selectOption('glass');
       await expect(preview.locator('.ytcq-inbox-card')).toHaveCSS('backdrop-filter', /blur\(16px\)/);
       await preview.locator('.ytcq-inbox-card .ytcq-profile-card-close').click();

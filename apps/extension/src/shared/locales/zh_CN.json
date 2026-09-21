@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "样式"
     },
-    "themeSection_artwork": {
-      "message": "装饰"
+    "themeSection_details": {
+      "message": "细节"
     },
     "themeShapeDepth": {
       "message": "形状与层次"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "保存并使用"
     },
+    "themeUse": {
+      "message": "使用主题"
+    },
     "themeUndone": {
       "message": "已撤销：{change}。"
     },
@@ -511,7 +514,7 @@
       "message": "聊天"
     },
     "themeArea_composer": {
-      "message": "输入区"
+      "message": "底部"
     },
     "themeBackgroundColor": {
       "message": "背景颜色"
@@ -1021,10 +1024,10 @@
       "message": "添加消息标记"
     },
     "themeSecondary": {
-      "message": "次要强调色"
+      "message": "辅助色"
     },
     "themePaletteHint": {
-      "message": "按钮和图标使用强调色；标签和高亮使用辅助强调色。面板、菜单和文字会自动适应浅色和深色模式。"
+      "message": "按钮和图标使用强调色；标签和高亮使用辅助色。面板、菜单和文字会自动适应浅色和深色模式。"
     },
     "theme_theme": {
       "message": "主题颜色"

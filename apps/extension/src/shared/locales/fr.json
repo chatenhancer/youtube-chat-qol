@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Style"
     },
-    "themeSection_artwork": {
-      "message": "Images"
+    "themeSection_details": {
+      "message": "Détails"
     },
     "themeShapeDepth": {
       "message": "Forme et relief"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Enregistrer et utiliser"
     },
+    "themeUse": {
+      "message": "Utiliser le thème"
+    },
     "themeUndone": {
       "message": "Annulé : {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Chat"
     },
     "themeArea_composer": {
-      "message": "Saisie"
+      "message": "Bas"
     },
     "themeBackgroundColor": {
       "message": "Couleur de fond"
@@ -1018,10 +1021,10 @@
       "message": "Ajouter un marqueur de message"
     },
     "themeSecondary": {
-      "message": "Accent secondaire"
+      "message": "Couleur secondaire"
     },
     "themePaletteHint": {
-      "message": "Les boutons et icônes suivent l’accent ; les étiquettes et surlignages utilisent l’accent secondaire. Les panneaux, menus et textes s’adaptent automatiquement aux modes clair et sombre."
+      "message": "Les boutons et icônes suivent l’accent ; les étiquettes et surlignages utilisent la couleur secondaire. Les panneaux, menus et textes s’adaptent automatiquement aux modes clair et sombre."
     },
     "theme_theme": {
       "message": "Couleurs du thème"

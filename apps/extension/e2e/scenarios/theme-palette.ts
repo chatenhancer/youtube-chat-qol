@@ -32,6 +32,7 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
           text: mode === 'dark' ? 'rgb(241, 241, 241)' : 'rgb(15, 15, 15)'
         }));
         await expect.poll(palette).toEqual(before);
+        await editor.getByRole('tab', { name: 'Style', exact: true }).click();
         for (const finish of ['glossy', 'glass', 'flat']) {
           await field('finish').selectOption(finish);
           await expect.poll(palette).toEqual(before);
@@ -51,6 +52,7 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
           await expect(preview.locator('yt-live-chat-header-renderer')).toHaveCSS('border-bottom', `1px solid ${mode === 'dark' ? 'rgb(68, 68, 68)' : 'rgb(214, 214, 214)'}`);
           await expect(preview.locator('yt-live-chat-header-renderer')).toHaveCSS('background-image', finish === 'flat' ? /^none(, none)*$/ : /linear-gradient/);
         }
+        await editor.getByRole('tab', { name: 'Colors', exact: true }).click();
         await field('surfaceTint').fill('60');
         await expect(preview.locator('yt-live-chat-header-renderer')).not.toHaveCSS('background-color', before[0].background);
         await field('surfaceTint').fill('0');
@@ -60,6 +62,7 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
     await editor.locator('#themeEditorPicker').selectOption('aero');
     await expect(field('surfaceTint')).toHaveValue('100');
     await editor.locator('#themeName').fill('Palette example');
+    await editor.getByRole('tab', { name: 'Style', exact: true }).click();
     await field('font').selectOption('mono');
     await editor.locator('[data-theme-details="style"] summary').click();
     await expect(editor.locator('[data-theme-section]')).toHaveCount(0);
@@ -76,6 +79,7 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
         const panel = preview.locator('.preview-inbox-card');
         const tag = panel.locator('.ytcq-inbox-keyword-chip');
         await expect(tag).toHaveCSS('font-family', /Consolas/);
+        await editor.getByRole('tab', { name: 'Colors', exact: true }).click();
         await field('secondary').fill('#a622dd');
         await field('accent').fill('#bb2255');
         await field('border').fill('#735a84');
@@ -83,6 +87,7 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
         const border = await preview.locator('#chatPreview').evaluate(element => getComputedStyle(element).borderColor);
 
         for (const finish of ['flat', 'glossy', 'glass']) {
+          await editor.getByRole('tab', { name: 'Style', exact: true }).click();
           await field('finish').selectOption(finish);
           await expect(preview.locator('#chatPreview')).toHaveCSS('border-color', border);
           await expect(preview.locator('yt-live-chat-header-renderer')).toHaveCSS('border-bottom', `1px solid ${border}`);
@@ -94,12 +99,14 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
           const beforeButtonText = await button.evaluate(element => getComputedStyle(element).color);
           await expect.poll(() => preview.locator('#chatPreview').evaluate(element => element.getAnimations().length)).toBe(0);
           const beforeBorder = await preview.locator('#chatPreview').evaluate(element => getComputedStyle(element).borderColor);
+          await editor.getByRole('tab', { name: 'Colors', exact: true }).click();
           await field('accent').fill('#228855');
           if (finish === 'flat') await expect(button).not.toHaveCSS('color', beforeButtonText);
           else await expect(button).not.toHaveCSS('background', beforeButton);
           await expect(icon).not.toHaveCSS('background', beforeIcon);
           await expect(preview.locator('#chatPreview')).toHaveCSS('border-color', beforeBorder);
           await field('accent').fill('#bb2255');
+          await editor.getByRole('tab', { name: 'Style', exact: true }).click();
           await expect(field('shine')).toHaveCount(finish === 'flat' ? 0 : 1);
           await expect(field('blur')).toHaveCount(finish === 'glass' ? 1 : 0);
           if (finish !== 'flat') {
@@ -133,10 +140,13 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
           ['chat', 'yt-live-chat-item-list-renderer'],
           ['composer', 'yt-live-chat-message-input-renderer']
         ]) {
+          await editor.getByRole('tab', { name: 'Background', exact: true }).click();
           await editor.locator(`[data-theme-area="${area}"]`).click();
           const surface = preview.locator(selector);
           for (const finish of ['flat', 'glossy', 'glass']) {
+            await editor.getByRole('tab', { name: 'Style', exact: true }).click();
             await field('finish').selectOption(finish);
+            await editor.getByRole('tab', { name: 'Background', exact: true }).click();
             await field('fill').selectOption('theme');
             const reflection = await surface.evaluate(element => getComputedStyle(element).backgroundImage.replace(/(?:, none)+$/, ''));
             await field('fill').selectOption('image');
@@ -197,8 +207,8 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
       await field('surfaceOpacity').fill('100');
       await field('gradientAngle').fill('270');
       await expect(header).toHaveCSS('background-image', /270deg/);
-      await editor.locator('[data-theme-details="artwork"] summary').click();
-      await expect(editor.locator('[data-theme-details="artwork"] input[type="file"]')).toHaveCount(1);
+      await editor.getByRole('tab', { name: 'Details', exact: true }).click();
+      await expect(editor.getByRole('tabpanel', { name: 'Details' }).locator('input[type="file"]')).toHaveCount(1);
       await expect(field('avatarFrame')).toBeVisible();
       await preview.locator('#previewInboxIcon').click();
       await editor.locator('#themeSave').click();

@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Stil"
     },
-    "themeSection_artwork": {
-      "message": "Grafiken"
+    "themeSection_details": {
+      "message": "Details"
     },
     "themeShapeDepth": {
       "message": "Form und Tiefe"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Speichern und verwenden"
     },
+    "themeUse": {
+      "message": "Theme verwenden"
+    },
     "themeUndone": {
       "message": "Rückgängig gemacht: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Chat"
     },
     "themeArea_composer": {
-      "message": "Eingabe"
+      "message": "Unten"
     },
     "themeBackgroundColor": {
       "message": "Hintergrundfarbe"
@@ -1018,10 +1021,10 @@
       "message": "Nachrichtenmarkierung hinzufügen"
     },
     "themeSecondary": {
-      "message": "Sekundäre Akzentfarbe"
+      "message": "Sekundärfarbe"
     },
     "themePaletteHint": {
-      "message": "Schaltflächen und Symbole folgen der Akzentfarbe; Tags und Hervorhebungen nutzen den zweiten Akzent. Bereiche, Menüs und Text passen sich automatisch an den hellen und dunklen Modus an."
+      "message": "Schaltflächen und Symbole folgen der Akzentfarbe; Tags und Hervorhebungen nutzen die Sekundärfarbe. Bereiche, Menüs und Text passen sich automatisch an den hellen und dunklen Modus an."
     },
     "theme_theme": {
       "message": "Theme-Farben"

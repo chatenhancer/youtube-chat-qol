@@ -19,13 +19,16 @@ export const customThemeRenderingScenario: BrowserScenario = async ({ page, cont
     await expect(editor.locator('#themeName')).toBeEnabled();
     const preview = editor.frameLocator('#themePreview');
     await editor.locator('#themeName').fill('Rendering example');
+    await editor.getByRole('tab', { name: 'Background', exact: true }).click();
     await editor.locator('[data-theme-field="fill"]').selectOption('solid');
     await editor.locator('[data-theme-field="color"]').fill('#662244');
+    await editor.getByRole('tab', { name: 'Colors', exact: true }).click();
     await editor.locator('[data-theme-field="border"]').fill('#ff7700');
 
     await test.step('New palette controls reach real chat menus, Inbox tags, buttons, fonts, and jump highlights', async () => {
       await editor.locator('[data-theme-field="secondary"]').fill('#a622dd');
       await editor.locator('[data-theme-field="accent"]').fill('#bb2255');
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       await editor.locator('[data-theme-field="font"]').selectOption('mono');
       for (const finish of ['flat', 'glossy', 'glass']) {
         await editor.locator('[data-theme-field="finish"]').selectOption(finish);

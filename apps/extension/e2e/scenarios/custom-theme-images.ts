@@ -26,6 +26,7 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
         return canvas.toDataURL('image/png').split(',')[1];
       }));
       await editor.locator('#themeName').fill('Image contrast');
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       for (const area of ['header', 'chat', 'composer']) {
         await editor.locator(`[data-theme-area="${area}"]`).click();
         await editor.locator('[data-theme-field="fill"]').selectOption('image');
@@ -34,6 +35,7 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
           await expect(editor.locator('[data-theme-field="imageText"]')).toBeEnabled();
         }
       }
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       for (const finish of ['flat', 'glossy', 'glass']) {
         await editor.locator('[data-theme-field="finish"]').selectOption(finish);
         await editor.locator('#themeSaveApply').click();
@@ -56,6 +58,7 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       }
       await clearChatComposer(chat);
       await preview.locator('#previewDraft').fill('');
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor.locator('[data-theme-area="header"]').click();
       const contrast = editor.getByRole('combobox', { name: 'Text over image', exact: true });
       await contrast.selectOption('light');
@@ -67,6 +70,7 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       await editor.locator('#themeSaveApply').click();
       await expect(chat.locator('yt-live-chat-header-renderer')).toHaveCSS('color', 'rgb(241, 241, 241)');
       await editor.reload();
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await expect(editor.getByRole('combobox', { name: 'Text over image', exact: true })).toHaveValue('light');
       await editor.locator('#themeDelete').click();
       await editor.locator('.popup-reset-dialog .popup-reset-dialog-confirm').click();
@@ -77,6 +81,7 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       const buffer = Buffer.from('R0lGODlhAQABAIAAACAwRGBAYCH/C05FVFNDQVBFMi4wAwEAAAAh+QQAMgAAACwAAAAAAQABAAACAkQBACH5BAAyAAAALAAAAAABAAEAAAICTAEAOw==', 'base64');
       const source = `data:image/gif;base64,${buffer.toString('base64')}`;
       await editor.locator('#themeName').fill('Animated');
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor.locator('[data-theme-field="fill"]').selectOption('image');
       for (const key of ['image', 'darkImage']) {
         const picker = editor.locator(`[data-theme-field="${key}"]`);
@@ -84,7 +89,7 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
         await picker.setInputFiles({ name: 'background.gif', mimeType: 'image/gif', buffer });
         await expect(picker.locator('..').locator('img')).toHaveAttribute('src', source);
       }
-      await editor.locator('[data-theme-details="artwork"] summary').click();
+      await editor.getByRole('tab', { name: 'Details', exact: true }).click();
       await editor.locator('[data-theme-field="avatarFrame"]').setInputFiles({ name: 'frame.gif', mimeType: 'image/gif', buffer });
       await editor.locator('#themeSaveApply').click();
       await expect(editor.locator('.theme-status')).toHaveText('Theme saved and applied.');
@@ -92,6 +97,7 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       expect(applied.avatarFrame).toBe(source);
       expect(applied.surfaces.header).toMatchObject({ image: source, darkImage: source });
       await editor.reload();
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       const thumbnail = editor.locator('[data-theme-field="image"]').locator('..').locator('img');
       await expect(thumbnail).toHaveAttribute('src', source);
       const firstFrame = await thumbnail.screenshot({ animations: 'allow' });

@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Стиль"
     },
-    "themeSection_artwork": {
-      "message": "Зображення"
+    "themeSection_details": {
+      "message": "Деталі"
     },
     "themeShapeDepth": {
       "message": "Форма й глибина"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Зберегти й використовувати"
     },
+    "themeUse": {
+      "message": "Використати тему"
+    },
     "themeUndone": {
       "message": "Скасовано: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Чат"
     },
     "themeArea_composer": {
-      "message": "Введення"
+      "message": "Нижня частина"
     },
     "themeBackgroundColor": {
       "message": "Колір тла"
@@ -1018,10 +1021,10 @@
       "message": "Додати маркер повідомлення"
     },
     "themeSecondary": {
-      "message": "Другорядний акцент"
+      "message": "Додатковий колір"
     },
     "themePaletteHint": {
-      "message": "Кнопки та значки використовують основний акцент, мітки й виділення — додатковий. Панелі, меню й текст автоматично адаптуються до світлого й темного режиму."
+      "message": "Кнопки та значки використовують основний акцент, мітки й виділення — додатковий колір. Панелі, меню й текст автоматично адаптуються до світлого й темного режиму."
     },
     "theme_theme": {
       "message": "Кольори теми"

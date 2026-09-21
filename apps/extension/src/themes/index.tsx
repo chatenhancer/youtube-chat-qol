@@ -21,7 +21,13 @@ import {
 } from '../shared/extension-page-i18n';
 import { showExtensionDialog, closeExtensionDialog } from '../shared/extension-dialog';
 import { initTabHighlight } from '../shared/extension-tabs';
-import { areaButtons, themeFields, themeBackgroundFields } from './fields';
+import {
+  areaButtons,
+  themeFields,
+  themeBackgroundFields,
+  THEME_EDITOR_TABS,
+  type ThemeEditorTab
+} from './fields';
 import { readThemeImage } from './image';
 import { createThemePreview } from './preview';
 import { createThemeHistory } from './history';
@@ -44,6 +50,7 @@ function initThemeEditor(): void {
   let appliedSnapshot = '';
   let mode: ChatSkinTheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   let area: ThemeArea = 'header';
+  let activeTab: ThemeEditorTab = 'colors';
   let busy = false;
 
   const picker = el<HTMLSelectElement>(
@@ -82,6 +89,31 @@ function initThemeEditor(): void {
     </p>
   );
   const fields = el<HTMLElement>(<div class="theme-fields" />);
+  const tabIds = Object.keys(THEME_EDITOR_TABS) as ThemeEditorTab[];
+  const tabs = el<HTMLElement>(
+    <div
+      class="theme-editor-tabs popup-tabs"
+      role="tablist"
+      aria-label={message('themeCustomize')}
+      onKeyDown={onTabKeyDown}
+    >
+      {tabIds.map((tab) => (
+        <button
+          type="button"
+          class="popup-tab"
+          id={`theme-tab-${tab}`}
+          role="tab"
+          data-theme-tab={tab}
+          aria-controls={`theme-panel-${tab}`}
+          aria-selected={activeTab === tab}
+          tabindex={activeTab === tab ? 0 : -1}
+          onClick={() => selectTab(tab)}
+        >
+          {message(THEME_EDITOR_TABS[tab])}
+        </button>
+      ))}
+    </div>
+  );
   const areas = areaButtons((value) => {
     area = value;
     rebuildFields(true);
@@ -172,6 +204,7 @@ function initThemeEditor(): void {
       </header>
       <div class="theme-name-row">{name}</div>
       {presetNotice}
+      {tabs}
       {fields}
       {status}
       {footer}
@@ -181,10 +214,47 @@ function initThemeEditor(): void {
   frame.before(modes);
   editor.addEventListener('change', history.commit);
   editor.addEventListener('pointerdown', history.commit);
-  const refreshHighlights = [areas, modes.querySelector<HTMLElement>('.popup-tabs')!].map(
+  const refreshHighlights = [tabs, areas, modes.querySelector<HTMLElement>('.popup-tabs')!].map(
     initTabHighlight
   );
 
+  function updateTabs(): void {
+    tabs.querySelectorAll<HTMLButtonElement>('[data-theme-tab]').forEach((button) => {
+      const selected = button.dataset.themeTab === activeTab;
+      button.setAttribute('aria-selected', String(selected));
+      button.classList.toggle('popup-tab-active', selected);
+      button.tabIndex = selected ? 0 : -1;
+    });
+    fields.querySelectorAll<HTMLElement>('[data-theme-panel]').forEach((panel) => {
+      panel.hidden = panel.dataset.themePanel !== activeTab;
+    });
+  }
+  function selectTab(tab: ThemeEditorTab): void {
+    if (busy) return;
+    history.commit();
+    activeTab = tab;
+    tabs
+      .querySelector<HTMLButtonElement>(`[data-theme-tab="${tab}"]`)
+      ?.focus({ preventScroll: true });
+    updateTabs();
+    refreshHighlights.forEach((refresh) => refresh());
+    if (tab === 'background') preview.showArea(area);
+  }
+  function onTabKeyDown(event: KeyboardEvent): void {
+    if (!(event.target instanceof HTMLButtonElement) || busy) return;
+    const current = tabIds.indexOf(activeTab);
+    let next: number;
+    if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = tabIds.length - 1;
+    else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      const direction = event.key === 'ArrowRight' ? 1 : -1;
+      next =
+        (current + direction * (document.documentElement.dir === 'rtl' ? -1 : 1) + tabIds.length) %
+        tabIds.length;
+    } else return;
+    event.preventDefault();
+    selectTab(tabIds[next]);
+  }
   function notice(key: string, error = false): void {
     status.textContent = message(key);
     status.classList.toggle('theme-error', error);
@@ -207,6 +277,11 @@ function initThemeEditor(): void {
     const blocked = busy ? 'themeWorking' : nameError;
     save.disabled = Boolean(blocked || !hasChanges);
     apply.disabled = Boolean(blocked || (!hasChanges && applied));
+    const applyLabel = message(
+      savedId && !hasChanges && !apply.disabled ? 'themeUse' : 'themeSaveApply'
+    );
+    apply.textContent = applyLabel;
+    actionHints[2].setAttribute('aria-label', applyLabel);
     reset.disabled = busy || JSON.stringify(draft) === JSON.stringify(resetTarget());
     setDisabledHint(
       actionHints[0],
@@ -306,6 +381,7 @@ function initThemeEditor(): void {
       .forEach((button) =>
         button.setAttribute('aria-pressed', String(button.dataset.themeArea === area))
       );
+    updateTabs();
     refreshHighlights.forEach((refresh) => refresh());
   }
   function updateModeButtons(): void {

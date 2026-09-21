@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "스타일"
     },
-    "themeSection_artwork": {
-      "message": "장식 이미지"
+    "themeSection_details": {
+      "message": "세부 설정"
     },
     "themeShapeDepth": {
       "message": "모양과 깊이"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "저장하고 사용"
     },
+    "themeUse": {
+      "message": "테마 사용"
+    },
     "themeUndone": {
       "message": "실행 취소: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "채팅"
     },
     "themeArea_composer": {
-      "message": "입력"
+      "message": "하단"
     },
     "themeBackgroundColor": {
       "message": "배경 색상"
@@ -1018,10 +1021,10 @@
       "message": "메시지 표시 추가"
     },
     "themeSecondary": {
-      "message": "보조 강조색"
+      "message": "보조 색상"
     },
     "themePaletteHint": {
-      "message": "버튼과 아이콘은 강조색을, 태그와 하이라이트는 보조 강조색을 사용합니다. 패널, 메뉴, 텍스트는 라이트 및 다크 모드에 자동으로 맞춰집니다."
+      "message": "버튼과 아이콘은 강조색을, 태그와 하이라이트는 보조 색상을 사용합니다. 패널, 메뉴, 텍스트는 라이트 및 다크 모드에 자동으로 맞춰집니다."
     },
     "theme_theme": {
       "message": "테마 색상"

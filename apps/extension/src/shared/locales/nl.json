@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Stijl"
     },
-    "themeSection_artwork": {
-      "message": "Afbeeldingen"
+    "themeSection_details": {
+      "message": "Details"
     },
     "themeShapeDepth": {
       "message": "Vorm en diepte"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Opslaan en gebruiken"
     },
+    "themeUse": {
+      "message": "Thema gebruiken"
+    },
     "themeUndone": {
       "message": "Ongedaan gemaakt: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Chat"
     },
     "themeArea_composer": {
-      "message": "Invoer"
+      "message": "Onderkant"
     },
     "themeBackgroundColor": {
       "message": "Achtergrondkleur"
@@ -1018,10 +1021,10 @@
       "message": "Berichtmarkering toevoegen"
     },
     "themeSecondary": {
-      "message": "Secundaire accentkleur"
+      "message": "Secundaire kleur"
     },
     "themePaletteHint": {
-      "message": "Knoppen en pictogrammen volgen het accent; tags en markeringen gebruiken het tweede accent. Panelen, menu’s en tekst passen zich automatisch aan de lichte en donkere modus aan."
+      "message": "Knoppen en pictogrammen volgen het accent; tags en markeringen gebruiken de secundaire kleur. Panelen, menu’s en tekst passen zich automatisch aan de lichte en donkere modus aan."
     },
     "theme_theme": {
       "message": "Themakleuren"

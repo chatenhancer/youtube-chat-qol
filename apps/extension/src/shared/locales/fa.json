@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "سبک"
     },
-    "themeSection_artwork": {
-      "message": "تصاویر"
+    "themeSection_details": {
+      "message": "جزئیات"
     },
     "themeShapeDepth": {
       "message": "شکل و عمق"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "ذخیره و استفاده"
     },
+    "themeUse": {
+      "message": "استفاده از تم"
+    },
     "themeUndone": {
       "message": "واگرد شد: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "چت"
     },
     "themeArea_composer": {
-      "message": "ورودی"
+      "message": "بخش پایین"
     },
     "themeBackgroundColor": {
       "message": "رنگ پس‌زمینه"
@@ -1018,7 +1021,7 @@
       "message": "افزودن نشانگر پیام"
     },
     "themeSecondary": {
-      "message": "رنگ تأکیدی دوم"
+      "message": "رنگ ثانویه"
     },
     "themePaletteHint": {
       "message": "دکمه‌ها و نمادها از رنگ تأکیدی و برچسب‌ها و برجسته‌سازی‌ها از رنگ ثانویه استفاده می‌کنند. پنل‌ها، منوها و متن به‌طور خودکار با حالت روشن و تیره سازگار می‌شوند."

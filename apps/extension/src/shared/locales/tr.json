@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Stil"
     },
-    "themeSection_artwork": {
-      "message": "Görseller"
+    "themeSection_details": {
+      "message": "Ayrıntılar"
     },
     "themeShapeDepth": {
       "message": "Şekil ve derinlik"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Kaydet ve kullan"
     },
+    "themeUse": {
+      "message": "Temayı kullan"
+    },
     "themeUndone": {
       "message": "Geri alındı: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Sohbet"
     },
     "themeArea_composer": {
-      "message": "Giriş"
+      "message": "Alt"
     },
     "themeBackgroundColor": {
       "message": "Arka plan rengi"
@@ -1021,7 +1024,7 @@
       "message": "Mesaj işareti ekle"
     },
     "themeSecondary": {
-      "message": "İkincil vurgu"
+      "message": "İkincil renk"
     },
     "themePaletteHint": {
       "message": "Düğmeler ve simgeler vurgu rengini, etiketler ve vurgulamalar ikincil rengi kullanır. Paneller, menüler ve metin açık ve koyu moda otomatik uyum sağlar."

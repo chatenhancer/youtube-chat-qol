@@ -47,6 +47,7 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
       await chatDraft.press('ControlOrMeta+z');
       await expect(chatDraft).toHaveValue('');
       await expect(status).toHaveText('Undid: Accent.');
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       await editor.locator('[data-theme-details="style"] summary').click();
       const radius = editor.locator('[data-theme-field="radius"]');
       await radius.scrollIntoViewIfNeeded();
@@ -99,7 +100,9 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
       await expect(status).toHaveText('Theme saved and applied.');
       const saved = await storedThemes();
       await name.fill('Unsaved rename');
+      await editor.getByRole('tab', { name: 'Colors', exact: true }).click();
       await accent.fill('#654321');
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       await font.selectOption('playful');
       await editor.locator('#themeReset').click();
       await expect(name).toHaveValue('Undo example');

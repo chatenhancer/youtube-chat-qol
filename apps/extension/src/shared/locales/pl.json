@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Styl"
     },
-    "themeSection_artwork": {
-      "message": "Grafika"
+    "themeSection_details": {
+      "message": "Szczegóły"
     },
     "themeShapeDepth": {
       "message": "Kształt i głębia"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Zapisz i użyj"
     },
+    "themeUse": {
+      "message": "Użyj motywu"
+    },
     "themeUndone": {
       "message": "Cofnięto: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Czat"
     },
     "themeArea_composer": {
-      "message": "Wpisywanie"
+      "message": "Dół"
     },
     "themeBackgroundColor": {
       "message": "Kolor tła"
@@ -1018,10 +1021,10 @@
       "message": "Dodaj znacznik wiadomości"
     },
     "themeSecondary": {
-      "message": "Dodatkowy akcent"
+      "message": "Kolor dodatkowy"
     },
     "themePaletteHint": {
-      "message": "Przyciski i ikony używają akcentu, a etykiety i wyróżnienia — akcentu dodatkowego. Panele, menu i tekst automatycznie dostosowują się do trybu jasnego i ciemnego."
+      "message": "Przyciski i ikony używają akcentu, a etykiety i wyróżnienia — koloru dodatkowego. Panele, menu i tekst automatycznie dostosowują się do trybu jasnego i ciemnego."
     },
     "theme_theme": {
       "message": "Kolory motywu"

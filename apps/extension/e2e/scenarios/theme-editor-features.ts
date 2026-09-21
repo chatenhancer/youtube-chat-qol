@@ -20,6 +20,65 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
     await expect(preview.locator('#previewInboxIcon')).toHaveAttribute('aria-expanded', 'false');
     await editor.locator('[data-theme-mode="light"]').click();
 
+    await test.step('Category tabs preserve edits, support keyboard navigation, and keep unrelated controls hidden', async () => {
+      const tabs = editor.getByRole('tablist', { name: 'Customize' });
+      const tab = (name: string) => tabs.getByRole('tab', { name, exact: true });
+      const field = (name: string) => editor.locator(`[data-theme-field="${name}"]`);
+      await expect(tabs.getByRole('tab')).toHaveText(['Colors', 'Style', 'Background', 'Details']);
+      await expect(editor.getByRole('tabpanel')).toHaveCount(1);
+      await expect(editor.getByRole('tabpanel', { name: 'Colors' })).toBeVisible();
+      await expect(field('font')).toBeHidden();
+      await expect(field('fill')).toBeHidden();
+      await expect(field('avatarShape')).toBeHidden();
+      await field('accent').fill('#9c2258');
+      await tab('Colors').press('ArrowRight');
+      await expect(tab('Style')).toBeFocused();
+      await expect(tab('Style')).toHaveAttribute('aria-selected', 'true');
+      await field('font').selectOption('mono');
+      await editor.locator('[data-theme-details="style"] summary').click();
+      await tab('Style').press('ArrowRight');
+      await editor.locator('[data-theme-area="chat"]').click();
+      await field('fill').selectOption('gradient');
+      await field('gradientAngle').fill('135');
+      await tab('Background').press('End');
+      await expect(tab('Details')).toBeFocused();
+      await field('avatarShape').selectOption('square');
+      await tab('Details').press('ArrowRight');
+      await expect(tab('Colors')).toBeFocused();
+      await expect(field('accent')).toHaveValue('#9c2258');
+      await tab('Style').click();
+      await expect(field('font')).toHaveValue('mono');
+      await expect(editor.locator('[data-theme-details="style"]')).toHaveAttribute('open', '');
+      await tab('Background').click();
+      await expect(editor.locator('[data-theme-area="chat"]')).toHaveAttribute('aria-pressed', 'true');
+      await expect(field('gradientAngle')).toHaveValue('135');
+      await tab('Details').click();
+      await expect(field('avatarShape')).toHaveValue('square');
+      await tab('Details').press('Home');
+      await expect(tab('Colors')).toBeFocused();
+      await editor.evaluate(() => { document.documentElement.dir = 'rtl'; });
+      await tab('Colors').press('ArrowLeft');
+      await expect(tab('Style')).toBeFocused();
+      await editor.evaluate(() => { document.documentElement.dir = 'ltr'; });
+      await editor.locator('#themeReset').click();
+      await expect(tab('Style')).toHaveAttribute('aria-selected', 'true');
+      await expect(field('font')).toHaveValue('default');
+      await editor.locator('[data-theme-details="style"] summary').click();
+      for (const appearance of ['light', 'dark'] as const) {
+        await editor.emulateMedia({ colorScheme: appearance });
+        for (const label of ['Colors', 'Style', 'Background', 'Details']) {
+          await tab(label).click();
+          await expect(editor.getByRole('tabpanel')).toHaveCount(1);
+          await expect(editor.locator('#themeSave')).toBeInViewport();
+          await test.info().attach(`theme-editor-${appearance}-${label.toLowerCase()}`, {
+            body: await editor.screenshot({ animations: 'disabled' }), contentType: 'image/png'
+          });
+        }
+      }
+      await editor.emulateMedia({ colorScheme: 'light' });
+      await tab('Colors').click();
+    });
+
     await test.step('The editor chat frame matches onboarding dimensions across viewport sizes', async () => {
       const onboarding = await context.newPage();
       try {
@@ -35,6 +94,8 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
         ]) {
           await editor.setViewportSize(size);
           await onboarding.setViewportSize(size);
+          expect(await editor.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(size.width);
+          for (const tab of await editor.getByRole('tab').all()) await expect(tab).toBeInViewport();
           const expected = await onboarding.locator('#chatPreview').boundingBox();
           await expect.poll(async () => {
             const actual = await preview.locator('#chatPreview').boundingBox();
@@ -48,6 +109,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
     });
 
     await test.step('Switching background areas preserves focus and the settled hover highlight', async () => {
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       const group = editor.locator('.theme-areas');
       for (const area of ['chat', 'composer', 'header']) {
         const tab = group.locator(`[data-theme-area="${area}"]`);
@@ -279,6 +341,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       const originalHeader = await preview.locator('yt-live-chat-header-renderer').evaluate(element => getComputedStyle(element).backgroundImage);
       await expect(editor.locator('#themeReset')).toBeDisabled();
       await name.fill('Sky draft');
+      await editor.getByRole('tab', { name: 'Colors', exact: true }).click();
       await editor.locator('[data-theme-field="accent"]').fill('#123456');
       await editor.locator('#themeReset').click();
       await expect(name).toHaveValue('Aero');
@@ -309,6 +372,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
     });
 
     await test.step('Image zoom changes only the image, and can be undone', async () => {
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor.locator('[data-theme-field="fill"]').selectOption('image');
       await editor.locator('[data-theme-field="image"]').setInputFiles(backgroundFile);
       if (!await editor.locator('[data-theme-details="image"]').getAttribute('open').then(value => value !== null)) await editor.locator('[data-theme-details="image"] summary').click();
@@ -323,8 +387,8 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
     });
 
     await test.step('Image thumbnails open their full image in a separate tab, including uploaded drafts', async () => {
-      await editor.locator('[data-theme-details="artwork"] summary').click();
       for (const key of ['image', 'darkImage', 'avatarFrame']) {
+        await editor.getByRole('tab', { name: key === 'avatarFrame' ? 'Details' : 'Background', exact: true }).click();
         const row = editor.locator(`[data-theme-field="${key}"]`).locator('..');
         const source = await row.locator('img').getAttribute('src');
         const link = row.getByRole('link', { name: 'Open image in new tab' });
@@ -347,7 +411,6 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
           await imageTab.close();
         }
       }
-      await editor.locator('[data-theme-details="artwork"] summary').click();
     });
 
     await test.step('A copy retains the Glass finish while its surface and avatar controls remain editable', async () => {
@@ -355,15 +418,19 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       const fill = editor.locator('[data-theme-field="fill"]');
       const finish = editor.locator('[data-theme-field="finish"]');
       const artwork = await header.evaluate(element => getComputedStyle(element).backgroundImage);
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       await finish.selectOption('glossy');
       await expect.poll(() => header.evaluate((element, previous) => getComputedStyle(element).backgroundImage === previous, artwork)).toBe(false);
       await expect(header).toHaveCSS('background-image', /^linear-gradient\(rgba\(255, 255, 255/);
       await expect(header).toHaveCSS('background-image', /url\(/);
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await fill.selectOption('theme');
       await expect(header).toHaveCSS('background-image', /^linear-gradient\(rgba\(255, 255, 255/);
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       await finish.selectOption('glass');
       await expect(header).toHaveCSS('background-image', /^linear-gradient\(135deg/);
       await expect(header).not.toHaveCSS('background-image', /url\(/);
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await fill.selectOption('solid');
       await editor.locator('[data-theme-field="color"]').fill('#713654');
       await expect(header).toHaveCSS('background-color', 'rgb(113, 54, 84)');
@@ -372,16 +439,18 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await editor.locator('[data-theme-field="gradientColor"]').fill('#241842');
       await expect(header).toHaveCSS('background-image', /rgb\(36, 24, 66\)/);
       await fill.selectOption('image');
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       await editor.locator('[data-theme-field="font"]').selectOption('mono');
       await expect(preview.locator('#label-text')).toHaveCSS('font-family', /Consolas/);
 
-      await editor.locator('[data-theme-details="artwork"] summary').click();
+      await editor.getByRole('tab', { name: 'Details', exact: true }).click();
       await editor.locator('[data-theme-field="avatarShape"]').selectOption('round');
       await expect(preview.locator('.preview-message #author-photo').first()).toHaveCSS('border-radius', '50%');
       await editor.locator('[data-theme-field="avatarShape"]').selectOption('square');
       await expect(preview.locator('.preview-message #author-photo').first()).toHaveCSS('border-radius', '2px');
       await editor.locator('[data-theme-mode="dark"]').click();
 
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor.locator('[data-theme-area="chat"]').click();
       await fill.selectOption('image');
       await editor.locator('[data-theme-field="image"]').setInputFiles(backgroundFile);
@@ -427,6 +496,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
     await test.step('Finishes and one shared font render throughout the preview', async () => {
       await preview.locator('#previewInboxIcon').click();
 
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       await editor.locator('[data-theme-details="style"] summary').click();
       const shadow = editor.locator('[data-theme-field="shadow"]');
       await shadow.fill('0');
@@ -440,6 +510,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       const marker = preview.locator('.preview-message #message-container').first();
 
       const markerEnabled = editor.locator('[data-theme-field="messageMarkEnabled"]');
+      await editor.getByRole('tab', { name: 'Details', exact: true }).click();
       await markerEnabled.uncheck();
       await expect.poll(() => marker.evaluate(element => getComputedStyle(element, '::before').content)).toBe('none');
       await markerEnabled.check();
@@ -447,6 +518,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await expect.poll(() => marker.evaluate(element => getComputedStyle(element, '::before').backgroundImage)).toContain('rgb(255, 51, 102)');
       await editor.locator('[data-theme-field="messageMark"]').fill('#989898');
 
+      await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       for (const value of ['flat', 'glossy', 'glass']) {
         await finish.selectOption(value);
         await expect.poll(() => marker.evaluate(element => {
@@ -497,6 +569,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
         await test.info().attach(`theme-font-${label.toLowerCase()}`, { body: await preview.locator('#chatPreview').screenshot(), contentType: 'image/png' });
       }
 
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor.locator('[data-theme-area="header"]').click();
       await expect(editor.locator('[data-theme-field="areaFont"]')).toHaveCount(0);
       await expect(preview.locator('#label-text')).toHaveCSS('font-family', /Instrument Serif/);

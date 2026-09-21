@@ -4,6 +4,14 @@ import { getExtensionMessage as message } from '../shared/extension-page-i18n';
 import { THEME_AREAS, type ThemeArea, type CustomTheme } from '../shared/custom-themes';
 import { THEME_FONT_OPTIONS } from '../shared/theme-fonts';
 
+export const THEME_EDITOR_TABS = {
+  colors: 'themeSection_colors',
+  style: 'themeSection_style',
+  background: 'themeBackground',
+  details: 'themeSection_details'
+} as const;
+export type ThemeEditorTab = keyof typeof THEME_EDITOR_TABS;
+
 // Purpose-drawn area diagrams match the popup's existing stroked icons.
 const AREA_PATHS: Record<ThemeArea, string> = {
   header:
@@ -172,10 +180,16 @@ function imageField(
   );
 }
 
-function group(title: string, children: Node[]): HTMLElement {
+function group(tab: ThemeEditorTab, children: Node[]): HTMLElement {
   return el<HTMLElement>(
-    <section class="theme-field-group" aria-label={message(title)}>
-      <h2>{message(title)}</h2>
+    <section
+      class="theme-field-group"
+      id={`theme-panel-${tab}`}
+      role="tabpanel"
+      aria-labelledby={`theme-tab-${tab}`}
+      data-theme-panel={tab}
+      hidden
+    >
       {children}
     </section>
   );
@@ -210,7 +224,7 @@ export function themeFields(
 ): HTMLElement {
   return el<HTMLElement>(
     <div class="theme-fields-content">
-      {group('themeSection_colors', [
+      {group('colors', [
         el<HTMLElement>(
           <div class="theme-colors">
             {(['accent', 'secondary', 'border'] as const).map((key) =>
@@ -229,7 +243,7 @@ export function themeFields(
         ),
         el<HTMLElement>(<p class="theme-field-hint">{message('themeSurfaceTintHint')}</p>)
       ])}
-      {group('themeSection_style', [
+      {group('style', [
         selectField('font', theme.font, 'themeFont', THEME_FONT_OPTIONS, (value) =>
           update(theme, 'font', value as typeof theme.font)
         ),
@@ -267,8 +281,8 @@ export function themeFields(
             : [])
         ])
       ])}
-      {group('themeBackground', [areas, themeBackgroundFields(theme, area, update, upload)])}
-      {details('artwork', 'themeSection_artwork', [
+      {group('background', [areas, themeBackgroundFields(theme, area, update, upload)])}
+      {group('details', [
         selectField(
           'avatarShape',
           theme.avatarShape,

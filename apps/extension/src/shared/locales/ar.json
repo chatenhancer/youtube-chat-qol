@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "النمط"
     },
-    "themeSection_artwork": {
-      "message": "الصور"
+    "themeSection_details": {
+      "message": "التفاصيل"
     },
     "themeShapeDepth": {
       "message": "الشكل والعمق"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "حفظ واستخدام"
     },
+    "themeUse": {
+      "message": "استخدام السمة"
+    },
     "themeUndone": {
       "message": "تم التراجع عن: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "الدردشة"
     },
     "themeArea_composer": {
-      "message": "الإدخال"
+      "message": "الجزء السفلي"
     },
     "themeBackgroundColor": {
       "message": "لون الخلفية"
@@ -1021,7 +1024,7 @@
       "message": "إضافة علامة للرسالة"
     },
     "themeSecondary": {
-      "message": "لون تمييز ثانوي"
+      "message": "لون ثانوي"
     },
     "themePaletteHint": {
       "message": "تتبع الأزرار والأيقونات اللون المميز، وتستخدم الوسوم والتظليلات اللون الثانوي. تتكيف اللوحات والقوائم والنصوص تلقائيًا مع الوضعين الفاتح والداكن."

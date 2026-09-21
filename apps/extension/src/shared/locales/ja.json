@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "スタイル"
     },
-    "themeSection_artwork": {
-      "message": "装飾画像"
+    "themeSection_details": {
+      "message": "詳細"
     },
     "themeShapeDepth": {
       "message": "形と奥行き"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "保存して使う"
     },
+    "themeUse": {
+      "message": "テーマを使う"
+    },
     "themeUndone": {
       "message": "{change}を元に戻しました。"
     },
@@ -511,7 +514,7 @@
       "message": "チャット"
     },
     "themeArea_composer": {
-      "message": "入力欄"
+      "message": "下部"
     },
     "themeBackgroundColor": {
       "message": "背景色"
@@ -1021,10 +1024,10 @@
       "message": "メッセージマーカーを追加"
     },
     "themeSecondary": {
-      "message": "セカンダリアクセント"
+      "message": "セカンダリカラー"
     },
     "themePaletteHint": {
-      "message": "ボタンとアイコンはアクセント色、タグとハイライトは第2アクセント色を使います。パネル、メニュー、テキストはライト・ダークモードに自動で適応します。"
+      "message": "ボタンとアイコンはアクセント色、タグとハイライトはセカンダリカラーを使います。パネル、メニュー、テキストはライト・ダークモードに自動で適応します。"
     },
     "theme_theme": {
       "message": "テーマの色"

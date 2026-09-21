@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "สไตล์"
     },
-    "themeSection_artwork": {
-      "message": "ภาพตกแต่ง"
+    "themeSection_details": {
+      "message": "รายละเอียด"
     },
     "themeShapeDepth": {
       "message": "รูปร่างและความลึก"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "บันทึกและใช้"
     },
+    "themeUse": {
+      "message": "ใช้ธีม"
+    },
     "themeUndone": {
       "message": "เลิกทำ: {change}"
     },
@@ -511,7 +514,7 @@
       "message": "แชท"
     },
     "themeArea_composer": {
-      "message": "ช่องพิมพ์"
+      "message": "ส่วนล่าง"
     },
     "themeBackgroundColor": {
       "message": "สีพื้นหลัง"
@@ -1018,10 +1021,10 @@
       "message": "เพิ่มเครื่องหมายข้อความ"
     },
     "themeSecondary": {
-      "message": "สีเน้นรอง"
+      "message": "สีรอง"
     },
     "themePaletteHint": {
-      "message": "ปุ่มและไอคอนใช้สีเน้น ส่วนแท็กและไฮไลต์ใช้สีเน้นรอง แผง เมนู และข้อความจะปรับตามโหมดสว่างและมืดโดยอัตโนมัติ"
+      "message": "ปุ่มและไอคอนใช้สีเน้น ส่วนแท็กและไฮไลต์ใช้สีรอง แผง เมนู และข้อความจะปรับตามโหมดสว่างและมืดโดยอัตโนมัติ"
     },
     "theme_theme": {
       "message": "สีธีม"

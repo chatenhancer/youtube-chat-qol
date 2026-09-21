@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Style"
     },
-    "themeSection_artwork": {
-      "message": "Artwork"
+    "themeSection_details": {
+      "message": "Details"
     },
     "themeShapeDepth": {
       "message": "Shape and depth"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Save and use"
     },
+    "themeUse": {
+      "message": "Use theme"
+    },
     "themeUndone": {
       "message": "Undid: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Chat"
     },
     "themeArea_composer": {
-      "message": "Input"
+      "message": "Bottom"
     },
     "themeBackgroundColor": {
       "message": "Background color"
@@ -1021,10 +1024,10 @@
       "message": "Add message marker"
     },
     "themeSecondary": {
-      "message": "Secondary accent"
+      "message": "Secondary color"
     },
     "themePaletteHint": {
-      "message": "Buttons and icons follow the accent; tags and highlights use the secondary accent. Panels, menus, and text adapt automatically to light and dark mode."
+      "message": "Buttons and icons follow the accent; tags and highlights use the secondary color. Panels, menus, and text adapt automatically to light and dark mode."
     },
     "theme_theme": {
       "message": "Theme colors"

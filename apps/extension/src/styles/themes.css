@@ -46,18 +46,19 @@ html body { margin: 0; min-width: 320px; font-family: inherit; }
 .theme-editor button:disabled { opacity: .45; cursor: default; }
 #themeName { width: 100%; min-width: 0; min-height: 36px; padding: 7px 10px; color: var(--ytcq-popup-text); background: linear-gradient(var(--ytcq-popup-control-tint), var(--ytcq-popup-control-tint)), var(--ytcq-popup-control-bg); border: 1px solid var(--ytcq-popup-control-border); border-radius: var(--ytcq-popup-squircle-radius-control); corner-shape: var(--ytcq-popup-squircle-corner-shape); }
 .theme-appearance-row > span { color: var(--ytcq-popup-secondary-text); }
+.theme-editor-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; }
+.theme-editor-tabs .popup-tab { min-width: 0; padding: 8px 4px; font-size: 12px; line-height: 16px; white-space: normal; overflow-wrap: anywhere; }
 .theme-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
 .theme-modes .popup-tab { padding: 5px 10px; font-size: 12px; }
 .theme-areas { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; }
 .theme-area { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 9px 4px; font-size: 12px; line-height: 16px; overflow-wrap: anywhere; }
 .theme-area svg { width: 24px; height: 24px; flex-shrink: 0; }
-.theme-fields { min-width: 0; padding: 2px; }
+.theme-fields { min-width: 0; min-height: 260px; padding: 2px; }
 .theme-marker-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .theme-marker-toggle input { accent-color: var(--ytcq-popup-action); }
 .theme-fields-content, .theme-image-controls { display: flex; flex-direction: column; gap: 16px; }
 .theme-field-group { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.theme-field-group + .theme-field-group { border-top: 1px solid var(--ytcq-popup-control-border); padding-top: 16px; }
-.theme-field-group h2 { margin: 0; font-size: 12px; font-weight: 600; color: var(--ytcq-popup-secondary-text); }
+.theme-field-group[hidden] { display: none; }
 .theme-field { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: center; gap: 10px; }
 .theme-colors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .theme-color { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }

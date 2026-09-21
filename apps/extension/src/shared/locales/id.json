@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Gaya"
     },
-    "themeSection_artwork": {
-      "message": "Gambar"
+    "themeSection_details": {
+      "message": "Detail"
     },
     "themeShapeDepth": {
       "message": "Bentuk dan kedalaman"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Simpan dan gunakan"
     },
+    "themeUse": {
+      "message": "Gunakan tema"
+    },
     "themeUndone": {
       "message": "Dibatalkan: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Chat"
     },
     "themeArea_composer": {
-      "message": "Input"
+      "message": "Bawah"
     },
     "themeBackgroundColor": {
       "message": "Warna latar"
@@ -1021,10 +1024,10 @@
       "message": "Tambahkan penanda pesan"
     },
     "themeSecondary": {
-      "message": "Aksen sekunder"
+      "message": "Warna sekunder"
     },
     "themePaletteHint": {
-      "message": "Tombol dan ikon mengikuti warna aksen; tag dan sorotan memakai aksen sekunder. Panel, menu, dan teks otomatis menyesuaikan mode terang dan gelap."
+      "message": "Tombol dan ikon mengikuti warna aksen; tag dan sorotan memakai warna sekunder. Panel, menu, dan teks otomatis menyesuaikan mode terang dan gelap."
     },
     "theme_theme": {
       "message": "Warna tema"

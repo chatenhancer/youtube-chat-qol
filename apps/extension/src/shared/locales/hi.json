@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "शैली"
     },
-    "themeSection_artwork": {
-      "message": "चित्र"
+    "themeSection_details": {
+      "message": "विवरण"
     },
     "themeShapeDepth": {
       "message": "आकार और गहराई"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "सहेजें और उपयोग करें"
     },
+    "themeUse": {
+      "message": "थीम इस्तेमाल करें"
+    },
     "themeUndone": {
       "message": "पूर्ववत किया गया: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "चैट"
     },
     "themeArea_composer": {
-      "message": "इनपुट"
+      "message": "निचला भाग"
     },
     "themeBackgroundColor": {
       "message": "पृष्ठभूमि का रंग"
@@ -1021,7 +1024,7 @@
       "message": "संदेश चिह्न जोड़ें"
     },
     "themeSecondary": {
-      "message": "दूसरा एक्सेंट रंग"
+      "message": "द्वितीयक रंग"
     },
     "themePaletteHint": {
       "message": "बटन और आइकन मुख्य रंग, जबकि टैग और हाइलाइट द्वितीयक रंग का उपयोग करते हैं। पैनल, मेन्यू और टेक्स्ट लाइट और डार्क मोड के अनुसार अपने आप बदलते हैं।"

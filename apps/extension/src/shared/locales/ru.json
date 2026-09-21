@@ -348,8 +348,8 @@
     "themeSection_style": {
       "message": "Стиль"
     },
-    "themeSection_artwork": {
-      "message": "Изображения"
+    "themeSection_details": {
+      "message": "Детали"
     },
     "themeShapeDepth": {
       "message": "Форма и глубина"
@@ -465,6 +465,9 @@
     "themeSaveApply": {
       "message": "Сохранить и использовать"
     },
+    "themeUse": {
+      "message": "Использовать тему"
+    },
     "themeUndone": {
       "message": "Отменено: {change}."
     },
@@ -511,7 +514,7 @@
       "message": "Чат"
     },
     "themeArea_composer": {
-      "message": "Ввод"
+      "message": "Нижняя часть"
     },
     "themeBackgroundColor": {
       "message": "Цвет фона"
@@ -1021,10 +1024,10 @@
       "message": "Добавить маркер сообщения"
     },
     "themeSecondary": {
-      "message": "Вторичный акцент"
+      "message": "Дополнительный цвет"
     },
     "themePaletteHint": {
-      "message": "Кнопки и значки используют основной акцент, метки и выделения — дополнительный. Панели, меню и текст автоматически адаптируются к светлому и тёмному режиму."
+      "message": "Кнопки и значки используют основной акцент, метки и выделения — дополнительный цвет. Панели, меню и текст автоматически адаптируются к светлому и тёмному режиму."
     },
     "theme_theme": {
       "message": "Цвета темы"
