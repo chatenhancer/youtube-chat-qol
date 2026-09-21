@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { APPLIED_CUSTOM_THEME_KEY, createCustomTheme } from '../shared/custom-themes';
+import aeroPreset from '../assets/themes/aero.json';
 
 const preview = vi.hoisted(() => ({
   applyOptions: vi.fn(),
@@ -21,6 +22,7 @@ const onboardingHtml = readFileSync(resolve(import.meta.dirname, '../onboarding.
 describe('onboarding settings', () => {
   beforeEach(async () => {
     vi.resetModules();
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify(aeroPreset)));
     vi.useFakeTimers();
     vi.stubGlobal('ResizeObserver', class {
       observe = vi.fn();

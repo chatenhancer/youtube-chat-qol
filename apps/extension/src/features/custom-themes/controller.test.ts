@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createChatThemeController } from './controller';
 import * as appearance from './appearance';
 import { APPLIED_CUSTOM_THEME_KEY, CUSTOM_THEMES_KEY, createCustomTheme } from '../../shared/custom-themes';
+import aeroPreset from '../../assets/themes/aero.json';
 
 describe('applied chat themes', () => {
   let controller: ReturnType<typeof createChatThemeController>;
@@ -10,6 +11,7 @@ describe('applied chat themes', () => {
     document.documentElement.removeAttribute('dark');
     document.documentElement.removeAttribute('data-ytcq-chat-skin');
     vi.clearAllMocks();
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify(aeroPreset)));
   });
   afterEach(() => {
     controller?.dispose();

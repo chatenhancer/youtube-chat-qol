@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../shared/options';
 import { CONTENT_INSTANCE_ATTRIBUTE, CONTENT_REATTACHMENT_ATTRIBUTE } from '../shared/content-instance';
 import type { FeatureMutationBatch } from './dispatcher';
+import aeroPreset from '../assets/themes/aero.json';
 
 const lifecycleMocks = vi.hoisted(() => ({
   bootFeatures: vi.fn(),
@@ -41,6 +42,7 @@ describe('content script entrypoint wiring', () => {
     document.body.replaceChildren();
     chrome.storage.sync.clear();
     vi.clearAllMocks();
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify(aeroPreset)));
     lifecycleMocks.shouldIgnoreFeatureAddedNode.mockReset();
     lifecycleMocks.shouldIgnoreFeatureAddedNode.mockReturnValue(false);
     lifecycleMocks.shouldIgnoreFeatureMutation.mockReset();
@@ -446,7 +448,7 @@ describe('content script entrypoint wiring', () => {
 
     expect(getOptions().targetLanguage).toBe('fr');
     expect(getOptions().chatSkin).toBe('custom:aero');
-    expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('custom');
+    await vi.waitFor(() => expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBe('custom'));
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin-theme')).toBe('dark');
     expect(lifecycleMocks.handleFeatureOptionsChanged).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
       chatSkin: 'custom:aero',

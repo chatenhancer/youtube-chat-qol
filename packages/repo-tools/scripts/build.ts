@@ -244,6 +244,7 @@ async function buildTarget(target) {
     syncExtensionLocales(path.join(extensionDir, '_locales')),
     copyStaticDirectory(path.join(extensionRoot, 'src', 'shared', 'locales'), path.join(extensionDir, 'locales')),
     copyStaticDirectory(path.join(extensionAssetsDir, 'fonts'), path.join(extensionDir, 'fonts')),
+    copyStaticDirectory(path.join(extensionAssetsDir, 'themes'), path.join(extensionDir, 'themes')),
     copyStaticDirectory(path.join(extensionAssetsDir, 'games'), path.join(extensionDir, 'games')),
     copyStaticDirectory(path.join(extensionAssetsDir, 'icons'), path.join(extensionDir, 'icons')),
     copyStaticDirectory(path.join(root, 'licenses'), path.join(extensionDir, 'licenses'))

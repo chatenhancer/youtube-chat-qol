@@ -10,19 +10,19 @@ export const THEME_FONTS = {
   mono: { stack: 'Consolas, "Liberation Mono", monospace' },
   gothic: {
     stack: '"Manufacturing Consent", Georgia, serif',
-    face: { family: 'Manufacturing Consent', file: 'manufacturing-consent-regular.ttf', weight: '400', sizeAdjust: 125 }
+    face: { family: 'Manufacturing Consent', file: 'manufacturing-consent-regular.woff2', weight: '400', sizeAdjust: 125 }
   },
   playful: {
     stack: '"Dongle", "Trebuchet MS", sans-serif',
-    face: { family: 'Dongle', file: 'dongle-regular.ttf', weight: '400', sizeAdjust: 180 }
+    face: { family: 'Dongle', file: 'dongle-regular.woff2', weight: '400', sizeAdjust: 180 }
   },
   pixel: {
     stack: '"Pixelify Sans", Consolas, monospace',
-    face: { family: 'Pixelify Sans', file: 'pixelify-sans-variable.ttf', weight: '400 700', sizeAdjust: 120 }
+    face: { family: 'Pixelify Sans', file: 'pixelify-sans-variable.woff2', weight: '400 700', sizeAdjust: 120 }
   },
   elegant: {
     stack: '"Instrument Serif", Georgia, serif',
-    face: { family: 'Instrument Serif', file: 'instrument-serif-regular.ttf', weight: '400', sizeAdjust: 105 }
+    face: { family: 'Instrument Serif', file: 'instrument-serif-regular.woff2', weight: '400', sizeAdjust: 105 }
   }
 } satisfies Record<string, ThemeFontDefinition>;
 

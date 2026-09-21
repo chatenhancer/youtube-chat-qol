@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import aeroPreset from '../assets/themes/aero.json';
 import {
   createOnboardingPreview,
   getPreviewSourceMessage,
@@ -6,6 +7,10 @@ import {
 } from './preview';
 
 describe('onboarding preview', () => {
+  beforeEach(() => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify(aeroPreset)));
+  });
+
   it('chooses a source language unlike the browser and translation target', () => {
     expect(getPreviewSourceMessage('en-US', 'ja').language).toBe('zh-CN');
     expect(getPreviewSourceMessage('zh-CN', 'ja').language).toBe('es');

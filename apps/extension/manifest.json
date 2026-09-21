@@ -75,17 +75,18 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "fonts/manufacturing-consent-regular.ttf",
-        "fonts/dongle-regular.ttf",
-        "fonts/pixelify-sans-variable.ttf",
-        "fonts/instrument-serif-regular.ttf",
+        "fonts/manufacturing-consent-regular.woff2",
+        "fonts/dongle-regular.woff2",
+        "fonts/pixelify-sans-variable.woff2",
+        "fonts/instrument-serif-regular.woff2",
         "games/*/*.mp3",
         "games/*/*.json",
         "games/*/*.otf",
         "games/*/*.png",
         "games/*/*.ttf",
         "games/*/*.webp",
-        "locales/*.json"
+        "locales/*.json",
+        "themes/aero.json"
       ],
       "matches": [
         "https://www.youtube.com/*",

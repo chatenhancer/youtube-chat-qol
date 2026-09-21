@@ -1,7 +1,6 @@
 /** Validated local themes. Presets use exactly the same data and renderer as user themes. */
 import { normalizeChatSkin, type CustomChatSkin } from './chat-skins';
 import { THEME_FONT_OPTIONS, type ThemeFont } from './theme-fonts';
-import aeroPreset from '../assets/themes/aero.json';
 
 export const CUSTOM_THEMES_KEY = 'ytcqCustomThemes:v1';
 export const APPLIED_CUSTOM_THEME_KEY = 'ytcqAppliedCustomTheme:v1';
@@ -139,9 +138,13 @@ export function customThemeSkin(theme: Pick<CustomTheme, 'id'>): CustomChatSkin 
 }
 
 export async function loadCustomThemes(): Promise<CustomTheme[]> {
+  // Keep the artwork in one packaged asset instead of duplicating it in every bundle.
+  const response = await fetch(chrome.runtime.getURL('themes/aero.json'));
+  if (!response.ok) throw new Error('Unable to load the bundled Aero theme');
+  const preset = normalizeCustomTheme(await response.json());
+  if (!preset || !isPreinstalledTheme(preset)) throw new Error('Invalid bundled Aero theme');
   const stored = await chrome.storage.local.get(CUSTOM_THEMES_KEY);
   const themes = normalizeCustomThemes(stored[CUSTOM_THEMES_KEY]);
-  const preset = normalizeCustomTheme(aeroPreset)!;
   const presetIndex = themes.findIndex(isPreinstalledTheme);
   if (JSON.stringify(themes[presetIndex]) !== JSON.stringify(preset)) {
     if (presetIndex < 0) themes.unshift(preset);

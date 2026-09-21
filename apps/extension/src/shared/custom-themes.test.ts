@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import aeroPreset from '../assets/themes/aero.json';
 import { normalizeOptions } from './options';
 import {
   APPLIED_CUSTOM_THEME_KEY, CUSTOM_THEMES_KEY, MAX_THEME_GIF_BYTES, MAX_THEME_IMAGE_LENGTH, applyCustomTheme, createCustomTheme,
@@ -8,6 +9,7 @@ import {
 
 describe('custom themes', () => {
   beforeEach(async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify(aeroPreset)));
     await chrome.storage.local.clear();
     await chrome.storage.sync.clear();
   });
@@ -112,6 +114,8 @@ describe('custom themes', () => {
 
   it('installs Aero locally once, protects it, and saves editable copies under new names', async () => {
     const [aero] = await loadCustomThemes();
+    expect(fetch).toHaveBeenCalledWith('chrome-extension://test/themes/aero.json');
+    expect(aero).toEqual(normalizeCustomTheme(aeroPreset));
     expect(aero.id).toBe('aero');
     expect((await chrome.storage.local.get(CUSTOM_THEMES_KEY))[CUSTOM_THEMES_KEY]).toEqual([aero]);
     expect(await loadCustomThemes()).toEqual([aero]);
@@ -127,6 +131,22 @@ describe('custom themes', () => {
     expect((await loadCustomThemes()).find(theme => theme.id === 'aero')).toEqual(aero);
     expect((await loadCustomThemes()).find(theme => theme.id === copy.id)).toEqual(copy);
     expect(await chrome.storage.sync.get('chatSkin')).toEqual({});
+  });
+
+  it.each([
+    ['missing', () => new Response('', { status: 404 })],
+    ['invalid', () => new Response('{}')]
+  ])('preserves stored themes and selections when the bundled preset is %s', async (_state, response) => {
+    const theme = { ...createCustomTheme(), name: 'Saved theme' };
+    const local = { [CUSTOM_THEMES_KEY]: [theme], [APPLIED_CUSTOM_THEME_KEY]: theme };
+    const sync = { chatSkin: `custom:${theme.id}` };
+    await chrome.storage.local.set(local);
+    await chrome.storage.sync.set(sync);
+    vi.mocked(fetch).mockImplementation(async () => response());
+
+    await expect(loadCustomThemes()).rejects.toThrow('Aero theme');
+    expect(await chrome.storage.local.get(null)).toEqual(local);
+    expect(await chrome.storage.sync.get(null)).toEqual(sync);
   });
 
   it('validates image controls', () => {

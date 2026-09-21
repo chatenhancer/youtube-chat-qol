@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AVATAR_RINGS_STORAGE_KEY } from '../shared/avatar-rings';
 import { BOOKMARKS_STORAGE_KEY, LEGACY_BOOKMARKS_STORAGE_KEY } from '../shared/bookmarks';
+import { CUSTOM_THEMES_KEY, createCustomTheme } from '../shared/custom-themes';
+import aeroPreset from '../assets/themes/aero.json';
 import {
   PLAYGROUND_PROFILE_MESSAGE_TYPE,
   PLAYGROUND_PROFILE_STATS_MESSAGE_TYPE,
@@ -10,6 +12,7 @@ import {
 describe('popup', () => {
   beforeEach(async () => {
     vi.resetModules();
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify(aeroPreset)));
     document.body.innerHTML = `
       <a id="landingLink"></a>
       <a id="sourceCodeLink"></a>
@@ -1280,7 +1283,14 @@ describe('popup', () => {
 
   it('persists control changes and remembers the last enabled translation language', async () => {
     await chrome.storage.sync.set({ targetLanguage: 'ja', lastTranslationTarget: 'ko' });
+    await chrome.storage.local.set({
+      [CUSTOM_THEMES_KEY]: [{ ...createCustomTheme(), id: 'saved-theme', name: 'Saved theme' }]
+    });
     await import('./index');
+    // Wait for the theme library to appear before interacting with its picker.
+    await vi.waitFor(() => expect(
+      document.querySelector('#chatSkin option[value="custom:saved-theme"]')?.textContent
+    ).toBe('Saved theme'));
 
     const language = document.querySelector<HTMLSelectElement>('#targetLanguage')!;
     language.value = '';

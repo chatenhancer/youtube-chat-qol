@@ -260,7 +260,7 @@ export function customThemeFontFace(theme: CustomTheme): string {
   // Keep Inter's line metrics after enlarging the glyphs, so normal line height
   // and baseline alignment do not inflate rows or push controls out of place.
   const metrics = `size-adjust:${sizeAdjust}%;ascent-override:${(96.875 / scale).toFixed(2)}%;descent-override:${(24.121 / scale).toFixed(2)}%;line-gap-override:0%;`;
-  return `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};font-display:swap;${metrics}src:url("${chrome.runtime.getURL(`fonts/${file}`)}") format("truetype")}`;
+  return `@font-face{font-family:"${family}";font-style:normal;font-weight:${weight};font-display:swap;${metrics}src:url("${chrome.runtime.getURL(`fonts/${file}`)}") format("woff2")}`;
 }
 
 function themeFont(font: CustomTheme['font']): string {
