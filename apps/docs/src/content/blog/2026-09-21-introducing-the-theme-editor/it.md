@@ -28,7 +28,7 @@ Con **Tonalità degli sfondi** decidi quanto il colore principale si riflette ne
 
 :::media-left
 
-![Il pannello della posta in arrivo con un tema personalizzato.](./inbox-theme.webp)
+![Il pannello della posta in arrivo con un tema personalizzato.](./inbox-theme.webp){size=large}
 
 La finitura cambia l’aspetto delle superfici:
 

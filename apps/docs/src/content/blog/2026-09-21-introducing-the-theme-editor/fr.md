@@ -28,7 +28,7 @@ Le réglage **Teinte des arrière-plans** détermine la présence de votre coule
 
 :::media-left
 
-![Le panneau de réception avec un thème personnalisé.](./inbox-theme.webp)
+![Le panneau de réception avec un thème personnalisé.](./inbox-theme.webp){size=large}
 
 La finition change l’apparence des surfaces :
 

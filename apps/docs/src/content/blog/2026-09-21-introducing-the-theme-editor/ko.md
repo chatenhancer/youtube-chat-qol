@@ -28,7 +28,7 @@ Aero는 YouTube 채팅에 새로운 분위기를 더했습니다. 새로운 **�
 
 :::media-left
 
-![사용자 지정 테마가 적용된 받은편지함 패널.](./inbox-theme.webp)
+![사용자 지정 테마가 적용된 받은편지함 패널.](./inbox-theme.webp){size=large}
 
 표면 스타일에 따라 인터페이스의 느낌이 달라집니다.
 

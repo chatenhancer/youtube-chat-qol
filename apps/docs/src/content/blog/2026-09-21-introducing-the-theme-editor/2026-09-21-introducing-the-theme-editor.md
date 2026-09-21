@@ -28,7 +28,7 @@ Use **Background tint** to decide how much of your accent comes through in the b
 
 :::media-left
 
-![The Inbox panel with a custom theme applied.](./inbox-theme.webp)
+![The Inbox panel with a custom theme applied.](./inbox-theme.webp){size=large}
 
 The finish changes the feel of the surfaces:
 

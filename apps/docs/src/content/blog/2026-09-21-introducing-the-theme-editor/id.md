@@ -28,7 +28,7 @@ Gunakan **Rona latar belakang** untuk mengatur seberapa kuat warna aksen terliha
 
 :::media-left
 
-![Panel Kotak Masuk dengan tema khusus.](./inbox-theme.webp)
+![Panel Kotak Masuk dengan tema khusus.](./inbox-theme.webp){size=large}
 
 Gaya permukaan mengubah nuansa antarmuka:
 

@@ -28,7 +28,7 @@ Aero は YouTube チャットに新しい雰囲気をもたらしました。新
 
 :::media-left
 
-![カスタムテーマを適用した受信トレイのパネル。](./inbox-theme.webp)
+![カスタムテーマを適用した受信トレイのパネル。](./inbox-theme.webp){size=large}
 
 質感によって、画面の各部分の印象が変わります。
 

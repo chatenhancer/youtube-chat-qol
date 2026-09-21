@@ -28,7 +28,7 @@ Con **Tinte de fondo** decides cuánto se refleja el color de acento en los fond
 
 :::media-left
 
-![El panel de la bandeja de entrada con un tema personalizado.](./inbox-theme.webp)
+![El panel de la bandeja de entrada con un tema personalizado.](./inbox-theme.webp){size=large}
 
 El acabado cambia el aspecto de las superficies:
 

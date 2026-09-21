@@ -3199,6 +3199,14 @@ html[dir="rtl"] .forward-link-icon {
   object-fit: contain;
 }
 
+.blog-media-block .blog-image-large {
+  width: var(--blog-image-width);
+}
+
+.blog-media-block .blog-image-large img {
+  max-height: none;
+}
+
 .blog-image-cropped p {
   aspect-ratio: var(--blog-image-crop-ratio, 1.7778);
   overflow: hidden;

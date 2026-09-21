@@ -28,7 +28,7 @@ Use **Tonalidade dos fundos** para decidir quanto da cor de destaque aparece nos
 
 :::media-left
 
-![O painel da caixa de entrada com um tema personalizado.](./inbox-theme.webp)
+![O painel da caixa de entrada com um tema personalizado.](./inbox-theme.webp){size=large}
 
 O acabamento muda a aparência das superfícies:
 

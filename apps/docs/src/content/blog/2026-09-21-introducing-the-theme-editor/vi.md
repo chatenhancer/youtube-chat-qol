@@ -28,7 +28,7 @@ Dùng **Sắc độ nền** để điều chỉnh mức độ xuất hiện củ
 
 :::media-left
 
-![Bảng Hộp thư đến với chủ đề tùy chỉnh.](./inbox-theme.webp)
+![Bảng Hộp thư đến với chủ đề tùy chỉnh.](./inbox-theme.webp){size=large}
 
 Kiểu bề mặt thay đổi cảm giác của giao diện:
 

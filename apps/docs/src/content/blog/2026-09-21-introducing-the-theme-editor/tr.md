@@ -28,7 +28,7 @@ Her düğme ve simge için ayrı bir renk seçmeniz gerekmez. Bir **vurgu rengi*
 
 :::media-left
 
-![Özel tema uygulanmış Gelen Kutusu paneli.](./inbox-theme.webp)
+![Özel tema uygulanmış Gelen Kutusu paneli.](./inbox-theme.webp){size=large}
 
 Yüzey stili, arayüzün görünümünü değiştirir:
 

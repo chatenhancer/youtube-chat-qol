@@ -28,7 +28,7 @@ Opcja **Zabarwienie tła** określa, jak mocno kolor akcentu wpływa na tła. Ni
 
 :::media-left
 
-![Panel skrzynki odbiorczej z zastosowanym własnym motywem.](./inbox-theme.webp)
+![Panel skrzynki odbiorczej z zastosowanym własnym motywem.](./inbox-theme.webp){size=large}
 
 Wykończenie zmienia wygląd powierzchni:
 

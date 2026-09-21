@@ -28,7 +28,7 @@ Mit **Hintergrundtönung** bestimmst du, wie stark die Akzentfarbe in den Hinter
 
 :::media-left
 
-![Das Posteingangspanel mit einem eigenen Theme.](./inbox-theme.webp)
+![Das Posteingangspanel mit einem eigenen Theme.](./inbox-theme.webp){size=large}
 
 Die Oberfläche verändert den Eindruck der Flächen:
 
