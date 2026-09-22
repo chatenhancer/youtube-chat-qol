@@ -71,10 +71,15 @@
 
 :root[data-ytcq-chat-skin="custom"] :where(
   yt-live-chat-item-list-renderer #item-scroller, yt-live-chat-item-list-renderer #items,
+  yt-live-chat-participant-list-renderer #header,
   .ytcq-lite-scroller, .ytcq-lite-items,
   yt-live-chat-text-message-renderer, .ytcq-lite-message-text
 ) {
   background: transparent !important;
+}
+
+:root[data-ytcq-chat-skin="custom"] yt-live-chat-participant-list-renderer #back-button button {
+  color: var(--ytcq-theme-chat-text) !important;
 }
 
 :root[data-ytcq-chat-skin="custom"] :where(
@@ -178,6 +183,7 @@
 
 /* YouTube's composer is rounder than its menus: 18px versus 12px. */
 :root[data-ytcq-chat-skin="custom"] yt-live-chat-message-input-renderer #input-container {
+  --yt-live-chat-text-input-field-placeholder-color: var(--ytcq-theme-input-muted);
   background: var(--ytcq-theme-composer-input) !important;
   border: 0 !important;
   border-radius: calc(var(--ytcq-theme-radius) * 1.5) !important;
@@ -185,6 +191,10 @@
 
 :root[data-ytcq-chat-skin="custom"] yt-live-chat-message-input-renderer :where(#input, #input #contenteditable-root) {
   color: var(--ytcq-theme-panels-text) !important;
+  font-family: var(--ytcq-theme-font) !important;
+}
+
+:root[data-ytcq-chat-skin="custom"] yt-live-chat-message-input-renderer #input #label {
   font-family: var(--ytcq-theme-font) !important;
 }
 

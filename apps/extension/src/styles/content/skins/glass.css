@@ -143,10 +143,6 @@
     0 calc(2px * var(--ytcq-theme-shadow-scale)) calc(5px * var(--ytcq-theme-shadow-scale)) hsl(calc(201.50000 + var(--ytcq-theme-header-tint-hue)) calc(71.42857% * var(--ytcq-theme-header-tint-saturation)) calc(32.94118% + var(--ytcq-theme-header-tint-lightness)) / 0.34) !important;
 }
 
-:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-live-chat-participant-list-renderer #header {
-  background: transparent !important;
-}
-
 :root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-live-chat-header-renderer :where(
   #chat-title,
   #view-selector,
@@ -643,42 +639,9 @@
 :root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-live-chat-message-input-renderer :where(
   #author-name,
   #author-name *,
-  label,
   yt-formatted-string
 ) {
   color: var(--ytcq-glass-muted-text) !important;
-}
-
-:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-live-chat-message-input-renderer yt-live-chat-text-input-field-renderer#input {
-  box-sizing: border-box !important;
-  min-height: 26px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  color: var(--ytcq-theme-panels-text) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 1px 0 !important;
-}
-
-:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-live-chat-message-input-renderer yt-live-chat-text-input-field-renderer#input #label {
-  /* The absolute label needs the same 1px inset as the field's content. */
-  top: 1px !important;
-  color: var(--ytcq-glass-muted-text) !important;
-  font-family: var(--ytcq-theme-font) !important;
-  line-height: 20px !important;
-  padding: 2px 0 !important;
-}
-
-:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-live-chat-message-input-renderer yt-live-chat-text-input-field-renderer#input #input[contenteditable] {
-  min-height: 20px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  color: var(--ytcq-glass-text) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  font-family: var(--ytcq-theme-font) !important;
-  line-height: 20px !important;
-  padding: 2px 0 !important;
 }
 
 :root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] :where(

@@ -3,8 +3,10 @@ import type { BrowserScenario } from './types';
 import { getExtensionId, getExtensionServiceWorker } from '../support/extension';
 import { clearChatComposer, setChatComposerText } from '../support/composer';
 import { expectThemeContrast } from '../support/theme-contrast';
+import { installNativeThemeSurfaces } from '../support/theme-watch-fixture';
 
 export const customThemeImagesScenario: BrowserScenario = async ({ chat, context }) => {
+  await installNativeThemeSurfaces(chat);
   const worker = await getExtensionServiceWorker(context);
   const editor = await context.newPage();
   try {
@@ -50,8 +52,29 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
             }
             await expectThemeContrast(frame.locator('yt-live-chat-text-message-renderer #author-name').first(), background);
           }
-          // The preview has YouTube's separate input surface; the minimal chat fixture does not.
-          await expectThemeContrast(preview.locator('#previewDraft'), '--ytcq-theme-composer-input');
+          for (const input of [preview.locator('#previewDraft'), chat.locator('#input[contenteditable]')]) {
+            await expectThemeContrast(input, '--ytcq-theme-composer-input');
+          }
+          const participants = chat.locator('yt-live-chat-participant-list-renderer');
+          await expect(participants.locator('#header')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+          await expectThemeContrast(participants.locator('#header'), background);
+          await expectThemeContrast(participants.getByRole('button', { name: 'Back' }), background);
+          await clearChatComposer(chat);
+          await expectThemeContrast(chat.locator('yt-live-chat-text-input-field-renderer #label'), '--ytcq-theme-composer-input');
+          for (const draft of ['', 'a', 'Two lines\nof draft']) {
+            await chat.locator('#input[contenteditable]').fill(draft);
+            for (const selector of ['#input[contenteditable]', '#emoji-picker-button', '.ytcq-composer-translate-button']) {
+              const offset = await chat.locator(selector).evaluate(element => {
+                const input = element.closest('#input-container')!.getBoundingClientRect();
+                const rect = element.getBoundingClientRect();
+                // Native YouTube centers the text and bottom-aligns the icon group.
+                return Math.abs(element.matches('[contenteditable]')
+                  ? rect.y + rect.height / 2 - input.y - input.height / 2
+                  : rect.bottom - input.bottom);
+              });
+              expect(offset, `${finish}/${mode}: ${selector} keeps YouTube's alignment`).toBeLessThan(1);
+            }
+          }
           await expectThemeContrast(chat.locator('yt-live-chat-message-input-renderer #author-name'), background);
           await test.info().attach(`image-contrast-${finish}-${mode}`, { body: await preview.locator('#chatPreview').screenshot(), contentType: 'image/png' });
         }

@@ -1249,14 +1249,16 @@ ytd-menu-popup-renderer.preview-settings-menu {
 }
 
 .preview-composer-field yt-live-chat-text-input-field-renderer {
-  display: block;
+  display: flex;
+  align-items: center;
   min-width: 0;
   flex: 1 1 auto;
 }
 
 .preview-placeholder {
   font-family: "Inter", Arial, sans-serif;
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 18px;
 }
 
 #previewDraft {
@@ -1276,6 +1278,11 @@ ytd-menu-popup-renderer.preview-settings-menu {
 
 .chat-preview[data-chat-skin="custom"] #previewDraft {
   color: var(--ytcq-theme-panels-text);
+}
+
+.chat-preview[data-chat-skin="custom"] #previewDraft::placeholder {
+  color: var(--ytcq-theme-input-muted);
+  opacity: 1;
 }
 
 .preview-composer-actions {
@@ -1389,11 +1396,6 @@ ytd-menu-popup-renderer.preview-settings-menu {
   box-shadow:
     0 18px 38px rgba(0, 87, 135, 0.24),
     inset 0 0 0 1px rgba(255, 255, 255, 0.72);
-}
-
-:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] .preview-composer-field yt-live-chat-text-input-field-renderer {
-  display: flex;
-  align-items: center;
 }
 
 :root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] .preview-native-header-icon,

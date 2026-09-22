@@ -51,6 +51,21 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
           await preview.locator('#previewMenuButton').click();
           await expect(preview.locator('yt-live-chat-header-renderer')).toHaveCSS('border-bottom', `1px solid ${mode === 'dark' ? 'rgb(68, 68, 68)' : 'rgb(214, 214, 214)'}`);
           await expect(preview.locator('yt-live-chat-header-renderer')).toHaveCSS('background-image', finish === 'flat' ? /^none(, none)*$/ : /linear-gradient/);
+          for (const font of ['default', 'classic', 'mono', 'gothic', 'playful', 'pixel', 'elegant']) {
+            await field('font').selectOption(font);
+            for (const text of ['', 'Draft']) {
+              await preview.locator('#previewDraft').fill(text);
+              for (const selector of ['#previewDraft', '#previewComposerTranslateIcon', '.preview-emoji']) {
+                await expect.poll(() => preview.locator(selector).evaluate(element => {
+                  const input = element.closest('#input-container')!.getBoundingClientRect();
+                  const rect = element.getBoundingClientRect();
+                  return Math.abs(rect.y + rect.height / 2 - input.y - input.height / 2);
+                }), { message: `${finish}/${font}: ${selector} is vertically centered` }).toBeLessThan(1);
+              }
+            }
+          }
+          await field('font').selectOption('default');
+          await preview.locator('#previewDraft').fill('');
         }
         await editor.getByRole('tab', { name: 'Colors', exact: true }).click();
         await field('surfaceTint').fill('60');
