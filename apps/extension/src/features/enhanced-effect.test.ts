@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { handleFeatureVisibilityChanged } from '../content/dispatcher';
 import {
   cleanupStaleEnhancedEffect,
   hideEnhancedEffect,
@@ -7,10 +8,20 @@ import {
 
 describe('enhanced startup effect', () => {
   let canvasContext: CanvasRenderingContext2D;
+  let header: HTMLElement;
+  let readyState: Document['readyState'];
+  let visibilityState: Document['visibilityState'];
 
   beforeEach(() => {
     document.body.replaceChildren();
     vi.useFakeTimers();
+    readyState = 'complete';
+    visibilityState = 'visible';
+    vi.spyOn(document, 'readyState', 'get').mockImplementation(() => readyState);
+    vi.spyOn(document, 'visibilityState', 'get').mockImplementation(() => visibilityState);
+    header = document.createElement('yt-live-chat-header-renderer');
+    document.body.append(header);
+    vi.spyOn(header, 'getBoundingClientRect').mockReturnValue(rect({ width: 320, height: 48 }));
     canvasContext = createCanvasContextMock();
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext);
     vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect').mockReturnValue(rect({
@@ -66,10 +77,10 @@ describe('enhanced startup effect', () => {
     expect(canvas.width).toBe(224);
     expect(canvas.height).toBe(84);
 
-    await vi.advanceTimersByTimeAsync(1_333);
+    await vi.advanceTimersByTimeAsync(1_344);
     expect(effect.classList.contains('ytcq-enhanced-effect-active')).toBe(true);
 
-    await vi.advanceTimersByTimeAsync(1);
+    await vi.advanceTimersByTimeAsync(16);
     expect(effect.classList.contains('ytcq-enhanced-effect-active')).toBe(false);
     expect(canvasContext.clearRect).toHaveBeenCalledWith(0, 0, canvas.width, canvas.height);
   });
@@ -86,7 +97,79 @@ describe('enhanced startup effect', () => {
     expect(canvasContext.clearRect).toHaveBeenCalled();
   });
 
-  it('reuses an existing effect surface and restarts pending activation timers', async () => {
+  it('keeps the full animation when the first browser frame arrives late', async () => {
+    let firstFrame: FrameRequestCallback | undefined;
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementationOnce(callback => {
+      firstFrame = callback;
+      return 1;
+    });
+    showEnhancedEffect({ animate: true });
+
+    await vi.advanceTimersByTimeAsync(2_000);
+    firstFrame!(performance.now());
+    await vi.advanceTimersByTimeAsync(224);
+
+    expect(document.querySelector('.ytcq-enhanced-effect-active')).not.toBeNull();
+    expect(canvasContext.globalAlpha).toBe(1);
+  });
+
+  it('waits for the document to load and the chat header to become visible', async () => {
+    readyState = 'loading';
+    vi.mocked(header.getBoundingClientRect).mockReturnValue(rect({ width: 0, height: 0 }));
+    showEnhancedEffect({ animate: true });
+
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(canvasContext.stroke).not.toHaveBeenCalled();
+    expect(document.querySelector('.ytcq-enhanced-effect-active')).toBeNull();
+
+    readyState = 'complete';
+    await vi.advanceTimersByTimeAsync(32);
+    expect(canvasContext.stroke).not.toHaveBeenCalled();
+
+    vi.mocked(header.getBoundingClientRect).mockReturnValue(rect({ width: 320, height: 48 }));
+    await vi.advanceTimersByTimeAsync(240);
+    expect(document.querySelector('.ytcq-enhanced-effect-active')).not.toBeNull();
+    expect(canvasContext.globalAlpha).toBe(1);
+  });
+
+  it('waits for a background chat to become visible before animating', async () => {
+    visibilityState = 'hidden';
+    showEnhancedEffect({ animate: true });
+
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(canvasContext.stroke).not.toHaveBeenCalled();
+    expect(document.querySelector('.ytcq-enhanced-effect-active')).toBeNull();
+
+    visibilityState = 'visible';
+    await vi.advanceTimersByTimeAsync(240);
+    expect(document.querySelector('.ytcq-enhanced-effect-active')).not.toBeNull();
+    expect(canvasContext.globalAlpha).toBe(1);
+  });
+
+  it('restarts an unfinished animation after returning to the tab, but never replays a completed one', async () => {
+    showEnhancedEffect({ animate: true });
+    await vi.advanceTimersByTimeAsync(240);
+    visibilityState = 'hidden';
+    handleFeatureVisibilityChanged(visibilityState);
+    expect(document.querySelector('.ytcq-enhanced-effect-active')).toBeNull();
+
+    await vi.advanceTimersByTimeAsync(2_000);
+    visibilityState = 'visible';
+    handleFeatureVisibilityChanged(visibilityState);
+    await vi.advanceTimersByTimeAsync(240);
+    expect(document.querySelector('.ytcq-enhanced-effect-active')).not.toBeNull();
+    expect(canvasContext.globalAlpha).toBe(1);
+
+    await vi.advanceTimersByTimeAsync(1_200);
+    visibilityState = 'hidden';
+    handleFeatureVisibilityChanged(visibilityState);
+    visibilityState = 'visible';
+    handleFeatureVisibilityChanged(visibilityState);
+    await vi.advanceTimersByTimeAsync(240);
+    expect(document.querySelector('.ytcq-enhanced-effect-active')).toBeNull();
+  });
+
+  it('reuses an existing effect surface', async () => {
     showEnhancedEffect({ animate: false });
     const firstEffect = document.querySelector('.ytcq-enhanced-effect');
 

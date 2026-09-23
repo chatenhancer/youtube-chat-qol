@@ -22,6 +22,7 @@ import {
 } from '../../scenarios/safe-send';
 import { popupSettingsBehaviorScenario } from '../../scenarios/settings';
 import { tabAlertScenario } from '../../scenarios/tab-alert';
+import { startupEffectWaitsForChatScenario } from '../../scenarios/startup-effect';
 import {
   pictureInPictureLivePlaybackScenario,
   pictureInPictureLiveScenario,
@@ -35,6 +36,12 @@ const interceptedSendReason =
   'Requires a locally intercepted YouTube send response without posting a real message.';
 
 export const targetSpecificScenarios: readonly YouTubeScenario[] = [
+  {
+    title: 'startup effect waits for the chat frame to become visible',
+    run: startupEffectWaitsForChatScenario,
+    on: [target.mockLiveLoggedIn],
+    reason: 'Keeps a real iframe hidden past the startup duration before showing native and Lite chat.'
+  },
   {
     title: 'enabling the extension attaches to an existing stream without reloading playback or drafts',
     run: attachEnabledExtensionScenario,

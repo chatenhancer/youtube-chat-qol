@@ -1,7 +1,7 @@
 /**
  * Chat-enhanced visual signal.
  *
- * Shows a short edge shimmer when the extension attaches, then leaves a quiet
+ * Shows a short edge shimmer once the loaded chat is visible, then leaves a quiet
  * ambient glow so the chat feels enhanced without competing with messages.
  */
 import { registerFeature } from '../content/dispatcher';
@@ -9,16 +9,16 @@ import { jsx, el } from '../shared/jsx-dom';
 import { drawEdgeShimmerFrame, EDGE_SHIMMER_DURATION_MS } from '../shared/edge-shimmer';
 import { getOptions } from '../shared/state';
 import type { Options } from '../shared/options';
+import { CHAT_HEADER_SELECTOR } from '../youtube/selectors';
 
 const EFFECT_CLASS = 'ytcq-enhanced-effect';
 const ACTIVE_CLASS = 'ytcq-enhanced-effect-active';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
-let activationTimer = 0;
 let animationFrame = 0;
 let effect: HTMLDivElement | null = null;
 let canvas: HTMLCanvasElement | null = null;
-let animationStart = 0;
+let animationStart: number | null = null;
 
 interface EnhancedEffectOptions {
   animate?: boolean;
@@ -28,7 +28,8 @@ registerFeature({
   page: {
     boot: showConfiguredEnhancedEffect,
     cleanup: cleanupStaleEnhancedEffect,
-    optionsChanged: handleEnhancedEffectOptionsChanged
+    optionsChanged: handleEnhancedEffectOptionsChanged,
+    visibilityChanged: handleEnhancedEffectVisibilityChanged
   }
 });
 
@@ -41,6 +42,13 @@ function handleEnhancedEffectOptionsChanged(previousOptions: Options, nextOption
   showEnhancedEffect({ animate: nextOptions.startupEffect });
 }
 
+function handleEnhancedEffectVisibilityChanged(visibilityState: Document['visibilityState']): void {
+  if (visibilityState !== 'hidden' || !animationFrame) return;
+  animationStart = null;
+  effect?.classList.remove(ACTIVE_CLASS);
+  clearCanvas();
+}
+
 export function showEnhancedEffect({ animate = true }: EnhancedEffectOptions = {}): void {
   const host = getEffectHost();
   effect = getOrCreateEffect();
@@ -51,38 +59,19 @@ export function showEnhancedEffect({ animate = true }: EnhancedEffectOptions = {
   }
 
   effect.classList.remove(ACTIVE_CLASS);
-  void effect.getBoundingClientRect();
-  effect.classList.add(ACTIVE_CLASS);
-
-  if (activationTimer) {
-    window.clearTimeout(activationTimer);
-    activationTimer = 0;
-  }
+  animationStart = null;
+  clearCanvas();
   if (animationFrame) {
     window.cancelAnimationFrame(animationFrame);
     animationFrame = 0;
   }
 
   if (animate && !window.matchMedia(REDUCED_MOTION_QUERY).matches) {
-    animationStart = performance.now();
     animationFrame = window.requestAnimationFrame(drawEnhancedFrame);
-  } else {
-    effect.classList.remove(ACTIVE_CLASS);
-    clearCanvas();
   }
-
-  activationTimer = window.setTimeout(() => {
-    activationTimer = 0;
-    effect?.classList.remove(ACTIVE_CLASS);
-    clearCanvas();
-  }, EDGE_SHIMMER_DURATION_MS);
 }
 
 export function hideEnhancedEffect(): void {
-  if (activationTimer) {
-    window.clearTimeout(activationTimer);
-    activationTimer = 0;
-  }
   if (animationFrame) {
     window.cancelAnimationFrame(animationFrame);
     animationFrame = 0;
@@ -91,6 +80,7 @@ export function hideEnhancedEffect(): void {
   effect?.remove();
   effect = null;
   canvas = null;
+  animationStart = null;
 }
 
 export function cleanupStaleEnhancedEffect(): void {
@@ -116,7 +106,19 @@ function getEffectHost(): HTMLElement {
 }
 
 function drawEnhancedFrame(now: number): void {
+  animationFrame = 0;
   if (!canvas || !effect?.isConnected) return;
+
+  if (animationStart === null) {
+    // Loading or a throttled iframe must not consume the short animation.
+    // Start its clock only when the browser can paint the loaded chat.
+    if (!isChatReadyToAnimate()) {
+      animationFrame = window.requestAnimationFrame(drawEnhancedFrame);
+      return;
+    }
+    animationStart = now;
+    effect.classList.add(ACTIVE_CLASS);
+  }
 
   const progress = Math.min((now - animationStart) / EDGE_SHIMMER_DURATION_MS, 1);
   drawEdgeShimmerFrame(canvas, progress);
@@ -126,7 +128,18 @@ function drawEnhancedFrame(now: number): void {
     return;
   }
 
-  animationFrame = 0;
+  effect.classList.remove(ACTIVE_CLASS);
+  clearCanvas();
+}
+
+function isChatReadyToAnimate(): boolean {
+  if (document.readyState !== 'complete' || document.visibilityState !== 'visible') return false;
+  const header = document.querySelector<HTMLElement>(CHAT_HEADER_SELECTOR);
+  if (!header) return false;
+  const rect = header.getBoundingClientRect();
+  return (
+    rect.width > 0 && rect.height > 0 && window.getComputedStyle(header).visibility !== 'hidden'
+  );
 }
 
 function clearCanvas(): void {
