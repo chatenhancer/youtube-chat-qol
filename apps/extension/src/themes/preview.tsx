@@ -1,6 +1,6 @@
 import { jsx, el } from '../shared/jsx-dom';
 import { createThemeStyleCache, customThemeFontFace } from '../features/custom-themes/styles';
-import { luminance, themeAppearance } from '../features/custom-themes/appearance';
+import { drawEdgeShimmerFrame, EDGE_SHIMMER_DURATION_MS } from '../shared/edge-shimmer';
 import type { ChatSkinTheme } from '../shared/chat-skins';
 import type { CustomTheme, ThemeArea } from '../shared/custom-themes';
 
@@ -13,6 +13,7 @@ export function createThemePreview(frame: HTMLIFrameElement): {
   let draft: CustomTheme | null = null;
   let appearance: ChatSkinTheme = 'light';
   let area: ThemeArea = 'header';
+  let activeHighlight: HTMLSpanElement | null = null;
   const themeStyles = createThemeStyleCache(render);
   function render(): void {
     const doc = frame.contentDocument;
@@ -36,8 +37,12 @@ export function createThemePreview(frame: HTMLIFrameElement): {
   function showArea(): void {
     const doc = frame.contentDocument;
     if (!doc || !draft) return;
+    activeHighlight?.remove();
+    activeHighlight = null;
     doc.querySelector<HTMLButtonElement>('.preview-inbox-card .ytcq-profile-card-close')?.click();
     doc.querySelector<HTMLButtonElement>('.preview-profile-card .ytcq-profile-card-close')?.click();
+    const win = doc.defaultView;
+    if (!win || win.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const selector = {
       header: 'yt-live-chat-header-renderer',
       chat: 'yt-live-chat-item-list-renderer',
@@ -45,29 +50,29 @@ export function createThemePreview(frame: HTMLIFrameElement): {
     }[area];
     const target = doc.querySelector<HTMLElement>(selector);
     if (!target) return;
-    const previous = doc.querySelector('.theme-area-highlight');
-    previous?.getAnimations().forEach((animation) => animation.cancel());
-    previous?.remove();
-    const highlight = el<HTMLSpanElement>(<span class="theme-area-highlight" aria-hidden="true" />);
-    // White would disappear against a pale surface, so choose the contrasting wash.
-    highlight.style.backgroundColor =
-      luminance(themeAppearance(draft, appearance).surfaces[area].color) > 0.45
-        ? 'rgb(0 0 0 / 0.16)'
-        : 'rgb(255 255 255 / 0.12)';
-    target.append(highlight);
-    // One gentle pulse; reduced motion keeps a steady wash before fading.
-    const reduced = frame.contentWindow?.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const animation = highlight.animate(
-      [
-        { opacity: reduced ? 1 : 0 },
-        { opacity: 1, offset: 0.3 },
-        { opacity: 1, offset: reduced ? 0.9 : 0.45 },
-        { opacity: 0 }
-      ],
-      { duration: reduced ? 1000 : 900, easing: 'ease-in-out' }
+    const highlight = el<HTMLSpanElement>(
+      <span class="theme-area-highlight" aria-hidden="true">
+        <canvas />
+      </span>
     );
-    animation.id = 'theme-area-highlight';
-    animation.onfinish = animation.oncancel = () => highlight.remove();
+    target.append(highlight);
+    activeHighlight = highlight;
+    const canvas = highlight.querySelector('canvas')!;
+    const gradientHeight = doc.querySelector('.preview-chat-feed')?.getBoundingClientRect().height;
+    const startedAt = win.performance.now();
+    const requestFrame = win.requestAnimationFrame.bind(win);
+    function draw(now: number): void {
+      if (activeHighlight !== highlight || !highlight.isConnected) return;
+      const progress = Math.min((now - startedAt) / EDGE_SHIMMER_DURATION_MS, 1);
+      drawEdgeShimmerFrame(canvas, progress, gradientHeight);
+      if (progress < 1) {
+        requestFrame(draw);
+      } else {
+        highlight.remove();
+        activeHighlight = null;
+      }
+    }
+    requestFrame(draw);
   }
   frame.addEventListener('load', () => {
     render();

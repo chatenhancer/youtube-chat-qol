@@ -12,6 +12,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
   const worker = await getExtensionServiceWorker(context);
   const editor = await context.newPage();
   try {
+    await editor.clock.install();
     await editor.setViewportSize({ width: 1280, height: 960 });
     await editor.goto(`chrome-extension://${extensionId}/themes.html`);
     const preview = editor.frameLocator('#themePreview');
@@ -229,8 +230,10 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await editor.locator('[data-theme-mode="light"]').click();
     });
 
-    await test.step('Area selection washes the full surface with contrast in either appearance', async () => {
+    await test.step('Area selection plays the startup edge shimmer around the chosen surface', async () => {
+      await editor.clock.pauseAt(await editor.evaluate(() => Date.now() + 1000));
       for (const mode of ['light', 'dark']) {
+        const sweepPositions: number[][] = [];
         await editor.locator(`[data-theme-mode="${mode}"]`).click();
         await expect(preview.locator('.preview-chat-feed')).toHaveCSS('background-color', mode === 'light' ? 'rgb(255, 255, 255)' : 'rgb(15, 15, 15)');
         for (const [area, selector] of [
@@ -244,11 +247,39 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
           await expect(surface).toBeVisible();
           await expect(preview.locator('.theme-area-highlight')).toHaveCount(1);
           await expect(highlight).toHaveCSS('pointer-events', 'none');
-          await expect(highlight).toHaveCSS('background-color', mode === 'light' ? 'rgba(0, 0, 0, 0.16)' : 'rgba(255, 255, 255, 0.12)');
+          await expect(highlight).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+          const canvas = highlight.locator('canvas');
+          await expect(canvas).toHaveCSS('filter', 'blur(6px) saturate(1.3) brightness(1.08)');
+          const positions: number[] = [];
+          for (const [edge, elapsed] of [['bottom', 224], ['top', 384]] as const) {
+            await editor.clock.runFor(elapsed);
+            const pixels = await canvas.evaluate((element, edge) => {
+              const canvas = element as HTMLCanvasElement;
+              const context = canvas.getContext('2d')!;
+              const y = edge === 'top' ? 2 : canvas.height - 3;
+              const line = context.getImageData(0, y, canvas.width, 1).data;
+              let brightest = 0;
+              let peak = 0;
+              for (let x = 0; x < canvas.width; x++) {
+                const brightness = line[x * 4] * line[x * 4 + 3];
+                if (brightness > brightest) {
+                  brightest = brightness;
+                  peak = x;
+                }
+              }
+              return {
+                peak: peak / canvas.width,
+                brightest,
+                centerAlpha: context.getImageData(Math.floor(canvas.width / 2), Math.floor(canvas.height / 2), 1, 1).data[3]
+              };
+            }, edge);
+            expect(pixels.brightest).toBeGreaterThan(0);
+            expect(pixels.centerAlpha).toBe(0);
+            positions.push(pixels.peak);
+            await test.info().attach(`theme-area-${mode}-${area}-${edge}`, { body: await surface.screenshot(), contentType: 'image/png' });
+          }
+          sweepPositions.push(positions);
           const coverage = await highlight.evaluate(element => {
-            const animation = element.getAnimations().find(animation => animation.id === 'theme-area-highlight')!;
-            animation.pause();
-            animation.currentTime = 360;
             const rect = element.getBoundingClientRect();
             const parent = element.parentElement!.getBoundingClientRect();
             return { width: rect.width / parent.width, height: rect.height / parent.height };
@@ -261,19 +292,21 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
             element.getAnimations({ subtree: true }).some(animation => animation.playState === 'running')
           )).toBe(false);
           await test.info().attach(`theme-area-${mode}-${area}`, { body: await editor.screenshot(), contentType: 'image/png' });
-          // Leave the pulse paused: selecting the next area must replace it immediately.
+        }
+        for (const positions of sweepPositions.slice(1)) {
+          positions.forEach((position, index) => {
+            expect(Math.abs(position - sweepPositions[0][index])).toBeLessThan(0.06);
+          });
         }
       }
-      await preview.locator('.theme-area-highlight').evaluate(element => element.getAnimations()[0].finish());
+      await editor.clock.runFor(800);
       await expect(preview.locator('.theme-area-highlight')).toHaveCount(0);
       await editor.emulateMedia({ reducedMotion: 'reduce' });
       await editor.locator('[data-theme-area="header"]').click();
-      const highlight = preview.locator('.theme-area-highlight');
-      expect(await highlight.evaluate(element => (element.getAnimations()[0].effect as KeyframeEffect).getKeyframes()[0].opacity)).toBe('1');
-      await highlight.evaluate(element => element.getAnimations()[0].finish());
-      await expect(highlight).toHaveCount(0);
+      await expect(preview.locator('.theme-area-highlight')).toHaveCount(0);
       await editor.emulateMedia({ reducedMotion: 'no-preference' });
       await editor.locator('[data-theme-mode="light"]').click();
+      await editor.clock.resume();
     });
 
     await test.step('Aero is a protected local preset that can only be saved as a named copy', async () => {
