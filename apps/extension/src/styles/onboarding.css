@@ -988,13 +988,6 @@ ytd-menu-popup-renderer.preview-settings-menu {
 }
 :root[data-ytcq-message-density="compact"] .preview-skeleton-row::after { margin-top: 9px; }
 
-/* Lite's compact rows keep a 24px content box plus 2px padding per side.
-   Native rows use a 24px border box. Match the renderer selected by the user. */
-.chat-preview[data-lite-mode-enabled="true"] .preview-message { overflow: visible; contain: none; font-size: 14px; }
-.chat-preview[data-lite-mode-enabled="true"] .preview-message > #content { padding-top: 0 !important; }
-:root[data-ytcq-message-density="compact"] .chat-preview[data-lite-mode-enabled="true"] .preview-message { min-height: 28px !important; }
-:root[data-ytcq-message-density="compact"] .chat-preview[data-lite-mode-enabled="true"] .preview-skeleton-row { height: 28px; }
-
 .preview-avatar {
   display: inline-flex;
   align-items: center;

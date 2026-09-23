@@ -7,10 +7,6 @@ export const onboardingTooltipScenario: ExtensionScenario = async ({ context }) 
   await withOnboardingPage(context, async (onboarding) => {
     await expect(onboarding.locator('#previewMenuButton')).toHaveCSS('cursor', 'pointer');
     await onboarding.locator('#previewMenuButton').hover();
-    await expect(onboarding.locator('#chatPreview')).toHaveAttribute(
-      'data-lite-mode-enabled',
-      'false'
-    );
     await expect(onboarding.locator('#previewChatMenuTooltip')).toBeVisible();
     await expect(onboarding.locator('#previewChatMenuTooltip')).not.toBeEmpty();
     await expect

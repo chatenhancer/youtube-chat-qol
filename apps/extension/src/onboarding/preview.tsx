@@ -30,7 +30,6 @@ interface PreviewElements {
 
 interface PreviewState {
   chatSkin: ChatSkin;
-  liteModeEnabled: boolean;
   playgroundEnabled: boolean;
   source: PreviewSourceMessage;
   status: 'idle' | 'loading' | 'translated' | 'error';
@@ -42,13 +41,11 @@ interface PreviewState {
 export interface OnboardingPreview {
   applyOptions(options: {
     chatSkin: ChatSkin;
-    liteModeEnabled: boolean;
     playgroundEnabled: boolean;
     targetLanguage: string;
     translationDisplay: TranslationDisplay;
   }): void;
   setChatSkin(chatSkin: ChatSkin): void;
-  setLiteModeEnabled(enabled: boolean): void;
   setPlaygroundEnabled(enabled: boolean): void;
   setTargetLanguage(targetLanguage: string): void;
   setTranslationDisplay(display: TranslationDisplay): void;
@@ -81,7 +78,6 @@ export function createOnboardingPreview(
   let translationRequestToken = 0;
   const state: PreviewState = {
     chatSkin: 'system',
-    liteModeEnabled: false,
     playgroundEnabled: false,
     source: getPreviewSourceMessage(uiLocale, ''),
     status: 'idle',
@@ -108,7 +104,6 @@ export function createOnboardingPreview(
     if (!customTheme) themeStyles.clear();
     if (themeStyle.textContent !== css) themeStyle.textContent = css;
     root.dataset.chatTheme = chatSkinTheme;
-    root.dataset.liteModeEnabled = String(state.liteModeEnabled);
     root.dataset.playgroundEnabled = String(state.playgroundEnabled);
     root.dataset.translationState = state.status;
     applyChatSkinTheme(root, skin, chatSkinTheme);
@@ -216,17 +211,12 @@ export function createOnboardingPreview(
   return {
     applyOptions(options): void {
       state.chatSkin = options.chatSkin;
-      state.liteModeEnabled = options.liteModeEnabled;
       state.playgroundEnabled = options.playgroundEnabled;
       state.translationDisplay = options.translationDisplay;
       setTargetLanguage(options.targetLanguage);
     },
     setChatSkin(chatSkin): void {
       state.chatSkin = chatSkin;
-      render();
-    },
-    setLiteModeEnabled(enabled): void {
-      state.liteModeEnabled = enabled;
       render();
     },
     setPlaygroundEnabled(enabled): void {

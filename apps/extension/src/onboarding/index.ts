@@ -60,7 +60,6 @@ export function initOnboarding(): void {
     setMessageDensity(document.documentElement, stored.messageDensity);
     if (themePreview) {
       controls.liteModeEnabled.checked = stored.liteModeEnabled === true;
-      controls.chatPreview.dataset.liteModeEnabled = String(controls.liteModeEnabled.checked);
     }
   });
   chrome.storage.onChanged.addListener((changes, area) => {
@@ -68,10 +67,9 @@ export function initOnboarding(): void {
     if (changes.messageDensity) setMessageDensity(document.documentElement, changes.messageDensity.newValue);
     if (themePreview && changes.liteModeEnabled) {
       controls.liteModeEnabled.checked = changes.liteModeEnabled.newValue === true;
-      controls.chatPreview.dataset.liteModeEnabled = String(controls.liteModeEnabled.checked);
     }
   });
-  // Only feed layout follows saved settings in the editor. Theme drafts and
+  // Feed density follows saved settings in the editor. Theme drafts and
   // preview interactions stay in this frame, without translation requests.
   if (themePreview) {
     document.documentElement.setAttribute('data-ytcq-theme-preview', '');
@@ -189,7 +187,6 @@ export function initOnboarding(): void {
       );
     }
     chrome.storage.sync.set({ liteModeEnabled });
-    preview.setLiteModeEnabled(liteModeEnabled);
   });
 }
 

@@ -17,7 +17,7 @@ describe('onboarding preview', () => {
     expect(getPreviewSourceMessage('es-ES', 'zh-TW').language).toBe('ja');
   });
 
-  it('updates translation display, theme, Playground, and Lite mode live', async () => {
+  it('updates translation display, theme, and Playground live', async () => {
     document.body.innerHTML = `
       <div id="preview">
         <span id="previewFeaturedMessage"></span>
@@ -37,7 +37,6 @@ describe('onboarding preview', () => {
 
     preview.applyOptions({
       chatSkin: 'system',
-      liteModeEnabled: false,
       playgroundEnabled: false,
       targetLanguage: 'ja',
       translationDisplay: 'replace'
@@ -79,7 +78,6 @@ describe('onboarding preview', () => {
 
     preview.setChatSkin('custom:aero');
     preview.setPlaygroundEnabled(true);
-    preview.setLiteModeEnabled(true);
 
     await vi.waitFor(() => expect(root.dataset.chatSkin).toBe('custom'));
     expect(root.dataset.chatTheme).toBe('light');
@@ -90,7 +88,6 @@ describe('onboarding preview', () => {
         .querySelector('#previewGamesIcon')
         ?.classList.contains('preview-element-visible')
     ).toBe(true);
-    expect(root.dataset.liteModeEnabled).toBe('true');
     expect(root.dataset.playgroundEnabled).toBe('true');
 
     preview.setPlaygroundEnabled(false);
@@ -100,9 +97,6 @@ describe('onboarding preview', () => {
         ?.classList.contains('preview-element-exiting')
     ).toBe(true);
     expect(root.dataset.playgroundEnabled).toBe('false');
-
-    preview.setLiteModeEnabled(false);
-    expect(root.dataset.liteModeEnabled).toBe('false');
 
     preview.setChatSkin('system');
     expect(document.documentElement.getAttribute('data-ytcq-chat-skin')).toBeNull();

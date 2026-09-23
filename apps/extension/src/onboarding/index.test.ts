@@ -7,7 +7,6 @@ import aeroPreset from '../assets/themes/aero.json';
 const preview = vi.hoisted(() => ({
   applyOptions: vi.fn(),
   setChatSkin: vi.fn(),
-  setLiteModeEnabled: vi.fn(),
   setPlaygroundEnabled: vi.fn(),
   setTargetLanguage: vi.fn(),
   setTranslationDisplay: vi.fn()

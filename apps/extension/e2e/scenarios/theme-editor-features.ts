@@ -577,7 +577,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await test.info().attach('theme-editor-presets-and-controls', { body: await editor.screenshot(), contentType: 'image/png' });
     });
 
-    await test.step('Both previews follow the real message-density setting', async () => {
+    await test.step('Both previews follow message density independently of Lite mode', async () => {
       await editor.locator('#themeReset').click();
       await editor.locator('#themeEditorPicker').selectOption('');
       await worker.evaluate(() => chrome.storage.sync.set({ messageDensity: 'compact', liteModeEnabled: false }));
@@ -595,11 +595,17 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       try {
         await onboarding.goto(`chrome-extension://${extensionId}/onboarding.html`);
         await expect(onboarding.locator('.preview-message').first()).toHaveCSS('padding-top', '2px');
-        await worker.evaluate(() => chrome.storage.sync.set({ liteModeEnabled: true }));
-        await expect(preview.locator('.preview-message').nth(1)).toHaveCSS('height', '28px');
-        await expect(preview.locator('.preview-skeleton-row').first()).toHaveCSS('height', '28px');
-        await onboarding.locator('#onboardingLiteModeEnabled').check();
-        await expect(onboarding.locator('.preview-message').nth(1)).toHaveCSS('height', '28px');
+        for (const liteModeEnabled of [true, false]) {
+          await onboarding.locator('#onboardingLiteModeEnabled').setChecked(liteModeEnabled);
+          await expect.poll(() => worker.evaluate(async () =>
+            (await chrome.storage.sync.get('liteModeEnabled')).liteModeEnabled
+          )).toBe(liteModeEnabled);
+          for (const page of [preview, onboarding]) {
+            await expect(page.locator('.preview-message').nth(1)).toHaveCSS('height', '24px');
+            await expect(page.locator('.preview-message').nth(1)).toHaveCSS('font-size', '13px');
+            await expect(page.locator('.preview-skeleton-row').first()).toHaveCSS('height', '24px');
+          }
+        }
         await worker.evaluate(() => chrome.storage.sync.set({ messageDensity: 'default' }));
         await expect(preview.locator('.preview-message').first()).toHaveCSS('padding-top', '4px');
         await expect(onboarding.locator('.preview-message').first()).toHaveCSS('padding-top', '4px');
