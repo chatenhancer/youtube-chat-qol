@@ -77,7 +77,7 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
           }
           await expectThemeContrast(chat.locator('yt-live-chat-message-input-renderer #author-name'), background);
           if (finish === 'glass') {
-            await chat.locator('#emoji-picker-button button').click();
+            await chat.locator('#emoji-picker-button yt-live-chat-icon-toggle-button-renderer#emoji button').click();
             const picker = chat.locator('yt-emoji-picker-renderer');
             // Native YouTube nests the picker inside the composer, whose image
             // can need the opposite text color from the picker's own panel.
