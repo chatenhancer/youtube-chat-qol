@@ -35,7 +35,9 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await expect(tab('Style')).toBeFocused();
       await expect(tab('Style')).toHaveAttribute('aria-selected', 'true');
       await field('font').selectOption('mono');
-      await editor.locator('[data-theme-details="style"] summary').click();
+      await expect(editor.getByRole('heading', { name: 'Shape and depth' })).toBeVisible();
+      await expect(field('radius')).toBeVisible();
+      await expect(editor.locator('details')).toHaveCount(0);
       await tab('Style').press('ArrowRight');
       await editor.locator('[data-theme-area="chat"]').click();
       await field('fill').selectOption('gradient');
@@ -48,7 +50,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await expect(field('accent')).toHaveValue('#9c2258');
       await tab('Style').click();
       await expect(field('font')).toHaveValue('mono');
-      await expect(editor.locator('[data-theme-details="style"]')).toHaveAttribute('open', '');
+      await expect(field('radius')).toBeVisible();
       await tab('Background').click();
       await expect(editor.locator('[data-theme-area="chat"]')).toHaveAttribute('aria-pressed', 'true');
       await expect(field('gradientAngle')).toHaveValue('135');
@@ -63,7 +65,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await editor.locator('#themeReset').click();
       await expect(tab('Style')).toHaveAttribute('aria-selected', 'true');
       await expect(field('font')).toHaveValue('default');
-      await editor.locator('[data-theme-details="style"] summary').click();
+      await expect(field('radius')).toBeVisible();
       for (const appearance of ['light', 'dark'] as const) {
         await editor.emulateMedia({ colorScheme: appearance });
         for (const label of ['Colors', 'Style', 'Background', 'Details']) {
@@ -375,7 +377,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor.locator('[data-theme-field="fill"]').selectOption('image');
       await editor.locator('[data-theme-field="image"]').setInputFiles(backgroundFile);
-      if (!await editor.locator('[data-theme-details="image"]').getAttribute('open').then(value => value !== null)) await editor.locator('[data-theme-details="image"] summary').click();
+      await expect(editor.getByRole('heading', { name: 'Image placement' })).toBeVisible();
       const header = preview.locator('yt-live-chat-header-renderer');
       const before = await header.boundingBox();
       const zoom = editor.locator('[data-theme-field="zoom"]');
@@ -454,7 +456,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await editor.locator('[data-theme-area="chat"]').click();
       await fill.selectOption('image');
       await editor.locator('[data-theme-field="image"]').setInputFiles(backgroundFile);
-      if (!await editor.locator('[data-theme-details="image"]').getAttribute('open').then(value => value !== null)) await editor.locator('[data-theme-details="image"] summary').click();
+      await expect(editor.getByRole('heading', { name: 'Image placement' })).toBeVisible();
       await editor.locator('[data-theme-field="fit"]').selectOption('cover');
       const feed = preview.locator('yt-live-chat-item-list-renderer');
       await editor.locator('[data-theme-field="zoom"]').fill('150');
@@ -497,7 +499,7 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
       await preview.locator('#previewInboxIcon').click();
 
       await editor.getByRole('tab', { name: 'Style', exact: true }).click();
-      await editor.locator('[data-theme-details="style"] summary').click();
+      await expect(editor.getByRole('heading', { name: 'Shape and depth' })).toBeVisible();
       const shadow = editor.locator('[data-theme-field="shadow"]');
       await shadow.fill('0');
       const header = preview.locator('yt-live-chat-header-renderer');

@@ -356,11 +356,6 @@ function initThemeEditor(): void {
   }
   function rebuildFields(backgroundOnly = false): void {
     history.commit();
-    const expanded = new Map(
-      [...fields.querySelectorAll<HTMLDetailsElement>('details[data-theme-details]')].map(
-        (details) => [details.dataset.themeDetails, details.open]
-      )
-    );
     const upload = (file: File, update: (image: string) => void) => {
       void uploadImage(file, update);
     };
@@ -372,11 +367,6 @@ function initThemeEditor(): void {
     } else {
       fields.replaceChildren(themeFields(draft, area, areas, edit, upload));
     }
-    fields
-      .querySelectorAll<HTMLDetailsElement>('details[data-theme-details]')
-      .forEach((details) => {
-        details.open = expanded.get(details.dataset.themeDetails) ?? false;
-      });
     areas
       .querySelectorAll<HTMLButtonElement>('button')
       .forEach((button) =>

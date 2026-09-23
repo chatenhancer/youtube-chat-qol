@@ -79,7 +79,7 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
     await editor.locator('#themeName').fill('Palette example');
     await editor.getByRole('tab', { name: 'Style', exact: true }).click();
     await field('font').selectOption('mono');
-    await editor.locator('[data-theme-details="style"] summary').click();
+    await expect(editor.getByRole('heading', { name: 'Shape and depth' })).toBeVisible();
     await expect(editor.locator('[data-theme-section]')).toHaveCount(0);
     await expect(editor.locator('[data-theme-area]')).toHaveCount(3);
     for (const removed of ['button', 'buttonText', 'menu', 'menuText', 'input', 'muted', 'emphasis', 'text', 'areaFont']) {
@@ -169,8 +169,7 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
             expect(painted.includes('url(')).toBe(true);
             if (reflection !== 'none') expect(painted.startsWith(`${reflection}, `)).toBe(true);
             if (finish === 'flat') continue;
-            const placement = editor.locator('[data-theme-details="image"]');
-            if (!await placement.evaluate(element => (element as HTMLDetailsElement).open)) await placement.locator('summary').click();
+            await expect(editor.getByRole('heading', { name: 'Image placement' })).toBeVisible();
             await field('zoom').fill('150');
             await field('surfaceOpacity').fill('50');
             await expect.poll(() => surface.evaluate((element, expected) =>
@@ -181,7 +180,6 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
           }
         }
       }
-      await editor.locator('[data-theme-details="image"] summary').click();
     });
 
     await test.step('One uploaded background adapts across modes, with shared placement and transparency', async () => {
@@ -189,10 +187,10 @@ export const themePaletteScenario: ExtensionScenario = async ({ context }) => {
       await field('fill').selectOption('image');
       await expect(field('image')).toBeVisible();
       await expect(field('darkImage')).toBeVisible();
-      await expect(editor.locator('[data-theme-details="image"]')).not.toHaveAttribute('open', '');
+      await expect(editor.getByRole('heading', { name: 'Image placement' })).toBeVisible();
+      await expect(field('zoom')).toBeVisible();
       await field('image').setInputFiles(imageFile);
       await field('darkImage').locator('..').getByRole('button', { name: 'Remove image' }).click();
-      await editor.locator('[data-theme-details="image"] summary').click();
       const feed = preview.locator('yt-live-chat-item-list-renderer');
       await field('surfaceOpacity').fill('50');
       await expect.poll(() => feed.evaluate(element => getComputedStyle(element, '::after').opacity)).toBe('0.5');

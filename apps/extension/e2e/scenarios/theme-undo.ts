@@ -49,7 +49,7 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
       await expect(chatDraft).toHaveValue('');
       await expect(status).toHaveText('Undo: Accent');
       await editor.getByRole('tab', { name: 'Style', exact: true }).click();
-      await editor.locator('[data-theme-details="style"] summary').click();
+      await expect(editor.getByRole('heading', { name: 'Shape and depth' })).toBeVisible();
       const radius = editor.locator('[data-theme-field="radius"]');
       await radius.scrollIntoViewIfNeeded();
       const bounds = (await radius.boundingBox())!;

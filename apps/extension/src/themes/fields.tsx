@@ -195,15 +195,12 @@ function group(tab: ThemeEditorTab, children: Node[]): HTMLElement {
   );
 }
 
-function details(key: string, title: string, children: Node[]): HTMLElement {
+function section(title: string, children: Node[]): HTMLElement {
   return el<HTMLElement>(
-    <details class="theme-details" data-theme-details={key}>
-      <summary>
-        {createSvgIcon(ICON_VIEW_BOX, 'M6 9l6 6 6-6', 2)}
-        {message(title)}
-      </summary>
+    <section class="theme-subsection">
+      <h3>{message(title)}</h3>
       <div class="theme-fields-content">{children}</div>
-    </details>
+    </section>
   );
 }
 
@@ -257,7 +254,7 @@ export function themeFields(
         el<HTMLElement>(
           <p class="theme-field-hint">{message('themeFinishHint_' + theme.finish)}</p>
         ),
-        details('style', 'themeShapeDepth', [
+        section('themeShapeDepth', [
           rangeField('radius', theme.radius, 'themeCorners', 24, 'px', (value) =>
             update(theme, 'radius', value)
           ),
@@ -389,7 +386,7 @@ export function themeBackgroundFields(
                 (value) => update(surface, 'imageText', value as typeof surface.imageText)
               ),
               el<HTMLElement>(<p class="theme-field-hint">{message('themeImageTextHint')}</p>),
-              details('image', 'themeImagePlacement', [
+              section('themeImagePlacement', [
                 selectField(
                   'fit',
                   surface.fit,
