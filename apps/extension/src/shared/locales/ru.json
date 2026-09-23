@@ -469,7 +469,7 @@
       "message": "Использовать тему"
     },
     "themeUndone": {
-      "message": "Отменено: {change}."
+      "message": "Отменить: {change}"
     },
     "themeNothingToUndo": {
       "message": "Нет изменений для отмены."

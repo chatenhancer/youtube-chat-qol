@@ -469,7 +469,7 @@
       "message": "שימוש בערכת הנושא"
     },
     "themeUndone": {
-      "message": "בוטל: {change}."
+      "message": "ביטול: {change}"
     },
     "themeNothingToUndo": {
       "message": "אין מה לבטל."

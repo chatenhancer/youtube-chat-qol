@@ -92,8 +92,10 @@ html body { margin: 0; min-width: 320px; font-family: inherit; }
 :root[dir="rtl"] .theme-details:not([open]) summary svg { transform: rotate(90deg); }
 .theme-details[open] summary svg { transform: rotate(0); }
 .theme-details > :not(summary) { margin-top: 16px; }
-.theme-status { margin: 0; font-size: 12px; line-height: 17px; color: var(--ytcq-popup-secondary-text); }
+.theme-status { display: flex; align-items: center; gap: 4px; margin: 0; font-size: 12px; line-height: 17px; color: var(--ytcq-popup-secondary-text); }
 .theme-status:empty { display: none; }
+.theme-status svg { width: 13px; height: 13px; flex: 0 0 13px; }
+:root[dir="rtl"] .theme-status svg { transform: scaleX(-1); }
 .theme-status.theme-error { color: var(--ytcq-popup-logo-red); }
 .theme-editor-footer {
   position: sticky;

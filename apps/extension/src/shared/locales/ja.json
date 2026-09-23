@@ -469,7 +469,7 @@
       "message": "テーマを使う"
     },
     "themeUndone": {
-      "message": "{change}を元に戻しました。"
+      "message": "元に戻す：{change}"
     },
     "themeNothingToUndo": {
       "message": "元に戻す変更はありません。"

@@ -469,7 +469,7 @@
       "message": "使用主題"
     },
     "themeUndone": {
-      "message": "已復原：{change}。"
+      "message": "復原：{change}"
     },
     "themeNothingToUndo": {
       "message": "沒有可復原的變更。"

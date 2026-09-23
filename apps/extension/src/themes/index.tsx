@@ -83,6 +83,7 @@ function initThemeEditor(): void {
     />
   );
   const status = el<HTMLElement>(<p class="theme-status" role="status" aria-live="polite" />);
+  const undoStatusIcon = createSvgIcon(ICON_VIEW_BOX, 'M4 7h10a6 6 0 0 1 0 12h-4 M8 3 4 7l4 4', 2);
   const presetNotice = el<HTMLElement>(
     <p class="theme-preset-notice" hidden>
       {message('themePresetNote')}
@@ -593,7 +594,7 @@ function initThemeEditor(): void {
     name.value = draft.name;
     name.setCustomValidity('');
     changed(true);
-    status.textContent = message('themeUndone', label);
+    status.replaceChildren(undoStatusIcon, message('themeUndone', label));
     if (focusedField)
       fields
         .querySelector<HTMLElement>(`[data-theme-field="${focusedField}"]`)

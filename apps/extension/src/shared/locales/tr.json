@@ -469,7 +469,7 @@
       "message": "Temayı kullan"
     },
     "themeUndone": {
-      "message": "Geri alındı: {change}."
+      "message": "Geri al: {change}"
     },
     "themeNothingToUndo": {
       "message": "Geri alınacak değişiklik yok."

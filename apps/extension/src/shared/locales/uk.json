@@ -469,7 +469,7 @@
       "message": "Використати тему"
     },
     "themeUndone": {
-      "message": "Скасовано: {change}."
+      "message": "Скасувати: {change}"
     },
     "themeNothingToUndo": {
       "message": "Немає змін для скасування."

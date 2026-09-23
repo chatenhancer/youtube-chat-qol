@@ -469,7 +469,7 @@
       "message": "استفاده از تم"
     },
     "themeUndone": {
-      "message": "واگرد شد: {change}."
+      "message": "واگرد: {change}"
     },
     "themeNothingToUndo": {
       "message": "چیزی برای واگرد وجود ندارد."

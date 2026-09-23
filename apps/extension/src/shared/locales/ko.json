@@ -469,7 +469,7 @@
       "message": "테마 사용"
     },
     "themeUndone": {
-      "message": "실행 취소: {change}."
+      "message": "실행 취소: {change}"
     },
     "themeNothingToUndo": {
       "message": "실행 취소할 변경 사항이 없습니다."

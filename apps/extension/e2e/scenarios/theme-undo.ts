@@ -26,7 +26,8 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
       await name.pressSequentially('Undo example');
       await name.press('Meta+z');
       await expect(name).toHaveValue('');
-      await expect(status).toHaveText('Undid: Theme name.');
+      await expect(status).toHaveText('Undo: Theme name');
+      await expect(status.locator('svg')).toBeVisible();
       await expect(editor.locator('#themeSave')).toBeDisabled();
       await name.fill('Undo example');
       await accent.fill('#123456');
@@ -35,7 +36,7 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
       await expect(accent).toHaveValue('#654321');
       await editor.keyboard.press('Control+z');
       await expect(accent).toHaveValue('#123456');
-      await expect(status).toHaveText('Undid: Accent.');
+      await expect(status).toHaveText('Undo: Accent');
       await editor.locator('[data-theme-mode="light"]').click();
       await expect(accent).toHaveValue('#123456');
       expect(await storedThemes()).toEqual(initialStorage);
@@ -46,7 +47,7 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
       await chatDraft.pressSequentially('Preview text');
       await chatDraft.press('ControlOrMeta+z');
       await expect(chatDraft).toHaveValue('');
-      await expect(status).toHaveText('Undid: Accent.');
+      await expect(status).toHaveText('Undo: Accent');
       await editor.getByRole('tab', { name: 'Style', exact: true }).click();
       await editor.locator('[data-theme-details="style"] summary').click();
       const radius = editor.locator('[data-theme-field="radius"]');
@@ -59,7 +60,7 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
       expect(Number(await radius.inputValue())).toBeGreaterThan(12);
       await preview.locator('#previewMenuButton').press('Meta+z');
       await expect(radius).toHaveValue('12');
-      await expect(status).toHaveText('Undid: Corner radius.');
+      await expect(status).toHaveText('Undo: Corner radius');
     });
 
     await test.step('Finish defaults undo together and preserve custom corner radii', async () => {
@@ -71,7 +72,7 @@ export const themeUndoScenario: ExtensionScenario = async ({ context }) => {
       await editor.keyboard.press('Control+z');
       await expect(finish).toHaveValue('flat');
       await expect(radius).toHaveValue('12');
-      await expect(status).toHaveText('Undid: Finish style.');
+      await expect(status).toHaveText('Undo: Finish style');
       await radius.fill('9');
       await finish.selectOption('glass');
       await expect(radius).toHaveValue('9');

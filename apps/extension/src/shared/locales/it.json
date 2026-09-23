@@ -469,7 +469,7 @@
       "message": "Usa tema"
     },
     "themeUndone": {
-      "message": "Annullato: {change}."
+      "message": "Annulla: {change}"
     },
     "themeNothingToUndo": {
       "message": "Nessuna modifica da annullare."

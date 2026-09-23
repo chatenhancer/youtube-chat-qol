@@ -469,7 +469,7 @@
       "message": "使用主题"
     },
     "themeUndone": {
-      "message": "已撤销：{change}。"
+      "message": "撤销：{change}"
     },
     "themeNothingToUndo": {
       "message": "没有可撤销的更改。"

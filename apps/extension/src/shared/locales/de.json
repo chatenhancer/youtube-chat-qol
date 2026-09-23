@@ -469,7 +469,7 @@
       "message": "Theme verwenden"
     },
     "themeUndone": {
-      "message": "Rückgängig gemacht: {change}."
+      "message": "Rückgängig: {change}"
     },
     "themeNothingToUndo": {
       "message": "Keine Änderung zum Rückgängigmachen."

@@ -469,7 +469,7 @@
       "message": "Sử dụng giao diện"
     },
     "themeUndone": {
-      "message": "Đã hoàn tác: {change}."
+      "message": "Hoàn tác: {change}"
     },
     "themeNothingToUndo": {
       "message": "Không có thay đổi nào để hoàn tác."

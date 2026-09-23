@@ -469,7 +469,7 @@
       "message": "Thema gebruiken"
     },
     "themeUndone": {
-      "message": "Ongedaan gemaakt: {change}."
+      "message": "Ongedaan maken: {change}"
     },
     "themeNothingToUndo": {
       "message": "Er is niets om ongedaan te maken."

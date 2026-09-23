@@ -469,7 +469,7 @@
       "message": "استخدام السمة"
     },
     "themeUndone": {
-      "message": "تم التراجع عن: {change}."
+      "message": "تراجع: {change}"
     },
     "themeNothingToUndo": {
       "message": "لا يوجد ما يمكن التراجع عنه."

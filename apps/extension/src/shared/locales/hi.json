@@ -469,7 +469,7 @@
       "message": "थीम इस्तेमाल करें"
     },
     "themeUndone": {
-      "message": "पूर्ववत किया गया: {change}."
+      "message": "वापस लाएँ: {change}"
     },
     "themeNothingToUndo": {
       "message": "पूर्ववत करने के लिए कुछ नहीं है।"

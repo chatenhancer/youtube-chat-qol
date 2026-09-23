@@ -469,7 +469,7 @@
       "message": "Gunakan tema"
     },
     "themeUndone": {
-      "message": "Dibatalkan: {change}."
+      "message": "Urungkan: {change}"
     },
     "themeNothingToUndo": {
       "message": "Tidak ada yang bisa dibatalkan."

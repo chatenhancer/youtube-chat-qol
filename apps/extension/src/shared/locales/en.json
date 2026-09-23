@@ -469,7 +469,7 @@
       "message": "Use theme"
     },
     "themeUndone": {
-      "message": "Undid: {change}."
+      "message": "Undo: {change}"
     },
     "themeNothingToUndo": {
       "message": "Nothing to undo."

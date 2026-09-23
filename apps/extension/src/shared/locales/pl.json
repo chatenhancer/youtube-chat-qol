@@ -469,7 +469,7 @@
       "message": "Użyj motywu"
     },
     "themeUndone": {
-      "message": "Cofnięto: {change}."
+      "message": "Cofnij: {change}"
     },
     "themeNothingToUndo": {
       "message": "Nie ma nic do cofnięcia."

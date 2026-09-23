@@ -469,7 +469,7 @@
       "message": "Usar tema"
     },
     "themeUndone": {
-      "message": "Desfeito: {change}."
+      "message": "Desfazer: {change}"
     },
     "themeNothingToUndo": {
       "message": "Não há nada para desfazer."
