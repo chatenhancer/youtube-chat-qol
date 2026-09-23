@@ -76,6 +76,19 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
             }
           }
           await expectThemeContrast(chat.locator('yt-live-chat-message-input-renderer #author-name'), background);
+          if (finish === 'glass') {
+            await chat.locator('#emoji-picker-button button').click();
+            const picker = chat.locator('yt-emoji-picker-renderer');
+            // Native YouTube nests the picker inside the composer, whose image
+            // can need the opposite text color from the picker's own panel.
+            await picker.evaluate(node => node.ownerDocument.querySelector('yt-live-chat-message-input-renderer')!.append(node));
+            await expectThemeContrast(picker.locator('yt-emoji-picker-category-renderer #title'), 'background-color', 3);
+            await expectThemeContrast(picker.locator('#search input'), '--ytcq-theme-input', 3, '::placeholder');
+            const field = await picker.locator('#search').boundingBox();
+            const input = await picker.locator('#search input').boundingBox();
+            expect(Math.abs(input!.y + input!.height / 2 - field!.y - field!.height / 2)).toBeLessThan(1);
+            await picker.getByRole('option').first().click();
+          }
           await test.info().attach(`image-contrast-${finish}-${mode}`, { body: await preview.locator('#chatPreview').screenshot(), contentType: 'image/png' });
         }
       }

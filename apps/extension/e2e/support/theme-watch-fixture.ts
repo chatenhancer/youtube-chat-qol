@@ -38,6 +38,8 @@ export async function installNativeThemeSurfaces(chat: ChatSurface): Promise<voi
       #emoji-picker-button { margin:auto 0 0 6px; min-height:0; }
       #emoji { display:block; width:36px; height:36px; }
       #emoji button { width:36px; height:36px; border:0; padding:6px; }
+      yt-emoji-picker-renderer #search tp-yt-iron-input { display:inline-block; height:24px; font-size:13px; line-height:24px; }
+      yt-emoji-picker-renderer #search input { display:inline-block; height:auto; }
       yt-live-chat-participant-list-renderer { display:block; }
       yt-live-chat-participant-list-renderer #header { display:flex; align-items:center; height:48px; background:#0f0f0f; }
       yt-live-chat-participant-list-renderer button { color:#f1f1f1; }

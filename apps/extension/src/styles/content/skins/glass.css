@@ -711,6 +711,9 @@
 }
 
 :root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-emoji-picker-renderer {
+  /* The picker is nested in the composer but paints its own panel surface. */
+  --ytcq-glass-text: var(--ytcq-theme-panels-text);
+  --ytcq-glass-muted-text: var(--ytcq-theme-muted);
   --yt-emoji-picker-category-background-color: var(--ytcq-glass-category-strip-bg);
   --yt-emoji-picker-category-color: var(--ytcq-glass-muted-text);
 
@@ -783,6 +786,15 @@
 }
 
 :root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-emoji-picker-renderer :where(
+  #search tp-yt-iron-input,
+  #search-input tp-yt-iron-input
+) {
+  /* Native wrappers keep a 24px line box around Glass's smaller input. */
+  display: flex !important;
+  align-items: center !important;
+}
+
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"] yt-emoji-picker-renderer :where(
   #search input,
   #search-input input
 ) {
@@ -800,7 +812,7 @@
   #search #label,
   #search-input #label
 ) {
-  color: color-mix(in srgb, var(--ytcq-glass-muted-text) 70%, var(--ytcq-glass-input-bg) 30%) !important;
+  color: var(--ytcq-glass-muted-text) !important;
   opacity: 1 !important;
 }
 
@@ -1986,12 +1998,7 @@
   outline-offset: 1px;
 }
 
-:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"][data-ytcq-chat-skin-theme="dark"] :where(
-  yt-emoji-picker-renderer #search input,
-  yt-emoji-picker-renderer #search-input input,
-  .ytcq-inbox-keyword-input
-)::placeholder,
-:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"][data-ytcq-chat-skin-theme="dark"] yt-emoji-picker-renderer :where(#search #label, #search-input #label) {
+:root[data-ytcq-chat-skin="custom"][data-ytcq-theme-finish="glass"][data-ytcq-chat-skin-theme="dark"] .ytcq-inbox-keyword-input::placeholder {
   color: var(--ytcq-glass-muted-text) !important;
 }
 

@@ -1,9 +1,9 @@
 import { expect, type Locator } from '@playwright/test';
 
 /** Check the actual foreground against a background property or a known image color. */
-export async function expectThemeContrast(element: Locator, background = 'background-color', minimum = 4.5): Promise<void> {
-  await expect.poll(() => element.evaluate((node, property) => {
-    const style = getComputedStyle(node);
+export async function expectThemeContrast(element: Locator, background = 'background-color', minimum = 4.5, pseudoElement?: string): Promise<void> {
+  await expect.poll(() => element.evaluate((node, { property, pseudoElement }) => {
+    const style = getComputedStyle(node, pseudoElement);
     const context = document.createElement('canvas').getContext('2d')!;
     const luminance = (color: string): number => {
       context.fillStyle = style.getPropertyValue('--ytcq-theme-panels-color');
@@ -18,5 +18,5 @@ export async function expectThemeContrast(element: Locator, background = 'backgr
     };
     const values = [luminance(style.color), luminance(style.getPropertyValue(property) || property)];
     return (Math.max(...values) + .05) / (Math.min(...values) + .05);
-  }, background)).toBeGreaterThanOrEqual(minimum);
+  }, { property: background, pseudoElement })).toBeGreaterThanOrEqual(minimum);
 }
