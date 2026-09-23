@@ -43,6 +43,7 @@ export function createChatThemeController(): {
     } else {
       style?.remove();
       style = null;
+      themeStyles.clear();
     }
     if (skin === 'system') {
       root.removeAttribute(SKIN_ATTRIBUTE);

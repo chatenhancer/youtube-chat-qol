@@ -4,7 +4,10 @@ import * as appearance from './appearance';
 import * as images from './image-color';
 import { createThemeStyleCache } from './styles';
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
 
 describe('theme style cache', () => {
   it('derives each appearance once and reuses it across repeated renders and mode switches', () => {
@@ -72,5 +75,41 @@ describe('theme style cache', () => {
     await Promise.resolve();
     expect(ready).not.toHaveBeenCalled();
     expect(styles(replacement, 'light')).toBe(expected);
+  });
+
+  it('keeps large GIF bytes out of CSS and releases their URLs when no longer used', async () => {
+    vi.spyOn(images, 'readThemeImageColor').mockResolvedValue({ color: '#000000', opacity: 1 });
+    const create = vi.fn((_blob: Blob) => 'blob:theme-2').mockReturnValueOnce('blob:theme-1');
+    const revoke = vi.fn();
+    vi.stubGlobal('URL', { createObjectURL: create, revokeObjectURL: revoke });
+    const source = `data:image/gif;base64,${'AAAA'.repeat(100_000)}`;
+    const theme = createCustomTheme();
+    for (const surface of Object.values(theme.surfaces)) {
+      surface.fill = 'image';
+      surface.image = surface.darkImage = source;
+    }
+    theme.avatarFrame = source;
+    const styles = createThemeStyleCache();
+    const css = styles(theme, 'light');
+    expect(css).toContain('url("blob:theme-1")');
+    expect(css).toContain('--ytcq-theme-avatar-frame:url("blob:theme-1")');
+    expect(css).not.toContain(source);
+    styles(theme, 'dark');
+    styles({ ...theme, accent: '#000000' }, 'light');
+    expect(create).toHaveBeenCalledOnce();
+    expect(revoke).not.toHaveBeenCalled();
+    const reader = new FileReader();
+    const bytes = new Promise(resolve => { reader.onload = () => resolve(reader.result); });
+    reader.readAsDataURL(create.mock.calls[0][0]);
+    expect(await bytes).toBe(source);
+    expect(theme.surfaces.chat.image).toBe(source);
+    expect(theme.avatarFrame).toBe(source);
+
+    styles(createCustomTheme(), 'light');
+    expect(revoke).toHaveBeenCalledExactlyOnceWith('blob:theme-1');
+    styles(theme, 'dark');
+    styles.clear();
+    expect(revoke).toHaveBeenLastCalledWith('blob:theme-2');
+    expect(revoke).toHaveBeenCalledTimes(2);
   });
 });

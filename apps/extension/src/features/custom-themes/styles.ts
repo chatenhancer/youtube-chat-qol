@@ -1,4 +1,4 @@
-import { THEME_AREAS, type CustomTheme } from '../../shared/custom-themes';
+import { MAX_THEME_IMAGE_LENGTH, THEME_AREAS, type CustomTheme } from '../../shared/custom-themes';
 import type { ChatSkinTheme } from '../../shared/chat-skins';
 import { THEME_FONTS } from '../../shared/theme-fonts';
 import { themeAppearance, hsl, luminance, mixColor, readableAccent, reflectedColors, tintColor } from './appearance';
@@ -99,8 +99,14 @@ export function customThemePalette(
 }
 
 /** Only normalized colors, numbers and raster data URLs reach these declarations. */
-export function customThemeDeclarations(theme: CustomTheme, mode: ChatSkinTheme, imageColors?: ThemeImageColors): string {
+export function customThemeDeclarations(
+  theme: CustomTheme,
+  mode: ChatSkinTheme,
+  imageColors?: ThemeImageColors,
+  imageUrls?: ReadonlyMap<string, string>
+): string {
   const variant = themeAppearance(theme, mode, imageColors);
+  const imageUrl = (source: string) => `url("${imageUrls?.get(source) ?? source}")`;
   const values: Record<string, string> = {
     ...customThemePalette(theme, mode, variant),
     shine: String(theme.shine / 100),
@@ -124,7 +130,7 @@ export function customThemeDeclarations(theme: CustomTheme, mode: ChatSkinTheme,
       : 'var(--ytcq-theme-gloss)',
     glass: theme.finish === 'glass' ? `blur(${theme.blur}px) saturate(150%)` : 'none',
     'avatar-radius': theme.avatarShape === 'square' ? '2px' : '50%',
-    'avatar-frame': theme.avatarFrame ? `url("${theme.avatarFrame}")` : 'none',
+    'avatar-frame': theme.avatarFrame ? imageUrl(theme.avatarFrame) : 'none',
     'avatar-frame-content': theme.avatarFrame ? '""' : 'none',
     // Glass replaces the bookmark ring only when an uploaded frame can draw it.
     'avatar-ring-shadow': theme.avatarFrame ? 'none' : 'initial',
@@ -167,7 +173,7 @@ export function customThemeDeclarations(theme: CustomTheme, mode: ChatSkinTheme,
       values['panels-end-tint-lightness'] = `${(el - rel) * 100}%`;
     }
     const overlay = `color-mix(in srgb, ${base} ${100 - surface.opacity}%, transparent)`;
-    const image = surface.fill === 'image' && surface.image ? `url("${surface.image}")` : 'none';
+    const image = surface.fill === 'image' && surface.image ? imageUrl(surface.image) : 'none';
     const size =
       surface.fit === 'repeat'
         ? 'auto'
@@ -226,16 +232,37 @@ export function customThemeDeclarations(theme: CustomTheme, mode: ChatSkinTheme,
 }
 
 /** Cache each appearance for one theme snapshot; replace the snapshot after edits. */
-export function createThemeStyleCache(onImageReady: () => void = () => {}): (theme: CustomTheme, mode: ChatSkinTheme) => string {
+export function createThemeStyleCache(onImageReady: () => void = () => {}): {
+  (theme: CustomTheme, mode: ChatSkinTheme): string;
+  clear: () => void;
+} {
   let current: CustomTheme | null = null;
   let styles: Partial<Record<ChatSkinTheme, string>> = {};
   // Only this theme's images are retained; edits and mode switches reuse their samples.
   const images = new Map<string, ThemeImageColor | null>();
-  return (theme, mode) => {
+  const imageUrls = new Map<string, string>();
+  const declarations = (theme: CustomTheme, mode: ChatSkinTheme): string => {
     if (current !== theme) {
       current = theme;
       styles = {};
       const sources = new Set(THEME_AREAS.flatMap(area => [theme.surfaces[area].image, theme.surfaces[area].darkImage]).filter(Boolean));
+      for (const [source, url] of imageUrls) {
+        if (sources.has(source) || source === theme.avatarFrame) continue;
+        URL.revokeObjectURL(url);
+        imageUrls.delete(source);
+      }
+      for (const source of new Set([...sources, theme.avatarFrame])) {
+        // Static uploads already stay small. Larger GIF data can exceed the
+        // browser's CSS variable limit after base64 encoding; store only the
+        // short object URL in CSS, keeping the original data in saved themes.
+        if (source.length <= MAX_THEME_IMAGE_LENGTH || imageUrls.has(source) || !source.startsWith('data:image/gif;base64,')) continue;
+        try {
+          const bytes = Uint8Array.from(atob(source.slice('data:image/gif;base64,'.length)), character => character.charCodeAt(0));
+          imageUrls.set(source, URL.createObjectURL(new Blob([bytes], { type: 'image/gif' })));
+        } catch {
+          // Malformed stored image data must not prevent the rest of the theme.
+        }
+      }
       for (const source of images.keys()) if (!sources.has(source)) images.delete(source);
       for (const source of sources) {
         if (images.has(source)) continue;
@@ -248,8 +275,16 @@ export function createThemeStyleCache(onImageReady: () => void = () => {}): (the
         }).catch(() => {});
       }
     }
-    return styles[mode] ??= customThemeDeclarations(theme, mode, images);
+    return styles[mode] ??= customThemeDeclarations(theme, mode, images, imageUrls);
   };
+  declarations.clear = () => {
+    current = null;
+    styles = {};
+    images.clear();
+    for (const url of imageUrls.values()) URL.revokeObjectURL(url);
+    imageUrls.clear();
+  };
+  return declarations;
 }
 
 export function customThemeFontFace(theme: CustomTheme): string {

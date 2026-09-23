@@ -103,6 +103,14 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
     await test.step('GIF backgrounds keep their animation through upload, saving, and reopening', async () => {
       const buffer = Buffer.from('R0lGODlhAQABAIAAACAwRGBAYCH/C05FVFNDQVBFMi4wAwEAAAAh+QQAMgAAACwAAAAAAQABAAACAkQBACH5BAAyAAAALAAAAAABAAEAAAICTAEAOw==', 'base64');
       const source = `data:image/gif;base64,${buffer.toString('base64')}`;
+      // Valid GIF comments keep the two animation frames while making its
+      // base64 data exceed the browser's 2 MiB CSS custom-property limit.
+      const commentBlock = Buffer.concat([Buffer.from([255]), Buffer.alloc(255)]);
+      const largeBuffer = Buffer.concat([
+        buffer.subarray(0, -1), Buffer.from([0x21, 0xfe]),
+        ...Array<Buffer>(7_000).fill(commentBlock), Buffer.from([0, 0x3b])
+      ]);
+      const largeSource = `data:image/gif;base64,${largeBuffer.toString('base64')}`;
       await editor.locator('#themeName').fill('Animated');
       await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor.locator('[data-theme-field="fill"]').selectOption('image');
@@ -114,11 +122,19 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       }
       await editor.getByRole('tab', { name: 'Details', exact: true }).click();
       await editor.locator('[data-theme-field="avatarFrame"]').setInputFiles({ name: 'frame.gif', mimeType: 'image/gif', buffer });
+      await editor.getByRole('tab', { name: 'Background', exact: true }).click();
+      await editor.locator('[data-theme-area="chat"]').click();
+      await editor.locator('[data-theme-field="fill"]').selectOption('image');
+      await editor.locator('[data-theme-field="image"]').setInputFiles({ name: 'large-background.gif', mimeType: 'image/gif', buffer: largeBuffer });
+      await expect(editor.locator('[data-theme-field="imageText"]')).toBeEnabled();
+      const feed = preview.locator('yt-live-chat-item-list-renderer');
+      await expect(feed).toHaveCSS('background-image', /url\("blob:/);
       await editor.locator('#themeSaveApply').click();
       await expect(editor.locator('.theme-status')).toHaveText('Theme saved and applied.');
       const applied = await worker.evaluate(async () => (await chrome.storage.local.get('ytcqAppliedCustomTheme:v1'))['ytcqAppliedCustomTheme:v1']);
       expect(applied.avatarFrame).toBe(source);
       expect(applied.surfaces.header).toMatchObject({ image: source, darkImage: source });
+      expect(applied.surfaces.chat.image).toBe(largeSource);
       await editor.reload();
       await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       const thumbnail = editor.locator('[data-theme-field="image"]').locator('..').locator('img');
@@ -128,7 +144,10 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       for (const mode of ['light', 'dark']) {
         await editor.locator(`[data-theme-mode="${mode}"]`).click();
         await chat.locator('html').evaluate((element, value) => element.toggleAttribute('dark', value === 'dark'), mode);
-        for (const frame of [preview, chat]) await expect(frame.locator('yt-live-chat-header-renderer')).toHaveCSS('background-image', /data:image\/gif;base64,/);
+        for (const frame of [preview, chat]) {
+          await expect(frame.locator('yt-live-chat-header-renderer')).toHaveCSS('background-image', /data:image\/gif;base64,/);
+          await expect(frame.locator('yt-live-chat-item-list-renderer')).toHaveCSS('background-image', /url\("blob:/);
+        }
       }
       await editor.locator('[data-theme-field="image"]').setInputFiles({ name: 'large.gif', mimeType: 'image/gif', buffer: Buffer.alloc(2 * 1024 * 1024 + 1) });
       await expect(editor.locator('.theme-status')).toHaveText('Choose a smaller image (PNG, JPEG, WebP: up to 10 MB; GIF: up to 2 MB).');

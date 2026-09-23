@@ -105,6 +105,7 @@ export function createOnboardingPreview(
     const css = customTheme
       ? `${customThemeFontFace(customTheme)}:root{${themeStyles(customTheme, chatSkinTheme)}}`
       : '';
+    if (!customTheme) themeStyles.clear();
     if (themeStyle.textContent !== css) themeStyle.textContent = css;
     root.dataset.chatTheme = chatSkinTheme;
     root.dataset.liteModeEnabled = String(state.liteModeEnabled);
