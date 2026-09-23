@@ -16,7 +16,7 @@ import type {
 import type { Env } from '../../types';
 import { ReplayTriviaError } from './errors';
 
-const DEFAULT_OPENAI_MODEL = 'gpt-5.6-luna';
+const DEFAULT_OPENAI_MODEL = 'gpt-6-luna';
 const DEFAULT_QUESTION_COUNT = 10;
 const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
 const OPENAI_PUBLIC_UNAVAILABLE_MESSAGE = 'Replay Trivia is temporarily unavailable. Try again later.';

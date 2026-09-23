@@ -21,7 +21,7 @@ describe('Replay Trivia OpenAI adapter', () => {
 
     expect(openAIRequest).toEqual(expect.objectContaining({
       max_output_tokens: 5000,
-      model: 'gpt-5.6-luna',
+      model: 'gpt-6-luna',
       reasoning: {
         effort: 'medium'
       },
