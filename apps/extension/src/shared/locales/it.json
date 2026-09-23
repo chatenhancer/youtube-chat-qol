@@ -1026,9 +1026,6 @@
     "themeSecondary": {
       "message": "Colore secondario"
     },
-    "themePaletteHint": {
-      "message": "Pulsanti e icone seguono il colore principale; tag ed evidenziazioni usano quello secondario. Pannelli, menu e testo si adattano automaticamente alla modalità chiara e scura."
-    },
     "theme_theme": {
       "message": "Colori del tema"
     },

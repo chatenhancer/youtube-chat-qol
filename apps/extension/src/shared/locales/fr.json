@@ -1023,9 +1023,6 @@
     "themeSecondary": {
       "message": "Couleur secondaire"
     },
-    "themePaletteHint": {
-      "message": "Les boutons et icônes suivent l’accent ; les étiquettes et surlignages utilisent la couleur secondaire. Les panneaux, menus et textes s’adaptent automatiquement aux modes clair et sombre."
-    },
     "theme_theme": {
       "message": "Couleurs du thème"
     },

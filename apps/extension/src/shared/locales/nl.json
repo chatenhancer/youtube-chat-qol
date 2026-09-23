@@ -1023,9 +1023,6 @@
     "themeSecondary": {
       "message": "Secundaire kleur"
     },
-    "themePaletteHint": {
-      "message": "Knoppen en pictogrammen volgen het accent; tags en markeringen gebruiken de secundaire kleur. Panelen, menu’s en tekst passen zich automatisch aan de lichte en donkere modus aan."
-    },
     "theme_theme": {
       "message": "Themakleuren"
     },

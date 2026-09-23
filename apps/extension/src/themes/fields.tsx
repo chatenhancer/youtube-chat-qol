@@ -234,7 +234,6 @@ export function themeFields(
             )}
           </div>
         ),
-        el<HTMLElement>(<p class="theme-field-hint">{message('themePaletteHint')}</p>),
         rangeField('surfaceTint', theme.surfaceTint, 'themeSurfaceTint', 100, '%', (value) =>
           update(theme, 'surfaceTint', value)
         ),

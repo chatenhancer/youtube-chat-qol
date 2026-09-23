@@ -1023,9 +1023,6 @@
     "themeSecondary": {
       "message": "輔助色"
     },
-    "themePaletteHint": {
-      "message": "按鈕和圖示使用強調色；標籤和醒目提示使用輔助色。面板、選單和文字會自動適應淺色和深色模式。"
-    },
     "theme_theme": {
       "message": "主題色彩"
     },

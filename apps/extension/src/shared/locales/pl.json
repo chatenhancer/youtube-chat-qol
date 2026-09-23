@@ -1023,9 +1023,6 @@
     "themeSecondary": {
       "message": "Kolor dodatkowy"
     },
-    "themePaletteHint": {
-      "message": "Przyciski i ikony używają akcentu, a etykiety i wyróżnienia — koloru dodatkowego. Panele, menu i tekst automatycznie dostosowują się do trybu jasnego i ciemnego."
-    },
     "theme_theme": {
       "message": "Kolory motywu"
     },

@@ -1026,9 +1026,6 @@
     "themeSecondary": {
       "message": "Warna sekunder"
     },
-    "themePaletteHint": {
-      "message": "Tombol dan ikon mengikuti warna aksen; tag dan sorotan memakai warna sekunder. Panel, menu, dan teks otomatis menyesuaikan mode terang dan gelap."
-    },
     "theme_theme": {
       "message": "Warna tema"
     },

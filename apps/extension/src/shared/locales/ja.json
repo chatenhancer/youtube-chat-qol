@@ -1026,9 +1026,6 @@
     "themeSecondary": {
       "message": "セカンダリカラー"
     },
-    "themePaletteHint": {
-      "message": "ボタンとアイコンはアクセント色、タグとハイライトはセカンダリカラーを使います。パネル、メニュー、テキストはライト・ダークモードに自動で適応します。"
-    },
     "theme_theme": {
       "message": "テーマの色"
     },

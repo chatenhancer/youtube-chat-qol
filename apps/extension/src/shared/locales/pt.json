@@ -1026,9 +1026,6 @@
     "themeSecondary": {
       "message": "Cor secundária"
     },
-    "themePaletteHint": {
-      "message": "Botões e ícones seguem a cor de destaque; etiquetas e realces usam a cor secundária. Painéis, menus e textos se adaptam automaticamente aos modos claro e escuro."
-    },
     "theme_theme": {
       "message": "Cores do tema"
     },

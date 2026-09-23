@@ -1023,9 +1023,6 @@
     "themeSecondary": {
       "message": "Color secundario"
     },
-    "themePaletteHint": {
-      "message": "Los botones e iconos siguen el acento; las etiquetas y los resaltados usan el color secundario. Los paneles, menús y textos se adaptan automáticamente al modo claro y oscuro."
-    },
     "theme_theme": {
       "message": "Colores del tema"
     },

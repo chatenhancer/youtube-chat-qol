@@ -1026,9 +1026,6 @@
     "themeSecondary": {
       "message": "İkincil renk"
     },
-    "themePaletteHint": {
-      "message": "Düğmeler ve simgeler vurgu rengini, etiketler ve vurgulamalar ikincil rengi kullanır. Paneller, menüler ve metin açık ve koyu moda otomatik uyum sağlar."
-    },
     "theme_theme": {
       "message": "Tema renkleri"
     },

@@ -1023,9 +1023,6 @@
     "themeSecondary": {
       "message": "Màu phụ"
     },
-    "themePaletteHint": {
-      "message": "Nút và biểu tượng dùng màu nhấn; thẻ và phần tô sáng dùng màu phụ. Bảng, menu và văn bản tự động thích ứng với chế độ sáng và tối."
-    },
     "theme_theme": {
       "message": "Màu giao diện"
     },

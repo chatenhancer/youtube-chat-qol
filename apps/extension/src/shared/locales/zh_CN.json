@@ -1026,9 +1026,6 @@
     "themeSecondary": {
       "message": "辅助色"
     },
-    "themePaletteHint": {
-      "message": "按钮和图标使用强调色；标签和高亮使用辅助色。面板、菜单和文字会自动适应浅色和深色模式。"
-    },
     "theme_theme": {
       "message": "主题颜色"
     },

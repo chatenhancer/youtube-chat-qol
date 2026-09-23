@@ -1023,9 +1023,6 @@
     "themeSecondary": {
       "message": "Sekundärfarbe"
     },
-    "themePaletteHint": {
-      "message": "Schaltflächen und Symbole folgen der Akzentfarbe; Tags und Hervorhebungen nutzen die Sekundärfarbe. Bereiche, Menüs und Text passen sich automatisch an den hellen und dunklen Modus an."
-    },
     "theme_theme": {
       "message": "Theme-Farben"
     },

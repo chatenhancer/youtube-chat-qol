@@ -1026,9 +1026,6 @@
     "themeSecondary": {
       "message": "Secondary color"
     },
-    "themePaletteHint": {
-      "message": "Buttons and icons follow the accent; tags and highlights use the secondary color. Panels, menus, and text adapt automatically to light and dark mode."
-    },
     "theme_theme": {
       "message": "Theme colors"
     },
