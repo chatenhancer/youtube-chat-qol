@@ -88,7 +88,7 @@ html body { margin: 0; min-width: 320px; font-family: inherit; }
 .theme-subsection { border-top: 1px solid var(--ytcq-popup-control-border); padding-top: 12px; }
 .theme-subsection h3 { margin: 0; color: var(--ytcq-popup-secondary-text); font-size: 12px; font-weight: 600; line-height: 17px; }
 .theme-subsection > .theme-fields-content { margin-top: 16px; }
-.theme-status { display: flex; align-items: center; gap: 4px; margin: 0; font-size: 12px; line-height: 17px; color: var(--ytcq-popup-secondary-text); }
+.theme-status { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 0; color: var(--ytcq-popup-secondary-text); font-size: 12px; line-height: 17px; text-align: center; }
 .theme-status:empty { display: none; }
 .theme-status svg { width: 13px; height: 13px; flex: 0 0 13px; }
 :root[dir="rtl"] .theme-status svg { transform: scaleX(-1); }
