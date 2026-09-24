@@ -4,7 +4,7 @@ import { normalizeOptions } from './options';
 import {
   APPLIED_CUSTOM_THEME_KEY, CUSTOM_THEMES_KEY, MAX_THEME_GIF_BYTES, MAX_THEME_IMAGE_LENGTH, applyCustomTheme, createCustomTheme,
   deleteCustomTheme, loadCustomThemes, normalizeCustomTheme, normalizeCustomThemes,
-  normalizeThemeImage, saveCustomTheme, selectedTheme, selectedThemeId
+  normalizeThemeImage, saveCustomTheme, selectedTheme, selectedThemeId, serializeCustomTheme
 } from './custom-themes';
 
 describe('custom themes', () => {
@@ -78,7 +78,7 @@ describe('custom themes', () => {
     expect(applied.surfaces.header.color).toBe(oldColor);
   });
 
-  it('preserves GIF data in saved and applied backgrounds and avatar frames', async () => {
+  it('embeds a repeated GIF once per saved or applied theme and preserves every use', async () => {
     const image = 'data:image/gif;base64,R0lGODlhAQABAIAAACAwRGBAYCH/C05FVFNDQVBFMi4wAwEAAAAh+QQAMgAAACwAAAAAAQABAAACAkQBACH5BAAyAAAALAAAAAABAAEAAAICTAEAOw==';
     const theme = { ...createCustomTheme(), name: 'Animated', avatarFrame: image };
     for (const surface of Object.values(theme.surfaces)) {
@@ -88,7 +88,87 @@ describe('custom themes', () => {
     await saveCustomTheme(theme);
     await applyCustomTheme(theme);
     expect((await loadCustomThemes()).find(item => item.id === theme.id)).toEqual(theme);
+    const stored = await chrome.storage.local.get([CUSTOM_THEMES_KEY, APPLIED_CUSTOM_THEME_KEY]);
+    const saved = stored[CUSTOM_THEMES_KEY].find((item: { id: string }) => item.id === theme.id);
+    for (const snapshot of [saved, stored[APPLIED_CUSTOM_THEME_KEY]]) {
+      expect(snapshot.version).toBe(1);
+      expect(snapshot.avatarFrame).toBe(image);
+      expect(snapshot.surfaces.header.image).toEqual({ $ref: '#/avatarFrame' });
+      expect(JSON.stringify(snapshot).split(image)).toHaveLength(2);
+      expect(normalizeCustomTheme(snapshot)).toEqual(theme);
+    }
+    expect(theme.surfaces.header.image).toBe(image);
+  });
+
+  it('loads legacy duplicated images and compacts the next save without changing the applied theme', async () => {
+    const image = 'data:image/png;base64,AQID';
+    const theme = { ...createCustomTheme(), name: 'Legacy images' };
+    theme.surfaces.header.image = theme.surfaces.header.darkImage = image;
+    await chrome.storage.local.set({ [CUSTOM_THEMES_KEY]: [theme], [APPLIED_CUSTOM_THEME_KEY]: theme });
+    await chrome.storage.sync.set({ chatSkin: `custom:${theme.id}` });
+    expect((await loadCustomThemes()).find(item => item.id === theme.id)).toEqual(theme);
+    expect(normalizeCustomTheme((await chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY))[APPLIED_CUSTOM_THEME_KEY])).toEqual(theme);
+    await saveCustomTheme(theme);
+    const saved = (await chrome.storage.local.get(CUSTOM_THEMES_KEY))[CUSTOM_THEMES_KEY]
+      .find((item: { id: string }) => item.id === theme.id);
+    expect(saved.surfaces.header.darkImage).toEqual({ $ref: '#/surfaces/header/image' });
+    expect(normalizeCustomTheme(saved)).toEqual(theme);
     expect((await chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY))[APPLIED_CUSTOM_THEME_KEY]).toEqual(theme);
+    expect(await chrome.storage.sync.get('chatSkin')).toEqual({ chatSkin: `custom:${theme.id}` });
+  });
+
+  it('keeps other image uses and the applied snapshot intact when the original field is replaced or cleared', async () => {
+    const image = 'data:image/png;base64,AQID';
+    const replacement = 'data:image/webp;base64,BAUG';
+    const theme = { ...createCustomTheme(), name: 'Shared images', avatarFrame: image };
+    theme.surfaces.header.image = theme.surfaces.chat.darkImage = image;
+    await saveCustomTheme(theme);
+    await applyCustomTheme(theme);
+    const edited = (await loadCustomThemes()).find(item => item.id === theme.id)!;
+    edited.avatarFrame = replacement;
+    edited.surfaces.header.image = '';
+    await saveCustomTheme(edited);
+    const saved = (await loadCustomThemes()).find(item => item.id === theme.id)!;
+    expect(saved.avatarFrame).toBe(replacement);
+    expect(saved.surfaces.header.image).toBe('');
+    expect(saved.surfaces.chat.darkImage).toBe(image);
+    expect(normalizeCustomTheme((await chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY))[APPLIED_CUSTOM_THEME_KEY])).toEqual(theme);
+    await applyCustomTheme(saved);
+    expect(normalizeCustomTheme((await chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY))[APPLIED_CUSTOM_THEME_KEY])).toEqual(saved);
+  });
+
+  it.each(['header', 'chat', 'composer'] as const)('resolves light and dark references within the %s surface', (area) => {
+    const image = 'data:image/png;base64,AQID';
+    for (const key of ['image', 'darkImage'] as const) {
+      const theme = createCustomTheme();
+      theme.surfaces[area][key] = image;
+      const stored = { ...theme, avatarFrame: { $ref: `#/surfaces/${area}/${key}` } };
+      const expanded = normalizeCustomTheme(stored)!;
+      expect(expanded.avatarFrame).toBe(image);
+      expect(normalizeCustomTheme(JSON.parse(JSON.stringify(serializeCustomTheme(expanded))))).toEqual(expanded);
+    }
+  });
+
+  it('rejects missing, external, non-image, chained, and circular image references', () => {
+    const theme = createCustomTheme();
+    const invalidReferences = [
+      '#/surfaces/missing/image', 'https://example.com/theme.json#/avatarFrame',
+      '#/accent', '#/surfaces/header/image', '#/avatarFrame', '#/surfaces/chat/image'
+    ];
+    for (const $ref of invalidReferences) {
+      const stored = {
+        ...theme,
+        avatarFrame: { $ref: '#/surfaces/header/image' },
+        surfaces: {
+          ...theme.surfaces,
+          header: { ...theme.surfaces.header, image: { $ref } },
+          chat: { ...theme.surfaces.chat, image: 'https://example.com/image.png' }
+        }
+      };
+      const normalized = normalizeCustomTheme(stored)!;
+      expect(normalized.avatarFrame).toBe('');
+      expect(normalized.surfaces.header.image).toBe('');
+    }
   });
 
   it('allows larger GIFs while retaining the static-image limit and bounding animated data', () => {
@@ -117,7 +197,7 @@ describe('custom themes', () => {
     expect(fetch).toHaveBeenCalledWith('chrome-extension://test/themes/aero.json');
     expect(aero).toEqual(normalizeCustomTheme(aeroPreset));
     expect(aero.id).toBe('aero');
-    expect((await chrome.storage.local.get(CUSTOM_THEMES_KEY))[CUSTOM_THEMES_KEY]).toEqual([aero]);
+    expect(normalizeCustomThemes((await chrome.storage.local.get(CUSTOM_THEMES_KEY))[CUSTOM_THEMES_KEY])).toEqual([aero]);
     expect(await loadCustomThemes()).toEqual([aero]);
     await expect(deleteCustomTheme(aero.id)).rejects.toThrow('cannot be deleted');
     await expect(saveCustomTheme({ ...aero, name: 'Changed' })).rejects.toThrow('copy');
@@ -169,7 +249,7 @@ describe('custom themes', () => {
     const outdated = { ...structuredClone(aero), radius: 18 };
     await chrome.storage.local.set({ [CUSTOM_THEMES_KEY]: [outdated, copy] });
     expect(await loadCustomThemes()).toEqual([aero, copy]);
-    expect(await chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY)).toEqual({ [APPLIED_CUSTOM_THEME_KEY]: copy });
+    expect(normalizeCustomTheme((await chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY))[APPLIED_CUSTOM_THEME_KEY])).toEqual(copy);
     expect(await chrome.storage.sync.get('chatSkin')).toEqual({ chatSkin: 'custom:my-sky' });
   });
 

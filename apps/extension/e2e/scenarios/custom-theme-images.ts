@@ -118,12 +118,14 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       const source = `data:image/gif;base64,${buffer.toString('base64')}`;
       // Valid GIF comments keep the two animation frames while making its
       // base64 data exceed the browser's 2 MiB CSS custom-property limit.
-      const commentBlock = Buffer.concat([Buffer.from([255]), Buffer.alloc(255)]);
-      const largeBuffer = Buffer.concat([
-        buffer.subarray(0, -1), Buffer.from([0x21, 0xfe]),
-        ...Array<Buffer>(7_000).fill(commentBlock), Buffer.from([0, 0x3b])
-      ]);
-      const largeSource = `data:image/gif;base64,${largeBuffer.toString('base64')}`;
+      const largeBuffers = [0, 1, 2].map(value => {
+        const commentBlock = Buffer.concat([Buffer.from([255]), Buffer.alloc(255, value)]);
+        return Buffer.concat([
+          buffer.subarray(0, -1), Buffer.from([0x21, 0xfe]),
+          ...Array<Buffer>(7_000).fill(commentBlock), Buffer.from([0, 0x3b])
+        ]);
+      });
+      const largeSources = largeBuffers.map(image => `data:image/gif;base64,${image.toString('base64')}`);
       await editor.locator('#themeName').fill('Animated');
       await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       await editor.locator('[data-theme-field="fill"]').selectOption('image');
@@ -136,12 +138,15 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       await editor.getByRole('tab', { name: 'Details', exact: true }).click();
       await editor.locator('[data-theme-field="avatarFrame"]').setInputFiles({ name: 'frame.gif', mimeType: 'image/gif', buffer });
       await editor.getByRole('tab', { name: 'Background', exact: true }).click();
-      // Three allowed GIF uploads fit in the saved library, but its separate
-      // applied snapshot takes total local storage beyond Chrome's 10 MiB quota.
-      for (const [area, key] of [['chat', 'image'], ['chat', 'darkImage'], ['composer', 'image']]) {
+      // Share the chat image in both modes, but keep three distinct GIF assets
+      // so the library and applied snapshot still exceed Chrome's 10 MiB quota.
+      for (const [area, key, index] of [
+        ['chat', 'image', 0], ['chat', 'darkImage', 0],
+        ['composer', 'image', 1], ['composer', 'darkImage', 2]
+      ] as const) {
         await editor.locator(`[data-theme-area="${area}"]`).click();
         await editor.locator('[data-theme-field="fill"]').selectOption('image');
-        await editor.locator(`[data-theme-field="${key}"]`).setInputFiles({ name: 'large-background.gif', mimeType: 'image/gif', buffer: largeBuffer });
+        await editor.locator(`[data-theme-field="${key}"]`).setInputFiles({ name: 'large-background.gif', mimeType: 'image/gif', buffer: largeBuffers[index] });
         await expect(editor.locator('[data-theme-field="imageText"]')).toBeEnabled();
       }
       await editor.locator('[data-theme-area="chat"]').click();
@@ -153,11 +158,13 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       await expect(editor.locator('.theme-status')).toHaveText('Theme saved and applied.');
       expect(await worker.evaluate(() => chrome.storage.local.getBytesInUse(null))).toBeGreaterThan(10 * 1024 * 1024);
       const applied = await worker.evaluate(async () => (await chrome.storage.local.get('ytcqAppliedCustomTheme:v1'))['ytcqAppliedCustomTheme:v1']);
+      expect(applied.version).toBe(1);
       expect(applied.avatarFrame).toBe(source);
-      expect(applied.surfaces.header).toMatchObject({ image: source, darkImage: source });
-      expect(applied.surfaces.chat.image).toBe(largeSource);
-      expect(applied.surfaces.chat.darkImage).toBe(largeSource);
-      expect(applied.surfaces.composer.image).toBe(largeSource);
+      expect(applied.surfaces.header).toMatchObject({ image: { $ref: '#/avatarFrame' }, darkImage: { $ref: '#/avatarFrame' } });
+      expect(applied.surfaces.chat.image).toBe(largeSources[0]);
+      expect(applied.surfaces.chat.darkImage).toEqual({ $ref: '#/surfaces/chat/image' });
+      expect(applied.surfaces.composer.image).toBe(largeSources[1]);
+      expect(applied.surfaces.composer.darkImage).toBe(largeSources[2]);
       await editor.reload();
       await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       const thumbnail = editor.locator('[data-theme-field="image"]').locator('..').locator('img');

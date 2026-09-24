@@ -46,6 +46,37 @@ export interface CustomTheme {
   surfaces: Record<ThemeArea, ThemeSurface>;
 }
 
+type ThemeImagePath = '#/avatarFrame' | `#/surfaces/${ThemeArea}/${'image' | 'darkImage'}`;
+type StoredThemeImage = string | { $ref: ThemeImagePath };
+interface StoredCustomTheme extends Omit<CustomTheme, 'avatarFrame' | 'surfaces'> {
+  avatarFrame: StoredThemeImage;
+  surfaces: Record<ThemeArea, Omit<ThemeSurface, 'image' | 'darkImage'> & {
+    image: StoredThemeImage;
+    darkImage: StoredThemeImage;
+  }>;
+}
+
+/** Store duplicates as references to an embedded image in this same snapshot. */
+export function serializeCustomTheme(theme: CustomTheme): StoredCustomTheme {
+  const images = new Map<string, ThemeImagePath>();
+  const image = (value: string, path: ThemeImagePath): StoredThemeImage => {
+    if (!value) return '';
+    const reference = images.get(value);
+    if (reference) return { $ref: reference };
+    images.set(value, path);
+    return value;
+  };
+  return {
+    ...theme,
+    avatarFrame: image(theme.avatarFrame, '#/avatarFrame'),
+    surfaces: Object.fromEntries(THEME_AREAS.map((area) => [area, {
+      ...theme.surfaces[area],
+      image: image(theme.surfaces[area].image, `#/surfaces/${area}/image`),
+      darkImage: image(theme.surfaces[area].darkImage, `#/surfaces/${area}/darkImage`)
+    }])) as StoredCustomTheme['surfaces']
+  };
+}
+
 export function defaultThemeRadius(finish: CustomTheme['finish']): number {
   return finish === 'glass' ? 4 : 12;
 }
@@ -85,6 +116,8 @@ export function normalizeThemeImage(value: unknown): string {
 export function normalizeCustomTheme(value: unknown): CustomTheme | null {
   const data = object(value);
   if (data.version !== 1 || typeof data.id !== 'string' || !/^[a-zA-Z0-9-]{1,64}$/.test(data.id)) return null;
+  // Embedded images and references both expand into independent
+  // image fields for the editor and renderer. Saving never mutates the input.
   const theme = createCustomTheme();
   theme.id = data.id;
   theme.name = typeof data.name === 'string' ? data.name.trim().slice(0, 60) : '';
@@ -99,7 +132,7 @@ export function normalizeCustomTheme(value: unknown): CustomTheme | null {
   for (const key of ['accent', 'secondary', 'border'] as const) {
     theme[key] = color(data[key], theme[key]);
   }
-  theme.avatarFrame = normalizeThemeImage(data.avatarFrame);
+  theme.avatarFrame = normalizeStoredThemeImage(data.avatarFrame, data);
   theme.messageMark = color(data.messageMark, '');
   for (const area of THEME_AREAS) {
     const surface = theme.surfaces[area];
@@ -109,8 +142,8 @@ export function normalizeCustomTheme(value: unknown): CustomTheme | null {
     for (const key of ['color', 'gradientColor'] as const) {
       surface[key] = color(storedSurface[key], surface[key]);
     }
-    surface.image = normalizeThemeImage(storedSurface.image);
-    surface.darkImage = normalizeThemeImage(storedSurface.darkImage);
+    surface.image = normalizeStoredThemeImage(storedSurface.image, data);
+    surface.darkImage = normalizeStoredThemeImage(storedSurface.darkImage, data);
     surface.imageText = choice(storedSurface.imageText, ['auto', 'light', 'dark'], 'auto');
     surface.opacity = number(storedSurface.opacity, 100, 100);
     surface.position = number(storedSurface.position, 50, 100);
@@ -121,6 +154,21 @@ export function normalizeCustomTheme(value: unknown): CustomTheme | null {
     surface.imageHeight = Math.max(20, number(storedSurface.imageHeight, 110, 400));
   }
   return theme;
+}
+
+function normalizeStoredThemeImage(value: unknown, theme: Record<string, unknown>): string {
+  const reference = object(value).$ref;
+  if (typeof reference === 'string') {
+    if (reference === '#/avatarFrame') {
+      value = theme.avatarFrame;
+    } else {
+      const path = /^#\/surfaces\/(header|chat|composer)\/(image|darkImage)$/.exec(reference);
+      value = path ? object(object(theme.surfaces)[path[1]])[path[2]] : undefined;
+    }
+  }
+  // Only direct references to known image fields are allowed. No traversal,
+  // reference chains, or cycles; referenced bytes still pass image validation.
+  return normalizeThemeImage(value);
 }
 
 export function normalizeCustomThemes(value: unknown): CustomTheme[] {
@@ -149,7 +197,7 @@ export async function loadCustomThemes(): Promise<CustomTheme[]> {
   if (JSON.stringify(themes[presetIndex]) !== JSON.stringify(preset)) {
     if (presetIndex < 0) themes.unshift(preset);
     else themes[presetIndex] = preset;
-    await chrome.storage.local.set({ [CUSTOM_THEMES_KEY]: themes });
+    await chrome.storage.local.set({ [CUSTOM_THEMES_KEY]: themes.map(serializeCustomTheme) });
   }
   return themes;
 }
@@ -178,7 +226,7 @@ export async function saveCustomTheme(theme: CustomTheme): Promise<void> {
   const index = themes.findIndex((item) => item.id === theme.id);
   if (index === -1) themes.push(normalized);
   else themes[index] = normalized;
-  await chrome.storage.local.set({ [CUSTOM_THEMES_KEY]: themes });
+  await chrome.storage.local.set({ [CUSTOM_THEMES_KEY]: themes.map(serializeCustomTheme) });
 }
 
 export async function applyCustomTheme(theme: CustomTheme): Promise<void> {
@@ -187,7 +235,7 @@ export async function applyCustomTheme(theme: CustomTheme): Promise<void> {
     : normalizeCustomTheme(theme);
   if (!normalized?.name) throw new Error('Invalid theme');
   // A separate applied snapshot lets Save leave the active appearance untouched.
-  await chrome.storage.local.set({ [APPLIED_CUSTOM_THEME_KEY]: normalized });
+  await chrome.storage.local.set({ [APPLIED_CUSTOM_THEME_KEY]: serializeCustomTheme(normalized) });
   await chrome.storage.sync.set({ chatSkin: customThemeSkin(normalized) });
 }
 
@@ -196,7 +244,7 @@ export async function deleteCustomTheme(id: string): Promise<void> {
   const themes = await loadCustomThemes();
   const { chatSkin } = await chrome.storage.sync.get('chatSkin');
   if (chatSkin === `custom:${id}`) await chrome.storage.sync.set({ chatSkin: 'system' });
-  await chrome.storage.local.set({ [CUSTOM_THEMES_KEY]: themes.filter((theme) => theme.id !== id) });
+  await chrome.storage.local.set({ [CUSTOM_THEMES_KEY]: themes.filter((theme) => theme.id !== id).map(serializeCustomTheme) });
   const applied = await chrome.storage.local.get(APPLIED_CUSTOM_THEME_KEY);
   if (normalizeCustomTheme(applied[APPLIED_CUSTOM_THEME_KEY])?.id === id) {
     await chrome.storage.local.remove(APPLIED_CUSTOM_THEME_KEY);
