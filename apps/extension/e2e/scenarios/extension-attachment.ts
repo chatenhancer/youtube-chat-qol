@@ -41,6 +41,16 @@ async function runAttachmentScenario(
     await developerMode.click();
   }
   const toggle = extensions.locator(`extensions-item[id="${extensionId}"] #enableToggle`);
+  const setExtensionEnabled = async (enabled: boolean): Promise<void> => {
+    await extensions.bringToFront();
+    const checked = await toggle.evaluate((element) => (element as HTMLElement & { checked: boolean }).checked);
+    if (checked !== enabled) {
+      // Use Chrome's keyboard action so pointer/drag handling in cr-toggle
+      // cannot swallow the state change when switching between test tabs.
+      await toggle.press('Space');
+    }
+    await expect(toggle).toHaveJSProperty('checked', enabled);
+  };
   const watchUrl = 'https://www.youtube.com/watch?v=attach-test-01';
   const foreignFrameUrl = 'https://example.com/unrelated-embed';
   await context.route(foreignFrameUrl, (route) => route.fulfill({
@@ -62,8 +72,7 @@ async function runAttachmentScenario(
       // Leave the fixture chat before disabling so its cleanup cannot reload
       // that document while this scenario navigates to the new watch page.
       await page.goto('about:blank');
-      await toggle.click();
-      await expect(toggle).toHaveJSProperty('checked', false);
+      await setExtensionEnabled(false);
     }
     await page.goto(watchUrl);
     const chat = page.frameLocator('#chatframe');
@@ -85,8 +94,7 @@ async function runAttachmentScenario(
     });
 
     if (reconnect) {
-      await toggle.click();
-      await expect(toggle).toHaveJSProperty('checked', false);
+      await setExtensionEnabled(false);
       await page.bringToFront();
       // A plain disable must restore native chat without the five-second wait.
       await expect(chat.locator('.ytcq-inbox-button, .ytcq-lite-root')).toHaveCount(0, { timeout: 1_500 });
@@ -96,8 +104,7 @@ async function runAttachmentScenario(
       await expect(page.locator('video')).toHaveJSProperty('paused', false);
     }
 
-    await toggle.click();
-    await expect(toggle).toHaveJSProperty('checked', true);
+    await setExtensionEnabled(true);
     await page.bringToFront();
     if (previousInstance) {
       await expect(chat.locator('html')).not.toHaveAttribute('data-ytcq-content-instance', previousInstance);
@@ -124,9 +131,7 @@ async function runAttachmentScenario(
     await input.dispose();
     await player.dispose();
   } finally {
-    if (!(await toggle.evaluate((element) => (element as HTMLElement & { checked: boolean }).checked))) {
-      await toggle.click();
-    }
+    await setExtensionEnabled(true);
     await extensions.close();
     await context.unroute(watchUrl);
     await context.unroute(foreignFrameUrl);
