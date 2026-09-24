@@ -136,18 +136,28 @@ export const customThemeImagesScenario: BrowserScenario = async ({ chat, context
       await editor.getByRole('tab', { name: 'Details', exact: true }).click();
       await editor.locator('[data-theme-field="avatarFrame"]').setInputFiles({ name: 'frame.gif', mimeType: 'image/gif', buffer });
       await editor.getByRole('tab', { name: 'Background', exact: true }).click();
+      // Three allowed GIF uploads fit in the saved library, but its separate
+      // applied snapshot takes total local storage beyond Chrome's 10 MiB quota.
+      for (const [area, key] of [['chat', 'image'], ['chat', 'darkImage'], ['composer', 'image']]) {
+        await editor.locator(`[data-theme-area="${area}"]`).click();
+        await editor.locator('[data-theme-field="fill"]').selectOption('image');
+        await editor.locator(`[data-theme-field="${key}"]`).setInputFiles({ name: 'large-background.gif', mimeType: 'image/gif', buffer: largeBuffer });
+        await expect(editor.locator('[data-theme-field="imageText"]')).toBeEnabled();
+      }
       await editor.locator('[data-theme-area="chat"]').click();
-      await editor.locator('[data-theme-field="fill"]').selectOption('image');
-      await editor.locator('[data-theme-field="image"]').setInputFiles({ name: 'large-background.gif', mimeType: 'image/gif', buffer: largeBuffer });
-      await expect(editor.locator('[data-theme-field="imageText"]')).toBeEnabled();
       const feed = preview.locator('yt-live-chat-item-list-renderer');
       await expect(feed).toHaveCSS('background-image', /url\("blob:/);
-      await editor.locator('#themeSaveApply').click();
+      await editor.locator('#themeSave').click();
+      await expect(editor.locator('.theme-status')).toHaveText('Theme saved. The applied theme is unchanged.');
+      await editor.getByRole('button', { name: 'Use theme', exact: true }).click();
       await expect(editor.locator('.theme-status')).toHaveText('Theme saved and applied.');
+      expect(await worker.evaluate(() => chrome.storage.local.getBytesInUse(null))).toBeGreaterThan(10 * 1024 * 1024);
       const applied = await worker.evaluate(async () => (await chrome.storage.local.get('ytcqAppliedCustomTheme:v1'))['ytcqAppliedCustomTheme:v1']);
       expect(applied.avatarFrame).toBe(source);
       expect(applied.surfaces.header).toMatchObject({ image: source, darkImage: source });
       expect(applied.surfaces.chat.image).toBe(largeSource);
+      expect(applied.surfaces.chat.darkImage).toBe(largeSource);
+      expect(applied.surfaces.composer.image).toBe(largeSource);
       await editor.reload();
       await editor.getByRole('tab', { name: 'Background', exact: true }).click();
       const thumbnail = editor.locator('[data-theme-field="image"]').locator('..').locator('img');
