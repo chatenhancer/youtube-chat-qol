@@ -45,9 +45,9 @@ async function runAttachmentScenario(
     await extensions.bringToFront();
     const checked = await toggle.evaluate((element) => (element as HTMLElement & { checked: boolean }).checked);
     if (checked !== enabled) {
-      // Use Chrome's keyboard action so pointer/drag handling in cr-toggle
-      // cannot swallow the state change when switching between test tabs.
-      await toggle.press('Space');
+      // Enter activates on keydown, without depending on Space's keyup after
+      // extension shutdown changes focus or reloads the chat frame.
+      await toggle.press('Enter');
     }
     await expect(toggle).toHaveJSProperty('checked', enabled);
   };

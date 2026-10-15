@@ -20,11 +20,23 @@ export async function withExtensionStorageValues<T>(
   const previous = await readExtensionStorageSnapshot(context, area, keys);
   await setExtensionStorageValues(context, area, values);
 
+  let result: T;
   try {
-    return await callback();
-  } finally {
-    await restoreExtensionStorageValues(context, area, previous);
+    result = await callback();
+  } catch (error) {
+    try {
+      await restoreExtensionStorageValues(context, area, previous);
+    } catch (cleanupError) {
+      throw new AggregateError(
+        [error, cleanupError],
+        'Scenario failed, and restoring extension storage also failed.',
+        { cause: error }
+      );
+    }
+    throw error;
   }
+  await restoreExtensionStorageValues(context, area, previous);
+  return result;
 }
 
 export async function withExtensionStorageSnapshot<T>(

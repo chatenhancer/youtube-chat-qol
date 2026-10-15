@@ -7,7 +7,7 @@ export default defineProject({
     name: 'extension',
     environment: 'jsdom',
     globals: false,
-    include: ['src/**/*.test.{ts,tsx}'],
+    include: ['src/**/*.test.{ts,tsx}', 'e2e/support/**/*.test.ts'],
     restoreMocks: true,
     setupFiles: ['vitest.setup.ts']
   }
