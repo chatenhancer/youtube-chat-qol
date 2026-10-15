@@ -91,7 +91,7 @@
       "other": "{count} 則已儲存訊息"
     },
     "settingState": "{label}{state}。",
-    "showRecentMessages": "顯示最近訊息",
+    "viewUser": "查看 {user}",
     "stateOff": "關閉",
     "selectOff": "關閉",
     "stateOn": "開啟",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "訊息密度"
+      "message": "訊息外觀"
     },
     "messageDensityTitle": {
-      "message": "選擇 YouTube 聊天中的訊息間距。"
+      "message": "選擇 YouTube 聊天訊息的顯示方式。"
     },
     "messageDensityHelper": {
-      "message": "在不變更文字大小的情況下顯示更多訊息。"
+      "message": "選擇聊天室訊息串中訊息的顯示方式。"
     },
     "messageDensityDefault": {
       "message": "預設"
     },
     "messageDensityCompact": {
       "message": "緊湊"
+    },
+    "messageDensityMinimal": {
+      "message": "極簡"
     },
     "popupResetItemBookmarks": {
       "message": "書籤"

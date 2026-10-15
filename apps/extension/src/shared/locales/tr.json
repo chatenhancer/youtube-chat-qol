@@ -91,7 +91,7 @@
       "other": "{count} kayıtlı mesaj"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "Son mesajları göster",
+    "viewUser": "{user} adlı kullanıcıyı görüntüle",
     "stateOff": "kapalı",
     "selectOff": "Kapalı",
     "stateOn": "açık",
@@ -925,19 +925,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "Mesaj yoğunluğu"
+      "message": "Mesaj görünümü"
     },
     "messageDensityTitle": {
-      "message": "YouTube sohbetinde mesajların ne kadar yakın görüneceğini seçin."
+      "message": "YouTube sohbetinde mesajların nasıl görüneceğini seçin."
     },
     "messageDensityHelper": {
-      "message": "Metin boyutunu değiştirmeden sohbette daha fazla mesaj gösterin."
+      "message": "Sohbet akışında mesajların nasıl görüntüleneceğini seçin."
     },
     "messageDensityDefault": {
       "message": "Varsayılan"
     },
     "messageDensityCompact": {
       "message": "Kompakt"
+    },
+    "messageDensityMinimal": {
+      "message": "Minimal"
     },
     "popupResetItemBookmarks": {
       "message": "Yer imleri"

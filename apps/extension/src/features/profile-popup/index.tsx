@@ -12,6 +12,8 @@ import { createCloseIcon } from '../../shared/icons';
 import { jsx, el } from '../../shared/jsx-dom';
 import { updateScrollEdgeFades, wireScrollEdgeFades } from '../../shared/scroll';
 import { findChatInput } from '../../youtube/chat-input';
+import { getAuthorName } from '../../youtube/messages';
+import { getParticipantAuthorName } from '../../youtube/participants';
 import {
   getLiveMessageForRecord,
   getUserMessagesForIdentity,
@@ -103,14 +105,15 @@ export function wireProfileClick(
     return;
   }
 
+  const avatar = message.querySelector<HTMLElement>('#author-photo');
+  const authorName = getAuthorName(message);
+  if (avatar && authorName) avatar.title = t('viewUser', { user: authorName });
+
   if (message.dataset.ytcqProfileWired === 'true') return;
   message.dataset.ytcqProfileWired = 'true';
-
-  const avatar = message.querySelector<HTMLElement>('#author-photo');
   if (!avatar) return;
 
   avatar.classList.add('ytcq-profile-enabled');
-  avatar.title = t('showRecentMessages');
   const handleClick = (event: MouseEvent): void => {
     const source = getMessageProfileSource(message);
     if (!source) return;
@@ -154,17 +157,22 @@ function handleLiteProfileClick(event: MouseEvent): void {
 }
 
 export function wireParticipantProfileClick(participant: HTMLElement): void {
-  if (participant.dataset.ytcqProfileWired === 'true') return;
-  participant.dataset.ytcqProfileWired = 'true';
-
   const clickTargets = [
     participant.querySelector<HTMLElement>('yt-img-shadow, img#img, img'),
     participant.querySelector<HTMLElement>('#author-name')
   ].filter((target): target is HTMLElement => Boolean(target));
+  const authorName = getParticipantAuthorName(participant);
+  if (authorName) {
+    clickTargets.forEach((target) => {
+      target.title = t('viewUser', { user: authorName });
+    });
+  }
+
+  if (participant.dataset.ytcqProfileWired === 'true') return;
+  participant.dataset.ytcqProfileWired = 'true';
 
   clickTargets.forEach((target) => {
     target.classList.add('ytcq-profile-enabled');
-    target.title = t('showRecentMessages');
     const handleClick = (event: MouseEvent): void => {
       const source = getParticipantProfileSource(participant);
       if (!source) return;
@@ -196,9 +204,7 @@ export function cleanupStaleProfilePopupSurfaces(): void {
     .forEach((card) => card.remove());
   document.querySelectorAll<HTMLElement>('.ytcq-profile-enabled').forEach((target) => {
     target.classList.remove('ytcq-profile-enabled');
-    if (target.title === t('showRecentMessages')) {
-      target.removeAttribute('title');
-    }
+    target.removeAttribute('title');
   });
   document.querySelectorAll('[data-ytcq-profile-wired]').forEach((element) => {
     element.removeAttribute('data-ytcq-profile-wired');

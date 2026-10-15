@@ -1258,11 +1258,11 @@ describe('popup', () => {
     }
   });
 
-  it('loads saved settings into their controls', async () => {
+  it.each(['compact', 'minimal'])('loads saved settings with %s message appearance', async messageDensity => {
     await chrome.storage.sync.set({
       chatSkin: 'custom:aero',
       liteModeEnabled: true,
-      messageDensity: 'compact',
+      messageDensity,
       sound: false,
       startupEffect: true,
       targetLanguage: 'ja',
@@ -1271,7 +1271,7 @@ describe('popup', () => {
     await import('./index');
 
     for (const [id, value] of [
-      ['chatSkin', 'custom:aero'], ['messageDensity', 'compact'],
+      ['chatSkin', 'custom:aero'], ['messageDensity', messageDensity],
       ['targetLanguage', 'ja'], ['translationDisplay', 'below']
     ]) {
       expect(document.querySelector<HTMLSelectElement>(`#${id}`)?.value).toBe(value);
@@ -1307,7 +1307,7 @@ describe('popup', () => {
     const changes: Array<[string, string | boolean]> = [
       ['translationDisplay', 'below'], ['translationDisplay', 'replace'],
       ['chatSkin', 'custom:aero'], ['chatSkin', 'system'],
-      ['messageDensity', 'compact'], ['messageDensity', 'default'],
+      ['messageDensity', 'compact'], ['messageDensity', 'minimal'], ['messageDensity', 'default'],
       ['sound', false], ['sound', true],
       ['startupEffect', false], ['startupEffect', true],
       ['liteModeEnabled', true], ['liteModeEnabled', false]

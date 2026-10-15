@@ -12,7 +12,6 @@ export function createThemePreview(frame: HTMLIFrameElement): {
 } {
   let draft: CustomTheme | null = null;
   let appearance: ChatSkinTheme = 'light';
-  let area: ThemeArea = 'header';
   let activeHighlight: HTMLSpanElement | null = null;
   const themeStyles = createThemeStyleCache(render);
   function render(): void {
@@ -34,7 +33,7 @@ export function createThemePreview(frame: HTMLIFrameElement): {
     preview.dataset.chatSkin = 'custom';
     preview.dataset.chatTheme = appearance;
   }
-  function showArea(): void {
+  function showArea(area: ThemeArea): void {
     const doc = frame.contentDocument;
     if (!doc || !draft) return;
     activeHighlight?.remove();
@@ -74,10 +73,7 @@ export function createThemePreview(frame: HTMLIFrameElement): {
     }
     requestFrame(draw);
   }
-  frame.addEventListener('load', () => {
-    render();
-    showArea();
-  });
+  frame.addEventListener('load', render);
   return {
     update(theme, mode) {
       // The editor mutates its draft in place. A new identity invalidates both cached appearances.
@@ -89,9 +85,6 @@ export function createThemePreview(frame: HTMLIFrameElement): {
       appearance = mode;
       render();
     },
-    showArea(value) {
-      area = value;
-      showArea();
-    }
+    showArea
   };
 }

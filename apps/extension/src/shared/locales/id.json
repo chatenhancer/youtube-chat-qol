@@ -91,7 +91,7 @@
       "other": "{count} pesan tersimpan"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "Tampilkan pesan terbaru",
+    "viewUser": "Lihat {user}",
     "stateOff": "mati",
     "selectOff": "Mati",
     "stateOn": "nyala",
@@ -925,19 +925,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "Kepadatan pesan"
+      "message": "Tampilan pesan"
     },
     "messageDensityTitle": {
-      "message": "Pilih seberapa rapat pesan ditampilkan di chat YouTube."
+      "message": "Pilih tampilan pesan di chat YouTube."
     },
     "messageDensityHelper": {
-      "message": "Tampilkan lebih banyak pesan di chat tanpa mengubah ukuran teks."
+      "message": "Pilih cara pesan ditampilkan di feed chat."
     },
     "messageDensityDefault": {
       "message": "Bawaan"
     },
     "messageDensityCompact": {
       "message": "Ringkas"
+    },
+    "messageDensityMinimal": {
+      "message": "Minimal"
     },
     "popupResetItemBookmarks": {
       "message": "Bookmark"

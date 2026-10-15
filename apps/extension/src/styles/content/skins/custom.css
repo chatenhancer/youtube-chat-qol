@@ -1,5 +1,5 @@
 /* Custom themes style the native chat and extension surfaces without changing layout. */
-:root[data-ytcq-chat-skin="custom"] :where(
+:root[data-ytcq-chat-skin="custom"]:not([data-ytcq-message-density="minimal"]) :where(
   yt-live-chat-text-message-renderer #message-container,
   .ytcq-lite-message-text #message-container
 )::before {

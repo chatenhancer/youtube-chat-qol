@@ -91,7 +91,7 @@
       "other": "{count} 条已保存消息"
     },
     "settingState": "{label} {state}。",
-    "showRecentMessages": "显示最近消息",
+    "viewUser": "查看 {user}",
     "stateOff": "关闭",
     "selectOff": "关闭",
     "stateOn": "开启",
@@ -925,19 +925,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "消息密度"
+      "message": "消息外观"
     },
     "messageDensityTitle": {
-      "message": "选择 YouTube 聊天中消息的间距。"
+      "message": "选择 YouTube 聊天消息的显示方式。"
     },
     "messageDensityHelper": {
-      "message": "在不改变文字大小的情况下显示更多消息。"
+      "message": "选择聊天消息流中消息的显示方式。"
     },
     "messageDensityDefault": {
       "message": "默认"
     },
     "messageDensityCompact": {
       "message": "紧凑"
+    },
+    "messageDensityMinimal": {
+      "message": "极简"
     },
     "popupResetItemBookmarks": {
       "message": "书签"

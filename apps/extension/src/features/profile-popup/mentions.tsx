@@ -156,7 +156,6 @@ function decoratePreservedProfileMentionTokens(
     if (mention === token) {
       mention.setAttribute('role', 'button');
       mention.tabIndex = 0;
-      mention.title = t('showRecentMessages');
       mention.setAttribute(PROFILE_MENTION_CREATED_ATTRIBUTE, 'true');
     }
     applyProfileMentionIdentity(mention, authorName, identity);
@@ -200,17 +199,12 @@ function decorateProfileMentionTextNode(node: Text, resolveMention: ProfileMenti
     }
 
     const mention = el<HTMLSpanElement>(
-      <span
-        class={PROFILE_MENTION_CLASS}
-        role="button"
-        tabIndex={0}
-        title={t('showRecentMessages')}
-      >
+      <span class={PROFILE_MENTION_CLASS} role="button" tabIndex={0}>
         {authorName}
       </span>
     );
-    applyProfileMentionIdentity(mention, authorName, identity);
     mention.setAttribute(PROFILE_MENTION_CREATED_ATTRIBUTE, 'true');
+    applyProfileMentionIdentity(mention, authorName, identity);
     fragment.append(mention);
     cursor = authorStart + authorName.length;
   }
@@ -240,6 +234,9 @@ function applyProfileMentionIdentity(
 ): void {
   mention.dir = 'auto';
   mention.dataset.ytcqProfileMention = identity.authorName || fallbackAuthorName;
+  if (mention.hasAttribute(PROFILE_MENTION_CREATED_ATTRIBUTE)) {
+    mention.title = t('viewUser', { user: getProfileMentionAuthorName(mention) });
+  }
   if (identity.channelId) {
     mention.dataset.ytcqProfileMentionChannelId = identity.channelId;
   } else {
@@ -249,13 +246,14 @@ function applyProfileMentionIdentity(
 
 function clearProfileMentionAttributes(mention: HTMLElement): void {
   const isPreservedToken = mention.classList.contains(PRESERVED_MENTION_TOKEN_CLASS);
+  const title = t('viewUser', { user: getProfileMentionAuthorName(mention) });
   mention.classList.remove(PROFILE_MENTION_CLASS);
   delete mention.dataset.ytcqProfileMention;
   delete mention.dataset.ytcqProfileMentionChannelId;
   if (!isPreservedToken) return;
   mention.removeAttribute('role');
   mention.removeAttribute('tabindex');
-  if (mention.title === t('showRecentMessages')) mention.removeAttribute('title');
+  if (mention.title === title) mention.removeAttribute('title');
 }
 
 function getLinkedChannelId(mention: HTMLElement): string | undefined {

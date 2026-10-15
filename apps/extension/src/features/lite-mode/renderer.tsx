@@ -1089,14 +1089,14 @@ function createAuthorAvatar(author: YouTubeChatAuthor | undefined): HTMLElement 
           id="author-photo"
           class="ytcq-lite-author-photo ytcq-profile-enabled"
           href={channelUrl}
-          title={t('showRecentMessages')}
+          title={author?.name ? t('viewUser', { user: author.name }) : undefined}
         />
       )
     : el<HTMLSpanElement>(
         <span
           id="author-photo"
           class="ytcq-lite-author-photo ytcq-profile-enabled"
-          title={t('showRecentMessages')}
+          title={author?.name ? t('viewUser', { user: author.name }) : undefined}
         />
       );
   const avatarUrl = getSafeHttpsUrl(author?.avatarUrl);

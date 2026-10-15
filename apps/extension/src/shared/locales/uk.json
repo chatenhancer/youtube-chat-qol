@@ -91,7 +91,7 @@
       "other": "{count} збережених повідомлень"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "Показати останні повідомлення",
+    "viewUser": "Переглянути {user}",
     "stateOff": "вимк.",
     "selectOff": "Вимк.",
     "stateOn": "увімк.",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "Щільність повідомлень"
+      "message": "Вигляд повідомлень"
     },
     "messageDensityTitle": {
-      "message": "Виберіть відстань між повідомленнями в чаті YouTube."
+      "message": "Виберіть, як показувати повідомлення в чаті YouTube."
     },
     "messageDensityHelper": {
-      "message": "Показуйте більше повідомлень без зміни розміру тексту."
+      "message": "Виберіть спосіб відображення повідомлень у стрічці чату."
     },
     "messageDensityDefault": {
       "message": "За замовчуванням"
     },
     "messageDensityCompact": {
       "message": "Компактна"
+    },
+    "messageDensityMinimal": {
+      "message": "Мінімальний"
     },
     "popupResetItemBookmarks": {
       "message": "Закладки"

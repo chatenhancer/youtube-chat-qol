@@ -91,7 +91,7 @@
       "other": "{count} پیام ذخیره‌شده"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "نمایش پیام‌های اخیر",
+    "viewUser": "مشاهدهٔ {user}",
     "stateOff": "خاموش",
     "selectOff": "خاموش",
     "stateOn": "روشن",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "تراکم پیام‌ها"
+      "message": "ظاهر پیام‌ها"
     },
     "messageDensityTitle": {
-      "message": "میزان فاصله بین پیام‌ها را در گپ YouTube انتخاب کنید."
+      "message": "نحوهٔ نمایش پیام‌ها در گپ YouTube را انتخاب کنید."
     },
     "messageDensityHelper": {
-      "message": "بدون تغییر اندازه متن، پیام‌های بیشتری را در گپ ببینید."
+      "message": "نحوهٔ نمایش پیام‌ها در جریان گپ را انتخاب کنید."
     },
     "messageDensityDefault": {
       "message": "پیش‌فرض"
     },
     "messageDensityCompact": {
       "message": "فشرده"
+    },
+    "messageDensityMinimal": {
+      "message": "مینیمال"
     },
     "popupResetItemBookmarks": {
       "message": "نشانک‌ها"

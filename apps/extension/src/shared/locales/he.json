@@ -91,7 +91,7 @@
       "other": "{count} הודעות שמורות"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "הצגת הודעות אחרונות",
+    "viewUser": "הצגת {user}",
     "stateOff": "כבוי",
     "selectOff": "כבוי",
     "stateOn": "פעיל",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "צפיפות הודעות"
+      "message": "מראה ההודעות"
     },
     "messageDensityTitle": {
-      "message": "בחרו את המרווח בין הודעות בצ׳אט של YouTube."
+      "message": "בחרו כיצד הודעות יוצגו בצ׳אט של YouTube."
     },
     "messageDensityHelper": {
-      "message": "הציגו יותר הודעות בצ׳אט בלי לשנות את גודל הטקסט."
+      "message": "בחרו כיצד הודעות יוצגו ברצף הצ׳אט."
     },
     "messageDensityDefault": {
       "message": "ברירת מחדל"
     },
     "messageDensityCompact": {
       "message": "קומפקטית"
+    },
+    "messageDensityMinimal": {
+      "message": "מינימלי"
     },
     "popupResetItemBookmarks": {
       "message": "סימניות"

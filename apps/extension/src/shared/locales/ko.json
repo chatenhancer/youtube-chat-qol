@@ -91,7 +91,7 @@
       "other": "저장된 메시지 {count}개"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "최근 메시지 보기",
+    "viewUser": "{user} 보기",
     "stateOff": "꺼짐",
     "selectOff": "꺼짐",
     "stateOn": "켜짐",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "메시지 밀도"
+      "message": "메시지 표시"
     },
     "messageDensityTitle": {
-      "message": "YouTube 채팅에서 메시지 간격을 선택하세요."
+      "message": "YouTube 채팅에서 메시지가 표시되는 방식을 선택하세요."
     },
     "messageDensityHelper": {
-      "message": "글자 크기를 바꾸지 않고 더 많은 메시지를 표시합니다."
+      "message": "채팅 피드에서 메시지가 표시되는 방식을 선택하세요."
     },
     "messageDensityDefault": {
       "message": "기본값"
     },
     "messageDensityCompact": {
       "message": "컴팩트"
+    },
+    "messageDensityMinimal": {
+      "message": "최소"
     },
     "popupResetItemBookmarks": {
       "message": "북마크"

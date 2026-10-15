@@ -171,11 +171,13 @@ async function changePopupMessageDensity({
   context: BrowserContext;
   popup: Page;
 }): Promise<void> {
-  await test.step('Set message density from the popup', async () => {
+  await test.step('Set message appearance from the popup', async () => {
     const control = popup.locator('#messageDensity');
     await expect(control).toBeVisible();
-    await expect(popup.locator('#messageDensityLabel')).toHaveText('Message density');
-    await expect(control.locator('option')).toHaveText(['Default', 'Compact']);
+    await expect(popup.locator('#messageDensityLabel')).toHaveText('Message appearance');
+    await expect(control.locator('option')).toHaveText(['Default', 'Compact', 'Minimal']);
+    await control.selectOption('minimal');
+    await expectStorageValue(context, 'messageDensity', 'minimal');
     await control.selectOption('compact');
     await expectStorageValue(context, 'messageDensity', 'compact');
   });

@@ -454,11 +454,19 @@ export class NativeChatTransport implements ControlledChat {
     const renderer: JsonObject = {
       authorExternalChannelId: channel,
       authorName: { simpleText: author },
+      authorBadges: (message.badges || []).map(kind => ({
+        liveChatAuthorBadgeRenderer: {
+          tooltip: kind === 'verified' ? 'Verified' : 'Member',
+          ...(kind === 'verified'
+            ? { icon: { iconType: 'VERIFIED' } }
+            : { customThumbnail: { thumbnails: [{ url: 'https://www.youtube.com/favicon.ico' }] } })
+        }
+      })),
       authorPhoto: {
         thumbnails: [
           {
             height: 32,
-            url: createAvatarDataUrl(author),
+            url: message.avatarUrl || createAvatarDataUrl(author),
             width: 32
           }
         ]

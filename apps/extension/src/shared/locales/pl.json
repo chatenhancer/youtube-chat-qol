@@ -91,7 +91,7 @@
       "other": "{count} zapisanych wiadomości"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "Pokaż ostatnie wiadomości",
+    "viewUser": "Zobacz {user}",
     "stateOff": "wył.",
     "selectOff": "Wył.",
     "stateOn": "wł.",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "Gęstość wiadomości"
+      "message": "Wygląd wiadomości"
     },
     "messageDensityTitle": {
-      "message": "Wybierz odstępy między wiadomościami na czacie YouTube."
+      "message": "Wybierz sposób wyświetlania wiadomości na czacie YouTube."
     },
     "messageDensityHelper": {
-      "message": "Wyświetlaj więcej wiadomości bez zmiany rozmiaru tekstu."
+      "message": "Wybierz sposób wyświetlania wiadomości w strumieniu czatu."
     },
     "messageDensityDefault": {
       "message": "Domyślna"
     },
     "messageDensityCompact": {
       "message": "Kompaktowa"
+    },
+    "messageDensityMinimal": {
+      "message": "Minimalny"
     },
     "popupResetItemBookmarks": {
       "message": "Zakładki"

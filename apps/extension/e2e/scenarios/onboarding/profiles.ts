@@ -18,6 +18,7 @@ export const onboardingProfilePreviewScenario: ExtensionScenario = async ({ cont
       const avatar = message.locator('#author-photo');
       const name = await message.locator('#author-name').innerText();
       const text = await message.locator('#message').innerText();
+      await expect(avatar).toHaveAttribute('aria-label', `View ${name}`);
       await avatar.click();
       await expect(card).toBeVisible();
       await expect(card.locator('.ytcq-profile-card-title')).toHaveText(name);

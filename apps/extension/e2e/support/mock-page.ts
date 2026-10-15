@@ -31,6 +31,8 @@ export async function appendMockFixtureMessage(
   chat: ChatSurface,
   message: {
     author: string;
+    avatarUrl?: string;
+    badges?: ('member' | 'verified')[];
     channel?: string;
     text: string;
   }
@@ -43,6 +45,8 @@ export async function appendMockFixtureMessage(
     const appendMessage = (window as typeof window & {
       ytcqAppendFixtureMessage?: (_message: {
         author: string;
+        avatarUrl?: string;
+        badges?: ('member' | 'verified')[];
         channel?: string;
         text: string;
       }) => Promise<string | null> | string | null;

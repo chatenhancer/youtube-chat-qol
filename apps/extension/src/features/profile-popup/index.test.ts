@@ -177,7 +177,7 @@ describe('profile popup coordinator', () => {
     expect(card).not.toBeNull();
     expect(card.getAttribute('aria-label')).toBe('Recent messages from this user');
     expect(message.dataset.ytcqProfileWired).toBe('true');
-    expect(avatar.title).toBe('Show recent messages');
+    expect(avatar.title).toBe('View @ViewerOne');
     expect(messageMocks.renderProfileMessages).toHaveBeenCalled();
     const author = card.querySelector<HTMLElement>('.ytcq-profile-card-author');
     expect(author?.dir).toBe('auto');
@@ -275,7 +275,9 @@ describe('profile popup coordinator', () => {
     document.body.append(message);
 
     wireProfileClick(message);
+    message.querySelector<HTMLElement>('#author-name')!.textContent = '@UpdatedViewer';
     wireProfileClick(message);
+    expect(avatar.title).toBe('View @UpdatedViewer');
     avatar.click();
     expect(sourceMocks.getMessageProfileSource).toHaveBeenCalledOnce();
 
@@ -424,6 +426,8 @@ describe('profile popup coordinator', () => {
     document.body.append(participant);
 
     wireParticipantProfileClick(participant);
+    expect(participant.querySelector<HTMLElement>('#img')!.title).toBe('View @Participant');
+    expect(participant.querySelector<HTMLElement>('#author-name')!.title).toBe('View @Participant');
     participant.querySelector<HTMLElement>('#author-name')!.click();
 
     expect(document.querySelector('.ytcq-profile-card')).not.toBeNull();

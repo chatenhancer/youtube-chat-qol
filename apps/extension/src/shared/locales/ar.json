@@ -91,7 +91,7 @@
       "other": "{count} رسائل محفوظة"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "عرض الرسائل الأخيرة",
+    "viewUser": "عرض {user}",
     "stateOff": "متوقف",
     "selectOff": "متوقف",
     "stateOn": "مشغل",
@@ -925,19 +925,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "كثافة الرسائل"
+      "message": "مظهر الرسائل"
     },
     "messageDensityTitle": {
-      "message": "اختر مدى تقارب الرسائل في دردشة YouTube."
+      "message": "اختر كيفية ظهور الرسائل في دردشة YouTube."
     },
     "messageDensityHelper": {
-      "message": "اعرض المزيد من الرسائل في الدردشة دون تغيير حجم النص."
+      "message": "اختر كيفية عرض الرسائل في سجل الدردشة."
     },
     "messageDensityDefault": {
       "message": "افتراضية"
     },
     "messageDensityCompact": {
       "message": "مضغوطة"
+    },
+    "messageDensityMinimal": {
+      "message": "مبسط"
     },
     "popupResetItemBookmarks": {
       "message": "الإشارات"

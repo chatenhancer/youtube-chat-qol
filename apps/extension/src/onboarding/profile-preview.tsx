@@ -47,7 +47,7 @@ export async function initProfilePreview(root: HTMLElement): Promise<void> {
     author.style.setProperty('--ytcq-avatar-ring-color', ringColor);
     avatar.setAttribute('role', 'button');
     avatar.setAttribute('aria-haspopup', 'dialog');
-    avatar.setAttribute('aria-label', `${t('showRecentMessages')}: ${authorName}`);
+    avatar.setAttribute('aria-label', t('viewUser', { user: authorName }));
     avatar.removeAttribute('aria-hidden');
     avatar.tabIndex = 0;
     avatar.addEventListener('click', open);

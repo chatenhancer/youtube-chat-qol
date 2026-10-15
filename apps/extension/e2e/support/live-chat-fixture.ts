@@ -397,7 +397,7 @@ export function createLiveChatFixtureHtml({
       const createMessage = (fixtureMessage, number) => {
         const id = getMessageId(number);
         const message = document.createElement('yt-live-chat-text-message-renderer');
-        const avatarSrc = createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number);
+        const avatarSrc = fixtureMessage.avatarUrl || createAvatarSrc(fixtureMessage.author.replace(/^@/, '').slice(0, 1).toUpperCase(), number);
         const channelId = fixtureMessage.channel || \`UCFixtureChannel\${number}\`;
         message.id = id;
         message.innerHTML = \`
@@ -422,10 +422,30 @@ export function createLiveChatFixtureHtml({
             </yt-icon-button>
           </div>
         \`;
+        const authorBadges = (fixtureMessage.badges || []).map(kind => ({
+          liveChatAuthorBadgeRenderer: {
+            tooltip: kind === 'verified' ? 'Verified' : 'Member',
+            ...(kind === 'verified'
+              ? { icon: { iconType: 'VERIFIED' } }
+              : { customThumbnail: { thumbnails: [{ url: 'https://www.youtube.com/favicon.ico' }] } })
+          }
+        }));
+        for (const { liveChatAuthorBadgeRenderer: badge } of authorBadges) {
+          const element = document.createElement('yt-live-chat-author-badge-renderer');
+          element.setAttribute('aria-label', badge.tooltip);
+          const icon = document.createElement('img');
+          icon.width = 16;
+          icon.height = 16;
+          icon.alt = badge.tooltip;
+          icon.src = 'https://www.youtube.com/favicon.ico';
+          element.append(icon);
+          message.querySelector(badge.icon ? '#chip-badges' : '#chat-badges').append(element);
+        }
         message.data = {
           id,
           authorExternalChannelId: channelId,
           authorName: { simpleText: fixtureMessage.author },
+          authorBadges,
           authorPhoto: { thumbnails: [{ url: avatarSrc }] },
           contextMenuEndpoint: createContextMenuEndpoint(id),
           message: { simpleText: fixtureMessage.text },
@@ -505,6 +525,8 @@ export function createLiveChatFixtureHtml({
         nextMessageNumber += 1;
         const fixtureMessage = {
           author: String(overrides.author || '@BrowserTestViewer'),
+          avatarUrl: overrides.avatarUrl,
+          badges: overrides.badges,
           channel: typeof overrides.channel === 'string' ? overrides.channel : '',
           text: String(overrides.text || 'Browser test message')
         };

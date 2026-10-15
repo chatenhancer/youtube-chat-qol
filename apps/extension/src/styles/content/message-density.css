@@ -1,8 +1,8 @@
 /*
- * Optional maximum compaction for ordinary native and Lite chat messages.
- * Typography and action hit areas stay at their normal size.
+ * Compact and Minimal share spacing for ordinary native and Lite chat messages.
+ * Message text and action hit areas stay at their normal size.
  */
-:root[data-ytcq-message-density="compact"] {
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) {
   --ytcq-density-avatar-gap: 8px;
   --ytcq-density-avatar-size: 20px;
   --ytcq-density-content-offset: 2px;
@@ -13,7 +13,7 @@
   --ytcq-density-row-block-padding: 2px;
 }
 
-:root[data-ytcq-message-density="compact"] :where(
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) :where(
   yt-live-chat-text-message-renderer,
   yt-live-chat-membership-item-renderer,
   yt-live-chat-placeholder-item-renderer
@@ -24,7 +24,7 @@
     var(--ytcq-density-feed-inline-padding) !important;
 }
 
-:root[data-ytcq-message-density="compact"] :where(
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) :where(
   yt-live-chat-text-message-renderer,
   yt-live-chat-membership-item-renderer,
   yt-live-chat-placeholder-item-renderer
@@ -39,7 +39,7 @@
   flex-basis: var(--ytcq-density-avatar-size) !important;
 }
 
-:root[data-ytcq-message-density="compact"] :where(
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) :where(
   yt-live-chat-text-message-renderer,
   yt-live-chat-membership-item-renderer,
   yt-live-chat-placeholder-item-renderer
@@ -52,7 +52,7 @@
   max-height: var(--ytcq-density-avatar-size) !important;
 }
 
-:root[data-ytcq-message-density="compact"] :where(
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) :where(
   yt-live-chat-text-message-renderer,
   yt-live-chat-membership-item-renderer,
   yt-live-chat-placeholder-item-renderer
@@ -61,18 +61,18 @@
 }
 
 /* Align YouTube's 32px control with the adjacent 28px bookmark. */
-:root[data-ytcq-message-density="compact"] :where(
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) :where(
   yt-live-chat-text-message-renderer,
   yt-live-chat-membership-item-renderer
 ) > #menu:has(> .ytcq-chat-bookmark-toggle) > #menu-button {
   top: var(--ytcq-density-menu-top);
 }
 
-:root[data-ytcq-message-density="compact"] .ytcq-lite-items {
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) .ytcq-lite-items {
   padding-block: var(--ytcq-density-items-block-padding);
 }
 
-:root[data-ytcq-message-density="compact"] .ytcq-lite-message {
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) .ytcq-lite-message {
   min-height: 24px;
   grid-template-columns: var(--ytcq-density-avatar-size) minmax(0, 1fr);
   column-gap: var(--ytcq-density-avatar-gap);
@@ -80,11 +80,11 @@
     var(--ytcq-density-row-block-padding) var(--ytcq-density-feed-inline-padding);
 }
 
-:root[data-ytcq-message-density="compact"] .ytcq-lite-message-menu {
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) .ytcq-lite-message-menu {
   top: 0;
 }
 
-:root[data-ytcq-message-density="compact"] :where(
+:root:is([data-ytcq-message-density="compact"], [data-ytcq-message-density="minimal"]) :where(
   .ytcq-lite-author-photo,
   .ytcq-lite-author-photo > img
 ) {
@@ -94,4 +94,42 @@
   height: var(--ytcq-density-avatar-size);
   min-height: var(--ytcq-density-avatar-size);
   max-height: var(--ytcq-density-avatar-size);
+}
+
+:root[data-ytcq-message-density="minimal"] :where(
+  yt-live-chat-item-list-renderer,
+  .ytcq-lite-items
+) #timestamp {
+  display: none !important;
+}
+
+/* Names remain available to message actions and assistive technology. Native
+ * verified badges can be nested in the name, so suppress its text size rather
+ * than hiding the element or changing YouTube-owned nodes. */
+:root[data-ytcq-message-density="minimal"] :where(
+  yt-live-chat-item-list-renderer,
+  .ytcq-lite-items
+) #author-name {
+  margin-inline: 0 !important;
+  padding: 0 !important;
+  font-size: 0 !important;
+  letter-spacing: 0 !important;
+}
+
+:root[data-ytcq-message-density="minimal"] :where(
+  yt-live-chat-item-list-renderer,
+  .ytcq-lite-items
+) #author-name #chip-badges {
+  font-size: 14px;
+}
+
+/* Align a badge-only chip to the message line instead of the hidden name's baseline. */
+:root[data-ytcq-message-density="minimal"] .ytcq-lite-author-chip {
+  vertical-align: top;
+}
+
+/* Avoid empty spacing and keyboard stops when a Lite author has no badges.
+ * Profile access remains on the visible avatar. */
+:root[data-ytcq-message-density="minimal"] .ytcq-lite-author-chip:not(:has(.ytcq-lite-author-badge)) {
+  display: none;
 }

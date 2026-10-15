@@ -91,7 +91,7 @@
       "other": "{count} opgeslagen berichten"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "Recente berichten tonen",
+    "viewUser": "{user} bekijken",
     "stateOff": "uit",
     "selectOff": "Uit",
     "stateOn": "aan",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "Berichtdichtheid"
+      "message": "Berichtweergave"
     },
     "messageDensityTitle": {
-      "message": "Kies hoe dicht berichten in YouTube-chat op elkaar staan."
+      "message": "Kies hoe berichten in YouTube-chat worden weergegeven."
     },
     "messageDensityHelper": {
-      "message": "Toon meer berichten in de chat zonder de tekstgrootte te wijzigen."
+      "message": "Kies hoe berichten in de chatfeed worden weergegeven."
     },
     "messageDensityDefault": {
       "message": "Standaard"
     },
     "messageDensityCompact": {
       "message": "Compact"
+    },
+    "messageDensityMinimal": {
+      "message": "Minimaal"
     },
     "popupResetItemBookmarks": {
       "message": "Bladwijzers"

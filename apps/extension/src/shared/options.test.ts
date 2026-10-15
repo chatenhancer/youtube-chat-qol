@@ -53,6 +53,10 @@ describe('shared option helpers', () => {
     expect(normalizeOptions({}).playgroundGamesAvailable).toBe(true);
   });
 
+  it.each(['default', 'compact', 'minimal'])('preserves the %s message appearance preset', messageDensity => {
+    expect(normalizeOptions({ messageDensity }).messageDensity).toBe(messageDensity);
+  });
+
   it('chooses a target when toggling translation back on', () => {
     expect(getTranslationToggleTarget({ lastTranslationTarget: 'ja', targetLanguage: '' })).toBe('ja');
     expect(getTranslationToggleTarget({ lastTranslationTarget: '', targetLanguage: 'es' })).toBe('es');

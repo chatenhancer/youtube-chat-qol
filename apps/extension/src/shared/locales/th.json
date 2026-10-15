@@ -91,7 +91,7 @@
       "other": "บันทึกแล้ว {count} ข้อความ"
     },
     "settingState": "{label} {state}",
-    "showRecentMessages": "แสดงข้อความล่าสุด",
+    "viewUser": "ดู {user}",
     "stateOff": "ปิด",
     "selectOff": "ปิด",
     "stateOn": "เปิด",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "ความหนาแน่นของข้อความ"
+      "message": "รูปแบบข้อความ"
     },
     "messageDensityTitle": {
-      "message": "เลือกระยะห่างระหว่างข้อความในแชท YouTube"
+      "message": "เลือกรูปแบบการแสดงข้อความในแชท YouTube"
     },
     "messageDensityHelper": {
-      "message": "แสดงข้อความในแชทได้มากขึ้นโดยไม่เปลี่ยนขนาดตัวอักษร"
+      "message": "เลือกวิธีแสดงข้อความในฟีดแชท"
     },
     "messageDensityDefault": {
       "message": "ค่าเริ่มต้น"
     },
     "messageDensityCompact": {
       "message": "กะทัดรัด"
+    },
+    "messageDensityMinimal": {
+      "message": "เรียบง่าย"
     },
     "popupResetItemBookmarks": {
       "message": "บุ๊กมาร์ก"

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPTIONS } from '../shared/options';
 import { CONTENT_INSTANCE_ATTRIBUTE, CONTENT_REATTACHMENT_ATTRIBUTE } from '../shared/content-instance';
+import { PIP_WINDOW_ATTRIBUTE } from '../features/picture-in-picture/bridge';
 import type { FeatureMutationBatch } from './dispatcher';
 import aeroPreset from '../assets/themes/aero.json';
 
@@ -80,6 +81,18 @@ describe('content script entrypoint wiring', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.restoreAllMocks();
+  });
+
+  it.each(['default', 'compact', 'minimal'])('keeps %s appearance compact in the floating player', async messageDensity => {
+    document.documentElement.setAttribute(PIP_WINDOW_ATTRIBUTE, '');
+    try {
+      await chrome.storage.sync.set({ messageDensity });
+      await import('./index');
+      expect(document.documentElement.getAttribute('data-ytcq-message-density'))
+        .toBe(messageDensity === 'minimal' ? 'minimal' : 'compact');
+    } finally {
+      document.documentElement.removeAttribute(PIP_WINDOW_ATTRIBUTE);
+    }
   });
 
   it('processes existing messages and participants before booting the shared observer', async () => {
@@ -469,8 +482,17 @@ describe('content script entrypoint wiring', () => {
 
     storageListener?.({
       messageDensity: {
-        newValue: 'default',
+        newValue: 'minimal',
         oldValue: 'compact'
+      }
+    }, 'sync');
+    expect(getOptions().messageDensity).toBe('minimal');
+    expect(document.documentElement.getAttribute('data-ytcq-message-density')).toBe('minimal');
+
+    storageListener?.({
+      messageDensity: {
+        newValue: 'default',
+        oldValue: 'minimal'
       },
       chatSkin: {
         newValue: 'system',

@@ -323,7 +323,9 @@ function applyChatSkin(options: Pick<Options, 'chatSkin'>): void {
 }
 
 function applyMessageDensity(options: Pick<Options, 'messageDensity'>): void {
-  const density = isPictureInPictureChat() ? 'compact' : options.messageDensity;
+  const density = isPictureInPictureChat() && options.messageDensity !== 'minimal'
+    ? 'compact'
+    : options.messageDensity;
   setMessageDensity(document.documentElement, density);
 }
 

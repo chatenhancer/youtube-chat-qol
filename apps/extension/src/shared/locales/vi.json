@@ -91,7 +91,7 @@
       "other": "{count} tin nhắn đã lưu"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "Hiện tin nhắn gần đây",
+    "viewUser": "Xem {user}",
     "stateOff": "tắt",
     "selectOff": "Tắt",
     "stateOn": "bật",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "Mật độ tin nhắn"
+      "message": "Giao diện tin nhắn"
     },
     "messageDensityTitle": {
-      "message": "Chọn khoảng cách giữa các tin nhắn trong cuộc trò chuyện YouTube."
+      "message": "Chọn cách hiển thị tin nhắn trong cuộc trò chuyện YouTube."
     },
     "messageDensityHelper": {
-      "message": "Hiển thị thêm tin nhắn mà không thay đổi cỡ chữ."
+      "message": "Chọn cách hiển thị tin nhắn trong luồng trò chuyện."
     },
     "messageDensityDefault": {
       "message": "Mặc định"
     },
     "messageDensityCompact": {
       "message": "Gọn"
+    },
+    "messageDensityMinimal": {
+      "message": "Tối giản"
     },
     "popupResetItemBookmarks": {
       "message": "Dấu trang"

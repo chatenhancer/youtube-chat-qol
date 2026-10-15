@@ -91,7 +91,7 @@
       "other": "保存済みメッセージ {count} 件"
     },
     "settingState": "{label} {state}。",
-    "showRecentMessages": "最近のメッセージを表示",
+    "viewUser": "{user} を表示",
     "stateOff": "オフ",
     "selectOff": "オフ",
     "stateOn": "オン",
@@ -925,19 +925,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "メッセージ密度"
+      "message": "メッセージの表示"
     },
     "messageDensityTitle": {
-      "message": "YouTube チャットのメッセージ間隔を選択します。"
+      "message": "YouTube チャットでのメッセージの表示方法を選びます。"
     },
     "messageDensityHelper": {
-      "message": "文字サイズを変えずに、より多くのメッセージを表示します。"
+      "message": "チャット欄でのメッセージの表示方法を選びます。"
     },
     "messageDensityDefault": {
       "message": "デフォルト"
     },
     "messageDensityCompact": {
       "message": "コンパクト"
+    },
+    "messageDensityMinimal": {
+      "message": "最小"
     },
     "popupResetItemBookmarks": {
       "message": "ブックマーク"

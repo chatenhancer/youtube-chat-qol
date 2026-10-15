@@ -19,7 +19,7 @@ import {
   settingsMenuScenario
 } from '../../scenarios/menus';
 import { settingsMenuBehaviorScenario } from '../../scenarios/settings';
-import { compactMessageDensityScenario } from '../../scenarios/message-density';
+import { compactMessageDensityScenario, minimalMessageAppearanceScenario } from '../../scenarios/message-density';
 import { customThemesScenario } from '../../scenarios/custom-themes';
 import { customThemeRenderingScenario } from '../../scenarios/custom-theme-rendering';
 import { customThemeImagesScenario } from '../../scenarios/custom-theme-images';
@@ -58,6 +58,11 @@ export const chatScenarios: readonly YouTubeScenario[] = [
     title: 'Compact message density combines with themes without changing typography',
     run: compactMessageDensityScenario,
     on: pair.liveLoggedIn
+  },
+  {
+    title: 'Minimal message appearance hides usernames and preserves badges, profiles, and incoming messages',
+    run: minimalMessageAppearanceScenario,
+    on: [...pair.liveLoggedIn, ...pair.liveLoggedOut]
   },
   {
     title: 'chat settings menu receives extension controls',

@@ -29,6 +29,7 @@ describe('profile mention decoration', () => {
     expect(root.querySelector('.ytcq-profile-mention')?.parentElement).toBe(root);
     mentions.forEach((mention) => {
       expect(mention.dataset.ytcqProfileMention).toBe(mention.textContent);
+      expect(mention.title).toBe(`View ${mention.textContent}`);
       expect(mention.getAttribute('role')).toBe('button');
       expect(mention.tabIndex).toBe(0);
       expect(isExtensionManagedElement(mention)).toBe(true);
@@ -54,7 +55,7 @@ describe('profile mention decoration', () => {
 
   it('reuses and preserves a native linked mention instead of nesting a control inside it', () => {
     const root = document.createElement('span');
-    root.innerHTML = '<a href="/channel/linked-channel">@LinkedViewer</a>';
+    root.innerHTML = '<a href="/channel/linked-channel" title="Native profile">@LinkedViewer</a>';
     const link = root.querySelector<HTMLAnchorElement>('a')!;
 
     decorateProfileMentions(root, resolveEveryMention);
@@ -67,6 +68,7 @@ describe('profile mention decoration', () => {
 
     expect(root.querySelector('a')).toBe(link);
     expect(link.getAttribute('href')).toBe('/channel/linked-channel');
+    expect(link.title).toBe('Native profile');
     expect(link.classList.contains(PROFILE_MENTION_CLASS)).toBe(false);
     expect(link.dataset.ytcqProfileMention).toBeUndefined();
     expect(link.dataset.ytcqProfileMentionChannelId).toBeUndefined();
@@ -114,10 +116,16 @@ describe('profile mention decoration', () => {
 
     expect(root.querySelector(`.${PROFILE_MENTION_CLASS}`)).toBe(preservedToken);
     expect(preservedToken.getAttribute('role')).toBe('button');
+    expect(preservedToken.title).toBe('View @KnownViewer');
     expect(preservedToken.querySelector('.ytcq-chat-keyword-highlight')?.textContent).toBe(
       'Viewer'
     );
     expect(root.textContent).toBe('Ask @KnownViewer');
+    clearProfileMentions(root);
+    expect(preservedToken.hasAttribute('title')).toBe(false);
+    expect(preservedToken.querySelector('.ytcq-chat-keyword-highlight')?.textContent).toBe(
+      'Viewer'
+    );
   });
 
   it('removes an existing mention control when its matching history disappears', () => {

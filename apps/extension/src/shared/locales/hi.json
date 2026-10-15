@@ -91,7 +91,7 @@
       "other": "{count} सेव किए गए मैसेज"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "हाल के मैसेज दिखाएं",
+    "viewUser": "{user} को देखें",
     "stateOff": "बंद",
     "selectOff": "बंद",
     "stateOn": "चालू",
@@ -925,19 +925,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "मैसेज डेंसिटी"
+      "message": "संदेशों का रूप"
     },
     "messageDensityTitle": {
-      "message": "चुनें कि YouTube चैट में मैसेज कितनी पास-पास दिखें।"
+      "message": "YouTube चैट में संदेश कैसे दिखें, चुनें।"
     },
     "messageDensityHelper": {
-      "message": "टेक्स्ट का आकार बदले बिना चैट में ज़्यादा मैसेज दिखाएँ।"
+      "message": "चुनें कि चैट फ़ीड में संदेश कैसे दिखाए जाएँ।"
     },
     "messageDensityDefault": {
       "message": "डिफ़ॉल्ट"
     },
     "messageDensityCompact": {
       "message": "कॉम्पैक्ट"
+    },
+    "messageDensityMinimal": {
+      "message": "न्यूनतम"
     },
     "popupResetItemBookmarks": {
       "message": "बुकमार्क"

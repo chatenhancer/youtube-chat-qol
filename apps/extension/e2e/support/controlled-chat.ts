@@ -4,6 +4,8 @@ import { appendMockFixtureMessage, pauseMockFixtureMessages } from './mock-page'
 
 export interface ControlledChatMessage {
   author: string;
+  avatarUrl?: string;
+  badges?: ('member' | 'verified')[];
   channel?: string;
   text: string;
 }

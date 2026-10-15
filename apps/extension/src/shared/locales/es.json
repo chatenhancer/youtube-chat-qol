@@ -91,7 +91,7 @@
       "other": "{count} mensajes guardados"
     },
     "settingState": "{label} {state}.",
-    "showRecentMessages": "Mostrar mensajes recientes",
+    "viewUser": "Ver a {user}",
     "stateOff": "desactivado",
     "selectOff": "Desactivado",
     "stateOn": "activado",
@@ -922,19 +922,22 @@
       "message": "Aero"
     },
     "messageDensity": {
-      "message": "Densidad de mensajes"
+      "message": "Apariencia de los mensajes"
     },
     "messageDensityTitle": {
-      "message": "Elige el espaciado entre los mensajes del chat de YouTube."
+      "message": "Elige cómo se muestran los mensajes en el chat de YouTube."
     },
     "messageDensityHelper": {
-      "message": "Muestra más mensajes en el chat sin cambiar el tamaño del texto."
+      "message": "Elige cómo se muestran los mensajes en el flujo del chat."
     },
     "messageDensityDefault": {
       "message": "Predeterminada"
     },
     "messageDensityCompact": {
       "message": "Compacta"
+    },
+    "messageDensityMinimal": {
+      "message": "Mínimo"
     },
     "popupResetItemBookmarks": {
       "message": "Marcadores"

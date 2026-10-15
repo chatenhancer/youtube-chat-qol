@@ -13,11 +13,17 @@ export const themeEditorFeaturesScenario: ExtensionScenario = async ({ context }
   const editor = await context.newPage();
   try {
     await editor.clock.install();
+    await editor.clock.pauseAt(await editor.evaluate(() => Date.now() + 1000));
     await editor.setViewportSize({ width: 1280, height: 960 });
     await editor.goto(`chrome-extension://${extensionId}/themes.html`);
     const preview = editor.frameLocator('#themePreview');
     const name = editor.locator('#themeName');
     await expect(name).toBeEnabled();
+    await test.step('Initial editor loading does not animate a section outline', async () => {
+      await expect(preview.locator('#chatPreview')).toBeVisible();
+      await expect(preview.locator('.theme-area-highlight')).toHaveCount(0);
+    });
+    await editor.clock.resume();
     await expect(preview.locator('#previewInboxIcon')).toHaveAttribute('aria-expanded', 'false');
     await editor.locator('[data-theme-mode="light"]').click();
 

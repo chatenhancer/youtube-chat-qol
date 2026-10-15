@@ -1,4 +1,4 @@
-/** Shared message-density registry for native and Lite chat feeds. */
+/** Message appearance presets; keep the stored density values for existing installs. */
 export const DEFAULT_MESSAGE_DENSITY = 'default';
 
 export const MESSAGE_DENSITY_OPTIONS = [
@@ -9,6 +9,10 @@ export const MESSAGE_DENSITY_OPTIONS = [
   {
     id: 'compact',
     labelMessage: 'messageDensityCompact'
+  },
+  {
+    id: 'minimal',
+    labelMessage: 'messageDensityMinimal'
   }
 ] as const;
 
@@ -20,6 +24,6 @@ export function isMessageDensity(value: unknown): value is MessageDensity {
 }
 
 export function setMessageDensity(root: HTMLElement, value: unknown): void {
-  if (value === 'compact') root.setAttribute('data-ytcq-message-density', value);
+  if (value === 'compact' || value === 'minimal') root.setAttribute('data-ytcq-message-density', value);
   else root.removeAttribute('data-ytcq-message-density');
 }
