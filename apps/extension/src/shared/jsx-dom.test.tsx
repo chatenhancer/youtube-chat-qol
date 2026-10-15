@@ -72,6 +72,24 @@ describe('jsx-dom', () => {
     expect(isExtensionManagedElement(image)).toBe(false);
   });
 
+  it('keeps markup and attribute delimiters literal in text and image sources', () => {
+    const value = 'x" onerror="alert(1)"><script>alert(1)</script>';
+    const wrapper = el<HTMLDivElement>(
+      <div>
+        <span>{value}</span>
+        <img src={value} alt="" />
+      </div>
+    );
+    const image = wrapper.querySelector('img')!;
+
+    expect(wrapper.children).toHaveLength(2);
+    expect(wrapper.querySelector('span')?.textContent).toBe(value);
+    expect(wrapper.querySelector('script')).toBeNull();
+    expect(image.getAttribute('src')).toBe(value);
+    expect(image.getAttribute('onerror')).toBeNull();
+    expect(image.onerror).toBeNull();
+  });
+
   it('removes managed markers from unmanaged descendants', () => {
     const wrapper = el<HTMLSpanElement>(
       <span>
