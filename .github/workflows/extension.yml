@@ -168,6 +168,7 @@ jobs:
           name: youtube-e2e-test-report
           path: test-results/e2e/playwright-report.json
           if-no-files-found: ignore
+          overwrite: true
           retention-days: 1
 
   verify:
