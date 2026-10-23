@@ -1,9 +1,9 @@
 /**
  * Real YouTube page helpers for end-to-end tests.
  *
- * These helpers keep the live-page navigation, consent prompt handling, and
- * chat iframe access out of individual specs so new real-YouTube tests can
- * stay focused on extension behavior.
+ * These helpers keep the live-page navigation, consent and survey popup
+ * handling, and chat iframe access out of individual specs so new
+ * real-YouTube tests can stay focused on extension behavior.
  */
 import { expect, type FrameLocator, type Locator, type Page } from '@playwright/test';
 import { defaultLiveUrl, defaultReplayUrl, getLiveProfileDir } from './paths';
@@ -12,6 +12,7 @@ const CHAT_FRAME_SELECTOR = 'iframe#chatframe';
 const COMPOSER_TIMEOUT_MS = 30_000;
 const INITIAL_CHAT_FRAME_TIMEOUT_MS = 15_000;
 const LIVE_PAGE_TIMEOUT_MS = 60_000;
+const SURVEY_POPUP_SELECTOR = 'ytd-popup-container ytd-single-option-survey-renderer';
 const YOUTUBE_PAGE_HOSTNAMES = new Set(['youtube.com', 'www.youtube.com']);
 const CONSENT_REJECT_BUTTON_NAMES = [
   /Reject all/i,
@@ -62,6 +63,7 @@ export async function resumeLiveChat(page: Page): Promise<void> {
 }
 
 export async function openLiveChat(page: Page, liveUrl: string): Promise<FrameLocator> {
+  await dismissYouTubeSurveysWhenShown(page);
   for (const timeout of [INITIAL_CHAT_FRAME_TIMEOUT_MS, LIVE_PAGE_TIMEOUT_MS]) {
     await gotoLiveChatPage(page, liveUrl);
     await dismissYouTubeConsentIfPresent(page);
@@ -328,6 +330,17 @@ export async function getUnavailableSignedInReason(page: Page): Promise<string> 
   }
 
   return '';
+}
+
+async function dismissYouTubeSurveysWhenShown(page: Page): Promise<void> {
+  // YouTube can open its recommendations survey over the chat at any point.
+  // Playwright checks for it before every action, including clicks inside the
+  // chat frame. Replacing any earlier handler keeps repeat opens from stacking.
+  const survey = page.locator(SURVEY_POPUP_SELECTOR);
+  await page.removeLocatorHandler(survey);
+  await page.addLocatorHandler(survey, (popup) =>
+    popup.locator('#header yt-icon-button').click()
+  );
 }
 
 export async function dismissYouTubeConsentIfPresent(page: Page): Promise<void> {
