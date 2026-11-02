@@ -76,7 +76,7 @@ jobs:
   build-and-e2e-deterministic:
     name: Build extensions and run deterministic tests
     if: github.event_name != 'schedule'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Playwright 1.60 does not support Ubuntu 26.04.
     permissions:
       contents: read
     steps:
@@ -126,7 +126,7 @@ jobs:
 
   e2e-youtube:
     name: Test YouTube integration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Playwright 1.60 does not support Ubuntu 26.04.
     permissions:
       contents: read
     steps:

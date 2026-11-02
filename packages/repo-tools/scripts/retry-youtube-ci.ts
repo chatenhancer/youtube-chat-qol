@@ -1,4 +1,4 @@
-/* Retry the YouTube CI job once on a fresh runner when Google blocks chat setup. */
+/* Retry the YouTube CI job once on a fresh runner when live chat setup fails on YouTube's side. */
 import type { JSONReport, JSONReportSuite, JSONReportTest } from '@playwright/test/reporter';
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
@@ -24,8 +24,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
     'run', 'view', runId, '--repo', repo, '--json', 'attempt,status,conclusion,jobs'
   ], { encoding: 'utf8' }));
   const report = JSON.parse(readFileSync(reportPath, 'utf8'));
-  const jobId = getYouTubeChallengeRetryJob(run, report);
-  let message = 'No retry: this run was already retried or has failures beyond Google-blocked chat setup.';
+  const jobId = getYouTubeSetupRetryJob(run, report);
+  let message = 'No retry: this run was already retried or has failures beyond YouTube chat setup.';
   if (jobId !== undefined) {
     // GitHub also re-runs dependent jobs, including the final verification gate.
     execFileSync('gh', ['run', 'rerun', '--repo', repo, '--job', String(jobId)], {
@@ -39,7 +39,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
   }
 }
 
-export function getYouTubeChallengeRetryJob(run: WorkflowRun, report: JSONReport): number | undefined {
+export function getYouTubeSetupRetryJob(run: WorkflowRun, report: JSONReport): number | undefined {
   if (run.attempt !== 1 || run.status !== 'completed' || run.conclusion !== 'failure') return;
   const job = run.jobs.find((candidate) => candidate.name === 'Test YouTube integration');
   if (job?.conclusion !== 'failure') return;
@@ -53,8 +53,8 @@ export function getYouTubeChallengeRetryJob(run: WorkflowRun, report: JSONReport
   if (!failures.every((test) => test.projectName === 'youtube-live-logged-out'
     && test.status === 'unexpected' && test.results.length > 0
     && test.results.every((result) => result.status === 'failed'
-      && isGoogleChallenge(result.error?.message)
-      && result.errors.every((error) => isGoogleChallenge(error.message))))) return;
+      && isYouTubeSetupFailure(result.error?.message)
+      && result.errors.every((error) => isYouTubeSetupFailure(error.message))))) return;
 
   return job.databaseId;
 }
@@ -64,6 +64,13 @@ function collectTests(suites: JSONReportSuite[]): JSONReportTest[] {
     ...(suite.specs ?? []).flatMap((spec) => spec.tests),
     ...collectTests(suite.suites ?? [])
   ]);
+}
+
+function isYouTubeSetupFailure(message: string | undefined): boolean {
+  // The live fixtures wait for YouTube's first chat poll right after opening chat.
+  // Playwright appends the source snippet to listed errors, so compare the first line.
+  return isGoogleChallenge(message) || message?.split('\n', 1)[0] ===
+    'Error: YouTube did not make a live-chat continuation request through the test interceptor.';
 }
 
 function isGoogleChallenge(message: string | undefined): boolean {

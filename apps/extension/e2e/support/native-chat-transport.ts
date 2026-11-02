@@ -156,7 +156,12 @@ export class NativeChatTransport implements ControlledChat {
     // tab. Fresh extension profiles also open onboarding once, so make the
     // controlled watch page the active surface before measuring delivery.
     await this.page.bringToFront();
-    await this.waitUntilReady();
+    // Keep this distinct from the setup wait, which CI may retry on a fresh runner.
+    await withTimeout(
+      this.readyPromise,
+      DEFAULT_DELIVERY_TIMEOUT_MS,
+      'YouTube did not resume live-chat continuation requests after the chat frame reloaded.'
+    );
     const startedAt = performance.now();
     const queued = messages.map((message) => this.createQueuedMessage(message));
     this.queuedMessages.push(...queued);

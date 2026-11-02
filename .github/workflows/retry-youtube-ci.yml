@@ -7,7 +7,7 @@ on:
 
 jobs:
   retry:
-    name: Retry Google-blocked YouTube tests
+    name: Retry YouTube chat setup failures
     if: github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.run_attempt == 1
     runs-on: ubuntu-latest
     permissions:
@@ -32,7 +32,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           name: youtube-e2e-test-report
           path: ${{ runner.temp }}/youtube-ci-report
-      - name: Retry only a Google challenge failure, once
+      - name: Retry only a YouTube chat setup failure, once
         if: steps.report.outcome == 'success'
         run: node packages/repo-tools/scripts/retry-youtube-ci.ts
         env:
